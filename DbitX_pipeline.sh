@@ -195,19 +195,21 @@ exon_intervals=$(dirname $reference)/$reference_basename.exon.intervals
 rRNA_intervals=$(dirname $reference)/$reference_basename.rRNA.intervals
 picard_jar=${dropseq_root}/3rdParty/picard/picard.jar
 
-r1=$1
-r2=$2
 
 tagged_unmapped_bam=${tmpdir}/unaligned_tagged_BC_filtered.bam
 aligned_sam=${tmpdir}/star.Aligned.out.sam
 aligned_sorted_bam=${tmpdir}/aligned.sorted.bam
 files_to_delete="${aligned_sorted_bam} ${aligned_sam} ${tagged_unmapped_bam}"
 
+# Read fastq files
+r1=$1
+r2=$2
+
 ## Stage 0: Filter .fastq files and generate .bam file
 
 # filter fastq files for minimum length
-filter_fastq="cutadapt --minimum-length ${min_lengths} -j 4 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2} \
-| tee ${tmpdir}/cutadapt_filter.out"
+filter_fastq="cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length ${min_lengths} -j 4 \
+-o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2} | tee ${tmpdir}/cutadapt_filter.out"
 
 # generate .bam file
 generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz ${r1} O=${outdir}/unmapped.bam SM=37_13 \
