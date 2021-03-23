@@ -1,4 +1,54 @@
 # DbitX_toolbox
+
+## Requirements
+
+#### 1. Drop-seq toolbox
+
+This toolbox is based on the Drop-seq toolbox 2.1.0 which can be also downloaded here:
+https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
+
+#### Samtools
+Download and instructions from: https://www.htslib.org/download/
+
+```
+# download samtools
+wget https://github.com/samtools/samtools/releases/download/1.12/samtools-1.12.tar.bz2
+
+# unzip
+tar -xf samtools-1.12.tar.bz2
+
+# install
+cd samtools-1.x    # and similarly for bcftools and htslib
+./configure --without-curses --prefix=/where/to/install
+make
+make install
+
+# add permanently to path variable
+nano ~/.bashrc
+
+# add following command at the end of .bashrc file
+export PATH=/where/to/install/bin:$PATH
+
+# save with CTRL+O and exit with CTRL+X
+```
+
+Use samtools for example with following command to show the head of a .bam file:
+```
+samtools view file.bam | head
+```
+
+## Create environment for pipeline and install necessary packages
+```
+# create python3 environment (cutadapt needs python 3 to use multiple cores)
+conda create -n dbitx_toolbox python=3
+conda activate dbitx_toolbox
+
+python3 -m pip install --user --upgrade cutadapt
+
+# to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
+conda install -c anaconda ipykernel
+ python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
+```
  
 ## Generate fastq files from .bcl files
 
