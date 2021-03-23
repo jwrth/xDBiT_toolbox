@@ -155,7 +155,7 @@ fi
 check_set "$genomedir" "Genome directory" "-g"
 check_set "$reference" "Reference fasta"  "-r"
 
-if (( $# != 1 ))
+if (( $# != 2 ))
 then error_exit "Incorrect number of arguments"
 fi
 
@@ -208,7 +208,7 @@ r2=$2
 ## Stage 0: Filter .fastq files and generate .bam file
 
 # filter fastq files for minimum length
-filter_fastq="cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length ${min_lengths} -j 4 \
+filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length ${min_lengths} -j 4 \
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2} | tee ${tmpdir}/cutadapt_filter.out"
 
 # generate .bam file
@@ -247,7 +247,8 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${outdir}/polyA_trimmin
 split_bam="bash ${splitseq_root}/src/splitbam.sh ${tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${splitseq_root}/src/Dbitseq_barcode_filtering_v1.py -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} -b ${barcode_dir} -a ${dist_alg} -z ${dist_threshold} ${multithreading}"
+filter_barcodes="python ${splitseq_root}/src/Dbitseq_barcode_filtering_v1.py -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
+-b ${barcode_dir} -a ${dist_alg} -z ${dist_threshold} ${multithreading}"
 
 # add header and merge all bam files for alignment
 merge_filtered_bam="bash ${splitseq_root}/src/mergebam.sh ${tmpdir}/tmp_split ${tagged_unmapped_bam}"
