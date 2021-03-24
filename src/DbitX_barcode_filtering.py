@@ -95,31 +95,43 @@ def sum_dicts(dictlist):
     result = dict(counter)
     return result
 
-def create_barcode_dictionary(barcode_dataframe, wells_used_in_barcoding_round):
+# def create_barcode_dictionary(barcode_dataframe, wells_used_in_barcoding_round):
+#     '''
+#     Function to generate barcode dictionary.
+#     Expects following inputs:
+#         1. 'barcode_dataframe': Dataframe with all barcodes and columns 'WellPosition' and 'Barcode'.
+#         2. 'wells_used_in_barcoding_round': List of barcodes that are used in this barcoding round.
+#     '''
+    
+#     bc_dict = {barcode_dataframe.Barcode.values[i]:barcode_dataframe.WellPosition.values[i][0]+barcode_dataframe.WellPosition.values[i][1:].zfill(2) \
+#             for i in range(len(barcode_dataframe.Barcode.values)) if barcode_dataframe.WellPosition.values[i] in wells_used_in_barcoding_round}
+#     return bc_dict
+
+# def create_assignment_dictionary(WellPosition, Coordinates):
+#     '''
+#     Function to generate dictionary to assign barcodes to coordinates.
+#     Expects following input:
+#         1. 'WellPosition': List or Series of well positions (e.g. A1, A10,...)
+#         2. 'Coordinates': List of Series of spot coordinates that correspond with the well positions.
+#     '''
+#     assign_dict = {WellPosition[i][0]+WellPosition[i][1:].zfill(2): int(Coordinates[i]) \
+#                  for i in range(len(WellPosition)) if not pd.isnull(WellPosition[i])}
+#     return assign_dict
+
+def create_barcode_dict(barcode_legend, coordinate_name):
     '''
     Function to generate barcode dictionary.
     Expects following inputs:
-        1. 'barcode_dataframe': Dataframe with all barcodes and columns 'WellPosition' and 'Barcode'.
-        2. 'wells_used_in_barcoding_round': List of barcodes that are used in this barcoding round.
+        1. 'barcode_legend': data from .csv file with columns: [WellPosition, Name, Barcode, X, Y, Z]
+        2. 'coordinate_name': name of coordinate.
     '''
-    
-    bc_dict = {barcode_dataframe.Barcode.values[i]:barcode_dataframe.WellPosition.values[i][0]+barcode_dataframe.WellPosition.values[i][1:].zfill(2) \
-            for i in range(len(barcode_dataframe.Barcode.values)) if barcode_dataframe.WellPosition.values[i] in wells_used_in_barcoding_round}
-    return bc_dict
-
-def create_assignment_dictionary(WellPosition, Coordinates):
-    '''
-    Function to generate dictionary to assign barcodes to coordinates.
-    Expects following input:
-        1. 'WellPosition': List or Series of well positions (e.g. A1, A10,...)
-        2. 'Coordinates': List of Series of spot coordinates that correspond with the well positions.
-    '''
-    assign_dict = {WellPosition[i][0]+WellPosition[i][1:].zfill(2): int(Coordinates[i]) \
-                 for i in range(len(well_coord_assign)) if not pd.isnull(WellPosition[i])}
-    return assign_dict
+    d = {barcode: [well[0] + well[1:].zfill(2), int(coord)] for (barcode, well, coord) in zip(barcode_legend["Barcode"],
+                                                          barcode_legend["WellPosition"],
+                                                          barcode_legend[coordinate_name]) if not pd.isnull(coord)}
+    return d
 
 def check_barcode(entry, barcode, tag, barcode_name, barcode_list, barcode_dict, assign_dict, 
-    record_dict, record_well_count, dist_threshold):
+    count_dict, record_well_count, dist_threshold):
     if barcode in barcode_list:
     # not all barcodes were found directly but bc1
     #print("Barcode 1 found directly")
@@ -129,7 +141,7 @@ def check_barcode(entry, barcode, tag, barcode_name, barcode_list, barcode_dict,
     entry.set_tag(tag, str(coord))
 
     # record
-    record_dict[barcode_name + "_direct"]+=1
+    count_dict[barcode_name + "_direct"]+=1
     record_well[well]+=1
 
     else:
@@ -145,11 +157,13 @@ def check_barcode(entry, barcode, tag, barcode_name, barcode_list, barcode_dict,
             entry.set_tag(tag, str(coord))
 
             # record
-            record_dict[barcode_name + "_fuzzy"]+=1
+            count_dict[barcode_name + "_fuzzy"]+=1
             record_well_count[well]+=1
         else:
             keep=False
     return keep
+
+
 
 
 def spatialfilter(in_bam):
@@ -174,46 +188,40 @@ def spatialfilter(in_bam):
     #n = np.zeros(9, dtype=np.int32)
 
     #%% Import barcode and well assignment files
-    bcs = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes*.csv"))[0])
-    well_coord_assign = pd.read_csv(glob.glob(os.path.join(bc_dir,"*assignment*.csv"))[0])
-
-    #%% Generate dictionaries for barcode-well-coordinate assignment
-    #bcx_dict = {bcx.Barcode.values[x]:bcx.WellPosition.values[x][0]+bcx.WellPosition.values[x][1:].zfill(2) for x in range(len(bcx.Barcode.values))}
-    #bcy_dict = {bcy.Barcode.values[x]:bcy.WellPosition.values[x][0]+bcy.WellPosition.values[x][1:].zfill(2) for x in range(len(bcy.Barcode.values))}
-
-    bcx_dict = create_barcode_dictionary(barcode_dataframe=bcs, 
-                                         wells_used_in_barcoding_round=well_coord_assign.X_WellPosition.values)
-    bcy_dict = create_barcode_dictionary(barcode_dataframe=bcs, 
-                                         wells_used_in_barcoding_round=well_coord_assign.Y_WellPosition.values)
-    bcz_dict = create_barcode_dictionary(barcode_dataframe=bcs, 
-                                         wells_used_in_barcoding_round=well_coord_assign.Z_WellPosition.values)
-
-    #%% Generate dictionaries for barcode-well assignment
-    #x_assign_dict = {well_coord_assign.X_Well[x][0]+well_coord_assign.X_Well[x][1:].zfill(2):well_coord_assign.X_Coord[x] for x in range(len(well_coord_assign)) if not pd.isnull(well_coord_assign.X_Well[x])}
-    #y_assign_dict = {well_coord_assign.Y_Well[x][0]+well_coord_assign.Y_Well[x][1:].zfill(2):well_coord_assign.Y_Coord[x] for x in range(len(well_coord_assign)) if not pd.isnull(well_coord_assign.Y_Well[x])}
-
-    x_assign_dict = create_assignment_dictionary(WellPosition=well_coord_assign.X_WellPosition,
-                                                 Coordinates=well_coord_assign.X_Coord)
-    y_assign_dict = create_assignment_dictionary(WellPosition=well_coord_assign.Y_WellPosition,
-                                                 Coordinates=well_coord_assign.Y_Coord)
-    z_assign_dict = create_assignment_dictionary(WellPosition=well_coord_assign.Z_WellPosition,
-                                                 Coordinates=well_coord_assign.Z_Coord)
+    bcs = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
+    #well_coord_assign = pd.read_csv(glob.glob(os.path.join(bc_dir,"*assignment*.csv"))[0])
 
     record_dict = {
-    'total_count': 0,
-    'x_direct': 0,
-    'y_direct': 0,
-    'z_direct': 0,
-    'all_direct': 0,
-    'x_fuzzy': 0,
-    'y_fuzzy': 0,
-    'z_fuzzy': 0,
-    'total_count_kept': 0
+    'total_count': 0, 
+    'total_count_kept': 0,
+    'all_direct': 0
     }
 
-    n_wellx = {e[0]+e[1:].zfill(2):0 for e in bcx_dict.values()}
-    n_welly = {e[0]+e[1:].zfill(2):0 for e in bcy_dict.values()}
-    n_wellz = {e[0]+e[1:].zfill(2):0 for e in bcz_dict.values()}
+    if mode == 'Dbit-seq':
+        coord_names = ['X', 'Y']
+
+    elif mode == 'DbitX':
+        coord_names = ['X', 'Y', 'Z']
+
+    else:
+        # exit script
+        sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
+
+    # create barcode dictionary
+    barcode_dicts = {name: create_barcode_dict(barcode_legend, name) for name in coord_names}
+
+    # setup recording dictionary
+    record_dict = {
+    'total_count': 0, 
+    'total_count_kept': 0,
+    'all_direct': 0
+    }
+
+    for name in coord_names:
+        record_dict[name] = {}
+        record_dict[name]['direct'] = 0
+        record_dict[name]['fuzzy'] = 0
+        record_dict[name]['well_counts'] = {e[0][0]+e[0][1:].zfill(2):0 for e in barcode_dicts[name].values()}
 
     # set up list to collect the barcodes for later statistics
     all_bcs =  [None]*est_num_cells*100
@@ -229,46 +237,38 @@ def spatialfilter(in_bam):
         record_dict['total_count']+=1
         keep = True
 
-        # extract barcodes from tags
-        x = entry.get_tag('XX')
-        y = entry.get_tag('XY')
-        z = entry.get_tag('XZ')
+        # extract barcodes from entry
+        barcodes = {name: entry.get_tag("X" + name) for name in coord_names}
 
-        if x in bcx.Barcode.values and y in bcy.Barcode.values and z in bcz.Barcode.values:
-            # both barcodes directly found
-            # record finding
-            record_dict['x_direct']+=1
-            record_dict['y_direct']+=1
-            record_dict['z_direct']+=1
-            record_dict['all_direct']+=1
-
-            # get well tag
-            z_well = bcz_dict[z]
-            x_well = bcx_dict[x]
-            y_well = bcy_dict[y]
+        # check if all barcodes are in the respective barcode sets
+        if np.all([barcodes[name] in barcode_dicts[name] for name in coord_names]):
+            # if both barcodes directly found:
+            # get well coordinate
+            wells = {name: barcode_dicts[name][bc][0] for (name, bc) in barcodes.items()}
 
             # get coordinate
-            z_coord = z_assign_dict[z_well]
-            x_coord = x_assign_dict[x_well]
-            y_coord = y_assign_dict[y_well]
+            coords = {name: barcode_dicts[name][bc][1] for (name, bc) in barcodes.items()}
 
             # save coordinate as tag
-            entry.set_tag('XZ', str(z_coord))
-            entry.set_tag('XX', str(x_coord))
-            entry.set_tag('XY', str(y_coord))
+            for name in coord_names:
+                entry.set_tag('X' + name, str(coords[name]))
 
-            n_wellz[z_well]+=1
-            n_wellx[x_well]+=1
-            n_welly[y_well]+=1
+
+            # record findings
+            for name in coord_names:
+                record_dict[name]['direct']+=1
+
+                well = wells[name]
+                record_dict[name]['well_counts'][well]+=1
+
+            record_dict['all_direct']+=1            
 
         else:
-            barcodes = [x, y, z]
-            tags = ['XX', 'XY', 'XZ']
-            names = ['x', 'y', 'z']
+
             for i in range(len(barcodes)):
                 keep = check_barcode(entry=entry, barcode=barcodes[i], tag=tags[i], barcode_name=names[i],
                     barcode_list=bcx.Barcode.values, barcode_dict=bcx_dict, assign_dict=x_assign_dict, 
-                    record_dict=record_dict, record_well_count=n_wellx, dist_threshold=dist_threshold,
+                    count_dict=count_dict, record_well_count=n_wellx, dist_threshold=dist_threshold,
                     keep=keep)
 
         if keep:
@@ -313,6 +313,7 @@ parser.add_argument("--store_discarded",action="store_true",help="Store names of
 parser.add_argument("-a" "--dist_alg", action="store", dest="dist_alg", default="hamming", help="Distance algorithm to be used: levenshtein or hamming")
 parser.add_argument("-z" "--dist_threshold", action="store", dest="dist_threshold", default=1, help="Threshold to be used for levenshtein or hamming distance matching")
 parser.add_argument('-m', action='store_true', help="Use multithreading?")
+parser.add_argument('--mode', action='store', default='DbitX', help="Use multithreading?")
 
 
 #%% Parse input
@@ -328,6 +329,7 @@ bc_dir = args.bc_dir
 dist_alg = args.dist_alg
 dist_threshold = int(args.dist_threshold)
 multi = args.m
+mode = args.mode
 
 split_dir = os.path.join(tmp_dir, 'tmp_split')
 
