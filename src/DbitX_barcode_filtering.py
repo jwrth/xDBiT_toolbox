@@ -130,41 +130,46 @@ def create_barcode_dict(barcode_legend, coordinate_name):
                                                           barcode_legend[coordinate_name]) if not pd.isnull(coord)}
     return d
 
-def check_barcode(entry, barcode, tag, barcode_name, barcode_list, barcode_dict, assign_dict, 
-    count_dict, record_well_count, dist_threshold):
-    if barcode in barcode_list:
-    # not all barcodes were found directly but bc1
-    #print("Barcode 1 found directly")
-    # determine well coordinate and set new tag with well coordinate
-    well = barcode_dict[barcode]
-    coord = assign_dict[well]
-    entry.set_tag(tag, str(coord))
+def check_barcode(entry, barcodes, coord_name, barcode_dictionaries, 
+    record_dict, dist_threshold):
+    
+    barcode = barcodes[name]
+    barcode_dict = barcode_dictionaries[name] # lookup in dictionaries is faster
+    barcode_list = list(barcode_dict.keys()) # iteration through lists is slightly faster
 
-    # record
-    count_dict[barcode_name + "_direct"]+=1
-    record_well[well]+=1
+    if barcode in barcode_dict:
+        # Not all barcodes were found directly but bc1
+        # Determine well coordinate and set new tag with well coordinate
+        well = barcode_dict[barcode][0]
+        coord = barcode_dict[barcode][1]
+
+        entry.set_tag("X" + name, str(coord))
+
+        # record
+        record_dict[name]['direct']+=1
+        record_dict[name]['well_counts'][well]+=1
 
     else:
-    # barcode 1 was not found directly. Fuzzy string matching is applied
-    #print("Fuzzy string matching applied")
-    d = [compute_dist(barcode,bc) for bc in barcode_list]
-    idx = [i for i,e in enumerate(d) if e<=dist_threshold]
+        # Barcode 1 was not found directly. Barcode with certain distance is searched.
+        d = [compute_dist(barcode,bc) for bc in barcode_list]
+        idx = [i for i,e in enumerate(d) if e <= dist_threshold]
 
-        if len(idx)==1:
-            barcode = barcode_list[idx[0]]
-            well = barcode_dict[barcode]
-            coord = assign_dict[well]
-            entry.set_tag(tag, str(coord))
+            if len(idx)==1:
+                barcode = barcode_list[idx[0]]
 
-            # record
-            count_dict[barcode_name + "_fuzzy"]+=1
-            record_well_count[well]+=1
-        else:
-            keep=False
-    return keep
+                well = barcode_dict[barcode][0]
+                coord = assign_dict[well][1]
 
+                entry.set_tag("X" + name, str(coord))
 
+                # record
+                record_dict[name]['corrected']+=1
+                record_dict[name]['well_counts'][well]+=1
 
+            else:
+                keep=False
+
+    return keep, record_dict
 
 def spatialfilter(in_bam):
     # count read length of input bam
@@ -191,12 +196,6 @@ def spatialfilter(in_bam):
     bcs = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
     #well_coord_assign = pd.read_csv(glob.glob(os.path.join(bc_dir,"*assignment*.csv"))[0])
 
-    record_dict = {
-    'total_count': 0, 
-    'total_count_kept': 0,
-    'all_direct': 0
-    }
-
     if mode == 'Dbit-seq':
         coord_names = ['X', 'Y']
 
@@ -220,7 +219,7 @@ def spatialfilter(in_bam):
     for name in coord_names:
         record_dict[name] = {}
         record_dict[name]['direct'] = 0
-        record_dict[name]['fuzzy'] = 0
+        record_dict[name]['corrected'] = 0
         record_dict[name]['well_counts'] = {e[0][0]+e[0][1:].zfill(2):0 for e in barcode_dicts[name].values()}
 
     # set up list to collect the barcodes for later statistics
