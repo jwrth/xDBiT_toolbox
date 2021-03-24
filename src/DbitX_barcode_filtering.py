@@ -371,36 +371,36 @@ if debug_flag:
         print(entry.get_tag('XF'))
         print(entry.get_tag('XM'))
 
+if __name__ == '__main__':
+    if multi:
+        #%% start multithreaded filtering   
+        
+            files = glob.glob(os.path.join(split_dir, 'x*.bam'))
+            ncores = len(files)
+            multifilter = Pool(processes=ncores)
+            results = multifilter.map(spatialfilter, files)
 
-if multi:
-    #%% start multithreaded filtering   
-    if __name__ == '__main__':
-        files = glob.glob(os.path.join(split_dir, 'x*.bam'))
-        ncores = len(files)
-        multifilter = Pool(processes=ncores)
-        results = multifilter.map(spatialfilter, files)
+        # extract and sum up recording variables
+        n = np.array([elem[0] for elem in results]).sum(axis=0)
 
-    # extract and sum up recording variables
-    n = np.array([elem[0] for elem in results]).sum(axis=0)
+        n_wellx = sum_dicts([elem[1][0] for elem in results])
+        n_welly = sum_dicts([elem[1][1] for elem in results])
 
-    n_wellx = sum_dicts([elem[1][0] for elem in results])
-    n_welly = sum_dicts([elem[1][1] for elem in results])
+        all_bcs = [item for sublist in [elem[2] for elem in results] for item in sublist]
+        n_all_bcs = np.array([elem[3] for elem in results]).sum()
 
-    all_bcs = [item for sublist in [elem[2] for elem in results] for item in sublist]
-    n_all_bcs = np.array([elem[3] for elem in results]).sum()
+    else:
+            # without multithreading
+            ncores = 1
+            results = np.array(spatialfilter(input_bam))
 
-else:
-    # without multithreading
-    ncores = 1
-    results = np.array(spatialfilter(input_bam))
+            n = results[0]
 
-    n = results[0]
+            n_wellx = results[1][0]
+            n_welly = results[1][1]
 
-    n_wellx = results[1][0]
-    n_welly = results[1][1]
-
-    all_bcs = results[2]
-    n_all_bcs = results[3]
+            all_bcs = results[2]
+            n_all_bcs = results[3]
 
 
 filter_stop = datetime.now()
