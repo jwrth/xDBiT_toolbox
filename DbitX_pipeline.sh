@@ -214,8 +214,6 @@ r2=$2
 filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length ${min_lengths} -j 4 \
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2}"
 
-# 
-
 # generate .bam file
 generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=37_13"
 
