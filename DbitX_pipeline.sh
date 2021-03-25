@@ -46,8 +46,7 @@ barcode_dir=$splitseq_root/data/barcode_lists
 jobs=1
 dist_alg=hamming
 dist_threshold=1
-multiwell=0
-debugging=0
+mode=DbitX
 
 
 function usage () {
@@ -70,8 +69,7 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -z                  : Threshold for string matching. Default: 1.
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
--m                  : Multiwell mode. Searches for three barcodes.
--u                  : Debugging option. Exits script before alignment.
+-m                  : Mode. Searches for three barcodes.
 EOF
 }
 
@@ -118,7 +116,7 @@ function show_time () {
 }
 
 #getopts parses input options. Options followed by a : expect an input argument. The : at the very beginning prevents standard error messages.
-while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lmu" options; do
+while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lm:" options; do
   case $options in
     d ) dropseq_root=$OPTARG;;
     t ) tmpdir=$OPTARG;;
@@ -135,8 +133,7 @@ while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lmu" options; do
     z ) dist_threshold=$OPTARG;;
     j ) jobs=$OPTARG;;
     l ) clear=1;;
-    m ) multiwell=1;;
-    u ) debugging=1;;
+    m ) mode=$OPTARG;;
     h ) usage
           exit 1;;
     \? ) usage
@@ -146,6 +143,7 @@ while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lmu" options; do
   esac
 done
 shift $(($OPTIND - 1))
+
 
 #Checking inputs
 if [[ "$pipeline" == 1 && -n "$echo_prefix" ]]
@@ -170,13 +168,26 @@ fi
 
 if (( ${jobs} > 1 ))
 then multithreading="-m"
-else multithreading=""
+else 
+    multithreading=""
 fi
 
-if (( $multiwell == 1))
-then min_lengths="35:94"
-else min_lengths="35:56"
+echo ${mode}
+if [[ ${mode} == "DbitX" ]]
+then
+    echo here1
+    min_lengths="35:94"
+    multiwell=1
+elif [[ ${mode} == "Dbit-seq" ]]
+then
+    echo here2
+    min_lengths="35:56"
+    multiwell=0
+else
+    echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'DbitX'/'Dbit-seq')"
+    exit 1
 fi
+
 
 #Create output directories if they do not exist
 if [[ ! -d $outdir ]]
@@ -248,7 +259,7 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${outdir}/polyA_trimmin
 split_bam="bash ${splitseq_root}/src/splitbam.sh ${tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${splitseq_root}/src/Dbitseq_barcode_filtering_v1.py -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
+filter_barcodes="python ${splitseq_root}/src/DbitX_barcode_filtering.py --mode ${mode} -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
 -b ${barcode_dir} -a ${dist_alg} -z ${dist_threshold} ${multithreading}"
 
 # add header and merge all bam files for alignment
@@ -315,10 +326,7 @@ if [[ "${multithreading}" == "-m" ]]
 then $echo_prefix $merge_filtered_bam
 fi
 
-if (( $debugging == 1 ))
-then
-    exit 0 #break here, for testing only
-fi
+exit 0
 
 # Stage 4
 $echo_prefix $sam_to_fastq FASTQ=$tmpdir/unaligned_tagged_BC_filtered.fastq

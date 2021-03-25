@@ -4,9 +4,9 @@
 This is to process Split-seq reads after tagging the bam file with cellular and molecular barcodes.
 
 Input: BAM file with reads that have been filtered, polyA and SMART adapter trimmed, and tagged with the following:
-    - XD: cell barcode 1
-    - XE: cell barcode 2
-    - XF: cell barcode 3
+    - XX: x-coordinate
+    - XY: y-coordinate
+    - (OPTIONAL) XZ: z-coordinate (well coordinate in DbitX)
     - XM: molecular barcode (UMI)
 
 Algorithm:
@@ -14,10 +14,14 @@ Algorithm:
 
 Output:
     - Filtered bam file containing only reads with expected barcodes. Barcodes that are within 1 hamming distance of an expected
-    barcode sequence are corrected. An additional tag XC is added, which corresponds to the concatenated barcode sequences 
-    strating with the RT barcode, then round 1 and round 2 ligation barcodes.
+    barcode sequence are corrected. An additional tag XC is added, which consists of the concatenated coordinates separated by an 'x' (XxYxZ).
 
-Copyright: Rebekka Wegmann, Snijderlab, ETH Zurich, 2019
+
+Copyright: Johannes Wirth, Meier Lab, Helmholtz Pioneer Campus, Helmholtz Zentrum Munich, 2021
+
+
+The code is based on work with a Copyright by Rebekka Wegmann (Snijderlab, ETH Zurich, 2019) which has been published in following GitHub repository: 
+https://github.com/RebekkaWegmann/splitseq_toolbox
 
 # MIT License
 #
@@ -58,6 +62,7 @@ import glob
 import collections
 from multiprocessing import Pool
 import Levenshtein as lv
+import json
 
 
 #%% Functions
@@ -69,8 +74,7 @@ def well2ind(well):
     col = int(well[1:])-1
     return [row,col]
 
-
-def make_plate_overview_mod(well_count):
+def make_plate_overview(well_count):
     # bring the counts per well into a plate layout
     out = np.zeros([8, 12])
     for wellpos in well_count.items():
@@ -95,29 +99,6 @@ def sum_dicts(dictlist):
     result = dict(counter)
     return result
 
-# def create_barcode_dictionary(barcode_dataframe, wells_used_in_barcoding_round):
-#     '''
-#     Function to generate barcode dictionary.
-#     Expects following inputs:
-#         1. 'barcode_dataframe': Dataframe with all barcodes and columns 'WellPosition' and 'Barcode'.
-#         2. 'wells_used_in_barcoding_round': List of barcodes that are used in this barcoding round.
-#     '''
-    
-#     bc_dict = {barcode_dataframe.Barcode.values[i]:barcode_dataframe.WellPosition.values[i][0]+barcode_dataframe.WellPosition.values[i][1:].zfill(2) \
-#             for i in range(len(barcode_dataframe.Barcode.values)) if barcode_dataframe.WellPosition.values[i] in wells_used_in_barcoding_round}
-#     return bc_dict
-
-# def create_assignment_dictionary(WellPosition, Coordinates):
-#     '''
-#     Function to generate dictionary to assign barcodes to coordinates.
-#     Expects following input:
-#         1. 'WellPosition': List or Series of well positions (e.g. A1, A10,...)
-#         2. 'Coordinates': List of Series of spot coordinates that correspond with the well positions.
-#     '''
-#     assign_dict = {WellPosition[i][0]+WellPosition[i][1:].zfill(2): int(Coordinates[i]) \
-#                  for i in range(len(WellPosition)) if not pd.isnull(WellPosition[i])}
-#     return assign_dict
-
 def create_barcode_dict(barcode_legend, coordinate_name):
     '''
     Function to generate barcode dictionary.
@@ -130,11 +111,21 @@ def create_barcode_dict(barcode_legend, coordinate_name):
                                                           barcode_legend[coordinate_name]) if not pd.isnull(coord)}
     return d
 
-def check_barcode(entry, barcodes, coord_name, barcode_dictionaries, 
-    record_dict, dist_threshold):
+def check_barcode_and_add_coord_to_tag(entry, barcodes, coord_name, barcode_dictionaries, 
+    record_dictionary, dist_threshold, compute_dist_function, keep):
+
+    '''
+    Function to check a barcode against a list and add a coordinate tag to a pysam entry.
+    Procedure:
+        1. Check barcode against list.
+        2. If it does not match exactly a distance computation function is applied.
+        3. If unique match is found the barcode is transformed to the spatial coordinate using the barcode dictionary.
+        4. Pysam entry is tagged with coordinate.
+        5. If no match is found the keep variable is set to False.
+    '''
     
-    barcode = barcodes[name]
-    barcode_dict = barcode_dictionaries[name] # lookup in dictionaries is faster
+    barcode = barcodes[coord_name]
+    barcode_dict = barcode_dictionaries[coord_name] # lookup in dictionaries is faster
     barcode_list = list(barcode_dict.keys()) # iteration through lists is slightly faster
 
     if barcode in barcode_dict:
@@ -143,33 +134,35 @@ def check_barcode(entry, barcodes, coord_name, barcode_dictionaries,
         well = barcode_dict[barcode][0]
         coord = barcode_dict[barcode][1]
 
-        entry.set_tag("X" + name, str(coord))
+        entry.set_tag("X" + coord_name, str(coord))
 
         # record
-        record_dict[name]['direct']+=1
-        record_dict[name]['well_counts'][well]+=1
+        record_dictionary[coord_name]['direct']+=1
+        record_dictionary[coord_name]['well_counts'][well]+=1
 
     else:
         # Barcode 1 was not found directly. Barcode with certain distance is searched.
-        d = [compute_dist(barcode,bc) for bc in barcode_list]
+        d = [compute_dist_function(barcode,bc) for bc in barcode_list]
         idx = [i for i,e in enumerate(d) if e <= dist_threshold]
 
-            if len(idx)==1:
-                barcode = barcode_list[idx[0]]
+        if len(idx)==1:
+            barcode = barcode_list[idx[0]]
 
-                well = barcode_dict[barcode][0]
-                coord = assign_dict[well][1]
+            well = barcode_dict[barcode][0]
+            coord = barcode_dict[barcode][1]
 
-                entry.set_tag("X" + name, str(coord))
+            entry.set_tag("X" + coord_name, str(coord))
 
-                # record
-                record_dict[name]['corrected']+=1
-                record_dict[name]['well_counts'][well]+=1
+            # record
+            record_dictionary[coord_name]['corrected']+=1
+            record_dictionary[coord_name]['well_counts'][well]+=1
 
-            else:
-                keep=False
+        else:
+            keep = False
+            coord = None
+            well = None
 
-    return keep, record_dict
+    return entry, record_dictionary, coord, well, keep
 
 def spatialfilter(in_bam):
     # count read length of input bam
@@ -193,18 +186,10 @@ def spatialfilter(in_bam):
     #n = np.zeros(9, dtype=np.int32)
 
     #%% Import barcode and well assignment files
-    bcs = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
+    barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
     #well_coord_assign = pd.read_csv(glob.glob(os.path.join(bc_dir,"*assignment*.csv"))[0])
 
-    if mode == 'Dbit-seq':
-        coord_names = ['X', 'Y']
 
-    elif mode == 'DbitX':
-        coord_names = ['X', 'Y', 'Z']
-
-    else:
-        # exit script
-        sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
 
     # create barcode dictionary
     barcode_dicts = {name: create_barcode_dict(barcode_legend, name) for name in coord_names}
@@ -263,196 +248,240 @@ def spatialfilter(in_bam):
             record_dict['all_direct']+=1            
 
         else:
-
-            for i in range(len(barcodes)):
-                keep = check_barcode(entry=entry, barcode=barcodes[i], tag=tags[i], barcode_name=names[i],
-                    barcode_list=bcx.Barcode.values, barcode_dict=bcx_dict, assign_dict=x_assign_dict, 
-                    count_dict=count_dict, record_well_count=n_wellx, dist_threshold=dist_threshold,
+            coords = {}
+            wells = {}
+            for name in coord_names:
+                
+                # check barcode and add coordinate to tag if matching barcode found.
+                entry, record_dict, coord, well, keep = check_barcode_and_add_coord_to_tag(entry=entry, barcodes=barcodes, coord_name=name, 
+                    barcode_dictionaries=barcode_dicts, record_dictionary=record_dict, dist_threshold=dist_threshold, compute_dist_function=compute_dist,
                     keep=keep)
+
+                # collect the coordinates
+                coords[name] = coord
+                wells[name] = well
 
         if keep:
             # concatenate coordinates
-            xy_coord = str(x_coord) + "," + str(y_coord)
+            coords_list = [str(coords[name]) for name in coord_names]
+            coord_concat = "x".join(coords_list)
 
             # set coordinates as tag and write to output file
-            entry.set_tag('XC', str(xy_coord))
+            entry.set_tag('XC', str(coord_concat))
             outfile.write(entry)
-            if n[6]<est_num_cells*100/ncores:
-                all_bcs[n[6]]=xy_coord
-            n[6]+=1
+
+            if record_dict['total_count_kept'] < est_num_cells * 100 / ncores:
+                all_bcs[record_dict['total_count_kept']] = coord_concat
+            record_dict['total_count_kept']+=1
         else:
             if store_discarded:
                 print(entry.query_name, file = open(os.path.join(out_dir,'discarded_reads.txt'),'a'), flush=True)
 
-        if n[0] % stride == 0:
+        total_count = record_dict['total_count']
+        if total_count % stride == 0:
             totaltime = datetime.now() - start_time_filtering
             stride_steptime = datetime.now() - start_time
-            time_to_go = (total_reads - n[0])/stride * stride_steptime
-            print("File " + filename + " - Reads " + str(n[0]) + "/" + str(total_reads) + " processed. Time for last " + str(stride) + ": " + str(stride_steptime) + ", Total time: " + str(totaltime) + ". Time remaining: " + str(time_to_go),
+            time_to_go = (total_reads - total_count) / stride * stride_steptime
+            print("File " + filename + " - Reads " + str(total_count) + "/" + str(total_reads) + " processed. Time for last " + str(stride) + ": " + str(stride_steptime) + ", Total time: " + str(totaltime) + ". Time remaining: " + str(time_to_go),
                 flush=True)
             start_time = datetime.now()
             
-    all_bcs = all_bcs[:n[6]]
+    all_bcs = all_bcs[:record_dict['total_count_kept']]
     n_all_bcs = len(all_bcs)
     print("Filtering finished.", flush=True)
     
     infile.close()
     outfile.close()
-    return [n, [n_wellx, n_welly], all_bcs, n_all_bcs]
-    
-#%%Setup input parser
-parser = ArgumentParser()
-parser.add_argument("-i" "--input_bam", action="store", dest="input_bam", default="-", help="Specify the input bam file. Defaults to stdin.")
-parser.add_argument("-n" "--est_num_cells", action="store", dest="est_num_cells", default=2500, help="Estimated number of cells. Defaults to 2500.",type=int)
-parser.add_argument("-d" "--out_dir", action="store", dest="out_dir", default=".", help="Directory to store logfiles and output plots. Defaults to the current directory.")
-parser.add_argument("-t" "--tmp_dir", action="store", dest="tmp_dir", default=".", help="Temp directory")
-parser.add_argument("-b" "--bc_dir", action="store", dest="bc_dir", default="./barcodes/", help="Directory where the expected barcode files are stored. Defaults to the directory this script is in.")
-parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
-parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
-parser.add_argument("-a" "--dist_alg", action="store", dest="dist_alg", default="hamming", help="Distance algorithm to be used: levenshtein or hamming")
-parser.add_argument("-z" "--dist_threshold", action="store", dest="dist_threshold", default=1, help="Threshold to be used for levenshtein or hamming distance matching")
-parser.add_argument('-m', action='store_true', help="Use multithreading?")
-parser.add_argument('--mode', action='store', default='DbitX', help="Use multithreading?")
+    #return [n, [n_wellx, n_welly], all_bcs, n_all_bcs]
+    return [record_dict, all_bcs, n_all_bcs]
 
-
-#%% Parse input
-args = parser.parse_args()
-
-debug_flag = args.debug_flag
-store_discarded = args.store_discarded
-input_bam = args.input_bam #use "-" for stdin, set flag to rb
-est_num_cells = args.est_num_cells
-out_dir = args.out_dir
-tmp_dir = args.tmp_dir
-bc_dir = args.bc_dir
-dist_alg = args.dist_alg
-dist_threshold = int(args.dist_threshold)
-multi = args.m
-mode = args.mode
-
-split_dir = os.path.join(tmp_dir, 'tmp_split')
-
-# define frequency of printed outputs during barcode filtering
-stride = 500000
-
-# retrieve information about algorithm
-if dist_alg == "hamming":
-    compute_dist = lv.hamming
-    
-if dist_alg == "levenshtein":
-    compute_dist = lv.distance
-
-if bc_dir==".":
-    bc_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
-    
-#%% Write parameters to logfile
-print('Splitseq barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'), 'w'))
-print('Input bam: %s' % input_bam, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Estimated number of cells: %d' % est_num_cells, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Output directory: %s' % out_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Barcode directory: %s' % bc_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-
-if store_discarded:
-    if os.path.isfile(os.path.join(out_dir,'discarded_reads.txt')):
-        os.remove(os.path.join(out_dir,'discarded_reads.txt'))
-        print('Old version of discarded reads.txt deleted.')
-
-#%% Start timing
-#t_start = timeit.default_timer()
-t_start = datetime.now()
-
-#%% for debugging only
-if debug_flag:
-    for entry in itertools.islice(infile, 10):
-        print(entry.query_name)
-        print(entry.get_forward_sequence())
-        print(entry.get_tag('XD'))
-        print(entry.get_tag('XE'))
-        print(entry.get_tag('XF'))
-        print(entry.get_tag('XM'))
 
 if __name__ == '__main__':
+    # Run Script
+    
+    #%%Setup input parser
+    parser = ArgumentParser()
+    parser.add_argument("-i" "--input_bam", action="store", dest="input_bam", default="-", help="Specify the input bam file. Defaults to stdin.")
+    parser.add_argument("-n" "--est_num_cells", action="store", dest="est_num_cells", default=2500, help="Estimated number of cells. Defaults to 2500.",type=int)
+    parser.add_argument("-d" "--out_dir", action="store", dest="out_dir", default=".", help="Directory to store logfiles and output plots. Defaults to the current directory.")
+    parser.add_argument("-t" "--tmp_dir", action="store", dest="tmp_dir", default=".", help="Temp directory")
+    parser.add_argument("-b" "--bc_dir", action="store", dest="bc_dir", default="./barcodes/", help="Directory where the expected barcode files are stored. Defaults to the directory this script is in.")
+    parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
+    parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
+    parser.add_argument("-a" "--dist_alg", action="store", dest="dist_alg", default="hamming", help="Distance algorithm to be used: levenshtein or hamming")
+    parser.add_argument("-z" "--dist_threshold", action="store", dest="dist_threshold", default=1, help="Threshold to be used for levenshtein or hamming distance matching")
+    parser.add_argument('-m', action='store_true', help="Use multithreading?")
+    parser.add_argument('--mode', action='store', default='DbitX', help="Which mode? DbitX or Dbit-seq?")
+
+
+    #%% Parse input
+    args = parser.parse_args()
+
+    debug_flag = args.debug_flag
+    store_discarded = args.store_discarded
+    input_bam = args.input_bam #use "-" for stdin, set flag to rb
+    est_num_cells = args.est_num_cells
+    out_dir = args.out_dir
+    tmp_dir = args.tmp_dir
+    bc_dir = args.bc_dir
+    dist_alg = args.dist_alg
+    dist_threshold = int(args.dist_threshold)
+    multi = args.m
+    mode = args.mode
+
+    split_dir = os.path.join(tmp_dir, 'tmp_split')
+
+    # define frequency of printed outputs during barcode filtering
+    stride = 500000
+
+    # retrieve information about algorithm
+    if dist_alg == "hamming":
+        compute_dist = lv.hamming
+        
+    if dist_alg == "levenshtein":
+        compute_dist = lv.distance
+
+    if bc_dir==".":
+        bc_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
+
+    # check out mode
+    if mode == 'Dbit-seq':
+        coord_names = ['X', 'Y']
+
+    elif mode == 'DbitX':
+        coord_names = ['X', 'Y', 'Z']
+
+    else:
+        # exit script
+        sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
+        
+    #%% Write parameters to logfile
+    print('Splitseq barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'), 'w'))
+    print('Input bam: %s' % input_bam, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Estimated number of cells: %d' % est_num_cells, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Output directory: %s' % out_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Barcode directory: %s' % bc_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+
+    if store_discarded:
+        if os.path.isfile(os.path.join(out_dir,'discarded_reads.txt')):
+            os.remove(os.path.join(out_dir,'discarded_reads.txt'))
+            print('Old version of discarded reads.txt deleted.')
+
+    #%% Start timing
+    #t_start = timeit.default_timer()
+    t_start = datetime.now()
+
+    #%% for debugging only
+    if debug_flag:
+        for entry in itertools.islice(infile, 10):
+            print(entry.query_name)
+            print(entry.get_forward_sequence())
+            for name in coord_names:
+                print(entry.get_tag('X' + name))
+            print(entry.get_tag('XM'))
+
+    ### Run Filtering
     if multi:
         #%% start multithreaded filtering   
         
-            files = glob.glob(os.path.join(split_dir, 'x*.bam'))
-            ncores = len(files)
-            multifilter = Pool(processes=ncores)
-            results = multifilter.map(spatialfilter, files)
+        files = glob.glob(os.path.join(split_dir, 'x*.bam'))
+        ncores = len(files)
+        multifilter = Pool(processes=ncores)
+        results = multifilter.map(spatialfilter, files)
 
-        # extract and sum up recording variables
-        n = np.array([elem[0] for elem in results]).sum(axis=0)
+        # extract recording dictionaries
+        record_dicts = [elem[0] for elem in results]
 
-        n_wellx = sum_dicts([elem[1][0] for elem in results])
-        n_welly = sum_dicts([elem[1][1] for elem in results])
+        # Sum up the recording dictionaries
+        first_level = ['total_count', 'total_count_kept', 'all_direct']
+        record_dict = sum_dicts([{k: d[k] for k in first_level} for d in record_dicts])
 
-        all_bcs = [item for sublist in [elem[2] for elem in results] for item in sublist]
-        n_all_bcs = np.array([elem[3] for elem in results]).sum()
+        second_level = ['direct', 'corrected']
+
+        for name in coord_names:
+            dicts_per_name = [d[name] for d in record_dicts]
+            record_dict[name] = sum_dicts([{k: d[k] for k in second_level} for d in dicts_per_name])
+    
+            record_dict[name]['well_counts'] = sum_dicts([d[name]['well_counts'] for d in record_dicts])
+
+
+        # extract recording values outside of recording dictionary
+        all_bcs = [item for sublist in [elem[1] for elem in results] for item in sublist]
+        n_all_bcs = np.array([elem[2] for elem in results]).sum()
 
     else:
-            # without multithreading
-            ncores = 1
-            results = np.array(spatialfilter(input_bam))
+        # without multithreading
+        ncores = 1
+        results = spatialfilter(input_bam)
+        record_dict, all_bcs, n_all_bcs = results
 
-            n = results[0]
-
-            n_wellx = results[1][0]
-            n_welly = results[1][1]
-
-            all_bcs = results[2]
-            n_all_bcs = results[3]
+    filter_stop = datetime.now()
+    filter_elapsed = filter_stop - t_start
 
 
-filter_stop = datetime.now()
-filter_elapsed = filter_stop - t_start
+    # Store recording dictionary as .json
+    with open(os.path.join(out_dir, 'recording_dictionary.json'), 'w') as fp:
+        json.dump(record_dict, fp)
 
-# print into log file
-print('Read %d entries' % n[0], file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Found %d [%.2f%%] complete barcodes' % (n[3], n[3]/float(n[0])*100), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Found %d [%.2f%%] expected ligation barcode (x-coordinate), with %s matching %d [%.2f%%] (distance: %d)' % (n[1] , n[1]/float(n[0])*100, dist_alg, n[4], n[4]/float(n[0])*100, dist_threshold), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Found %d [%.2f%%] expected RT barcode (y-coordinate), with %s matching %d [%.2f%%] (distance: %d)' % (n[2] , n[2]/float(n[0])*100, dist_alg, n[5], n[5]/float(n[0])*100, dist_threshold), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Retained %d [%.2f%%] reads after %s matching and filtering' % (n[6], n[6]/float(n[0])*100, dist_alg), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-print('Elapsed time for filtering: %s' % str(filter_elapsed), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    # Print to log file
+    print('Read %d entries' % record_dict['total_count'], file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Found %d [%.2f%%] complete barcodes' % (record_dict['all_direct'], record_dict['all_direct']/float(record_dict['total_count'])*100), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    for name in coord_names:
+            print('Found %d [%.2f%%] expected %s-coordinates, with %s matching %d [%.2f%%] (distance: %d)' % (record_dict[name]['direct'] , 
+                record_dict[name]['direct'] / float(record_dict['total_count']) * 100, name, dist_alg, 
+                record_dict[name]['corrected'], record_dict[name]['corrected']/float(record_dict['total_count'])*100, dist_threshold),
+            file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    
+    print('Retained %d [%.2f%%] reads after %s matching and filtering' % (record_dict['total_count_kept'], record_dict['total_count_kept']/float(record_dict['total_count'])*100, 
+        dist_alg), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Elapsed time for filtering: %s' % str(filter_elapsed), file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
 
+    # Create plate overview
+    print("Generate summary...", flush=True)
+    bc_matrices = {name: make_plate_overview(record_dict[name]['well_counts']) for name in coord_names}
 
-# create plate overview
-print("Generate summary...", flush=True)
-bcx_matrix = make_plate_overview_mod(n_wellx)
-bcy_matrix = make_plate_overview_mod(n_welly)
+    #bcx_matrix = make_plate_overview(n_wellx)
+    #bcy_matrix = make_plate_overview(n_welly)
 
-# this part is super slow if you have a large number of cells, maybe omit
-all_bc_counts = {i:all_bcs.count(i) for i in list(set(all_bcs))}
+    # This part is super slow if you have a large number of cells, maybe omit
+    all_bc_counts = {i:all_bcs.count(i) for i in list(set(all_bcs))}
 
-# calculate cumulative fraction of reads
-all_bc_cumsum = np.cumsum(sorted(list(all_bc_counts.values()), reverse=True))/n_all_bcs
+    # Calculate cumulative fraction of reads
+    all_bc_cumsum = np.cumsum(sorted(list(all_bc_counts.values()), reverse=True))/n_all_bcs
 
-#%% plotting summary graphs
-fig, axes = plt.subplots(2,2)
-p1 = axes[0,0].imshow(np.log10(bcy_matrix+1));  axes[0,0].set_title('Number of reads per RT barcode (y-coordinate)')
-clb = fig.colorbar(p1, ax=axes[0,0]); clb.set_label('No. BCs, log10')
-p2 = axes[0,1].imshow(np.log10(bcx_matrix+1));  axes[0,1].set_title('Number of reads per ligation barcode (x-coordinate)')
-clb = fig.colorbar(p2, ax=axes[0,1]); clb.set_label('No. BCs, log10')
+    #%% plotting summary graphs
+    fig, axes = plt.subplots(2,2)
+    axes = axes.ravel()
 
-# plotting the cumulative fraction of reads per barcode helps to determine the number of assayed cells (see Macosko, 2015)
-p4 = axes[1,1].plot(all_bc_cumsum); axes[1,1].set_title('Cumulative fraction of reads per barcode'); axes[1,1].set_xlim(0, 5000)
+    for i, name in enumerate(coord_names):
+        matrix = bc_matrices[name]
+        p = axes[i].imshow(np.log10(matrix+1))
+        axes[i].set_title('Number of reads per {}-coordinate'.format(name))
+        clb = fig.colorbar(p, ax=axes[i])
+        clb.set_label('No. BCs, log10')
 
-fig.set_size_inches(12,7)
-fig.savefig(os.path.join(out_dir,'barcode_filtering_summary.pdf'),bbox_inches='tight')
+    # plotting the cumulative fraction of reads per barcode helps to determine the number of assayed cells (see Macosko, 2015)
+    p4 = axes[3].plot(all_bc_cumsum); axes[3].set_title('Cumulative fraction of reads per barcode')
+    axes[3].set_xlim(0, 5000)
 
-#%% Stop timing
-t_stop = datetime.now()
-t_elapsed = t_stop-t_start
+    fig.set_size_inches(12,7)
+    fig.savefig(os.path.join(out_dir,'barcode_filtering_summary.pdf'),bbox_inches='tight')
 
-#%% Save the QC output
-f = h5py.File(os.path.join(out_dir,'splitseq_filtering_QC_data.hdf5'), 'w')
+    #%% Stop timing
+    t_stop = datetime.now()
+    t_elapsed = t_stop-t_start
 
-f.create_dataset('BCX_plate_overview', data = bcx_matrix)
-f.create_dataset('BCY_plate_overview', data = bcy_matrix)
-f.create_dataset('reads_per_BC', data=list(all_bc_counts.values()))
-f.create_dataset('labels_reads_per_BC', data=np.string_(list(all_bc_counts.keys())))
+    #%% Save the QC output
+    f = h5py.File(os.path.join(out_dir,'splitseq_filtering_QC_data.hdf5'), 'w')
 
-f.close()
+    for name in coord_names:
+        f.create_dataset('BC{}_plate_overview'.format(name), data = bc_matrices[name])
 
-#%% print info to stdout
-print("Summary generated. Elapsed time: " + str(t_elapsed), flush=True)
+    f.create_dataset('reads_per_BC', data=list(all_bc_counts.values()))
+    f.create_dataset('labels_reads_per_BC', data=np.string_(list(all_bc_counts.keys())))
+
+    f.close()
+
+    #%% print info to stdout
+    print("Summary generated. Elapsed time: " + str(t_elapsed), flush=True)

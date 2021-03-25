@@ -1,4 +1,9 @@
-# DbitX_toolbox
+# DbitX toolbox
+
+This toolbox includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or DbitX experiments.
+It is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
+
+The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox.
 
 ## Requirements
 

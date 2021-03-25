@@ -25,7 +25,7 @@ echo "`timestamp` - Headers added to files."
 
 echo "`timestamp` - Merging of BAM files initiated..."
 # merge the reheaded files
-if samtools merge ${out_file} ${split_dir}/reheaded_* ; then
+if samtools merge -f ${out_file} ${split_dir}/reheaded_* ; then
 	echo "`timestamp` - Merging successful - ready to delete the unnecessary files"
 	reheaded_files=${split_dir}/reheaded_*
 	split_files=${split_dir}/x*
