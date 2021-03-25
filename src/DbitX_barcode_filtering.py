@@ -46,7 +46,7 @@ https://github.com/RebekkaWegmann/splitseq_toolbox
     
 """
 
-#%% libraries
+## libraries
 import sys, os, timeit, h5py
 import pysam
 import itertools
@@ -65,7 +65,7 @@ import Levenshtein as lv
 import json
 
 
-#%% Functions
+## Functions
 
 def well2ind(well):
     """Convert well positions to (zero-based) indices"""
@@ -182,18 +182,6 @@ def spatialfilter(in_bam):
 
     outfile = pysam.AlignmentFile(out_bam, 'wb', template=infile)
 
-    # set up recording array and variables
-    #n = np.zeros(9, dtype=np.int32)
-
-    #%% Import barcode and well assignment files
-    barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
-    #well_coord_assign = pd.read_csv(glob.glob(os.path.join(bc_dir,"*assignment*.csv"))[0])
-
-
-
-    # create barcode dictionary
-    barcode_dicts = {name: create_barcode_dict(barcode_legend, name) for name in coord_names}
-
     # setup recording dictionary
     record_dict = {
     'total_count': 0, 
@@ -254,7 +242,7 @@ def spatialfilter(in_bam):
                 
                 # check barcode and add coordinate to tag if matching barcode found.
                 entry, record_dict, coord, well, keep = check_barcode_and_add_coord_to_tag(entry=entry, barcodes=barcodes, coord_name=name, 
-                    barcode_dictionaries=barcode_dicts, record_dictionary=record_dict, dist_threshold=dist_threshold, compute_dist_function=compute_dist,
+                    barcode_dictionaries=barcode_dicts, record_dictionary=record_dict, dist_threshold=dist_thresholds[name], compute_dist_function=compute_dist,
                     keep=keep)
 
                 # collect the coordinates
@@ -297,9 +285,9 @@ def spatialfilter(in_bam):
 
 
 if __name__ == '__main__':
-    # Run Script
+    ## Run Script
     
-    #%%Setup input parser
+    # Setup input parser
     parser = ArgumentParser()
     parser.add_argument("-i" "--input_bam", action="store", dest="input_bam", default="-", help="Specify the input bam file. Defaults to stdin.")
     parser.add_argument("-n" "--est_num_cells", action="store", dest="est_num_cells", default=2500, help="Estimated number of cells. Defaults to 2500.",type=int)
@@ -308,13 +296,13 @@ if __name__ == '__main__':
     parser.add_argument("-b" "--bc_dir", action="store", dest="bc_dir", default="./barcodes/", help="Directory where the expected barcode files are stored. Defaults to the directory this script is in.")
     parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
     parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
-    parser.add_argument("-a" "--dist_alg", action="store", dest="dist_alg", default="hamming", help="Distance algorithm to be used: levenshtein or hamming")
-    parser.add_argument("-z" "--dist_threshold", action="store", dest="dist_threshold", default=1, help="Threshold to be used for levenshtein or hamming distance matching")
     parser.add_argument('-m', action='store_true', help="Use multithreading?")
     parser.add_argument('--mode', action='store', default='DbitX', help="Which mode? DbitX or Dbit-seq?")
 
+    ## Start timing
+    t_start = datetime.now()
 
-    #%% Parse input
+    ## Parse input
     args = parser.parse_args()
 
     debug_flag = args.debug_flag
@@ -324,8 +312,6 @@ if __name__ == '__main__':
     out_dir = args.out_dir
     tmp_dir = args.tmp_dir
     bc_dir = args.bc_dir
-    dist_alg = args.dist_alg
-    dist_threshold = int(args.dist_threshold)
     multi = args.m
     mode = args.mode
 
@@ -334,28 +320,36 @@ if __name__ == '__main__':
     # define frequency of printed outputs during barcode filtering
     stride = 500000
 
-    # retrieve information about algorithm
-    if dist_alg == "hamming":
-        compute_dist = lv.hamming
-        
-    if dist_alg == "levenshtein":
-        compute_dist = lv.distance
-
+    # Fetch flags
     if bc_dir==".":
         bc_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
 
     # check out mode
     if mode == 'Dbit-seq':
         coord_names = ['X', 'Y']
-
     elif mode == 'DbitX':
         coord_names = ['X', 'Y', 'Z']
-
     else:
         # exit script
         sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
         
-    #%% Write parameters to logfile
+    ## Import barcode legend and extract information
+    barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
+    # create barcode dictionary
+    barcode_dicts = {name: create_barcode_dict(barcode_legend, name) for name in coord_names}
+    # retrieve string matching settings
+    dist_alg = barcode_legend['string_matching_algorithm'][0]
+    dist_thresholds = {name: int(barcode_legend[name + "_maxdist"][0]) for name in coord_names}
+
+    if dist_alg == "hamming":
+        compute_dist = lv.hamming
+    elif dist_alg == "levenshtein":
+        compute_dist = lv.distance
+    else:
+        print("Unknown string matching alogrithm. Used levenshtein as default.", flush=True)
+        compute_dist = lv.distance
+
+    ## Write parameters to logfile
     print('Splitseq barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'), 'w'))
     print('Input bam: %s' % input_bam, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
     print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
@@ -368,11 +362,7 @@ if __name__ == '__main__':
             os.remove(os.path.join(out_dir,'discarded_reads.txt'))
             print('Old version of discarded reads.txt deleted.')
 
-    #%% Start timing
-    #t_start = timeit.default_timer()
-    t_start = datetime.now()
-
-    #%% for debugging only
+    ## for debugging only
     if debug_flag:
         for entry in itertools.islice(infile, 10):
             print(entry.query_name)
@@ -383,7 +373,7 @@ if __name__ == '__main__':
 
     ### Run Filtering
     if multi:
-        #%% start multithreaded filtering   
+        ## start multithreaded filtering   
         
         files = glob.glob(os.path.join(split_dir, 'x*.bam'))
         ncores = len(files)
@@ -430,7 +420,7 @@ if __name__ == '__main__':
     for name in coord_names:
             print('Found %d [%.2f%%] expected %s-coordinates, with %s matching %d [%.2f%%] (distance: %d)' % (record_dict[name]['direct'] , 
                 record_dict[name]['direct'] / float(record_dict['total_count']) * 100, name, dist_alg, 
-                record_dict[name]['corrected'], record_dict[name]['corrected']/float(record_dict['total_count'])*100, dist_threshold),
+                record_dict[name]['corrected'], record_dict[name]['corrected']/float(record_dict['total_count'])*100, dist_thresholds[name]),
             file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
     
     print('Retained %d [%.2f%%] reads after %s matching and filtering' % (record_dict['total_count_kept'], record_dict['total_count_kept']/float(record_dict['total_count'])*100, 
@@ -441,16 +431,13 @@ if __name__ == '__main__':
     print("Generate summary...", flush=True)
     bc_matrices = {name: make_plate_overview(record_dict[name]['well_counts']) for name in coord_names}
 
-    #bcx_matrix = make_plate_overview(n_wellx)
-    #bcy_matrix = make_plate_overview(n_welly)
-
     # This part is super slow if you have a large number of cells, maybe omit
     all_bc_counts = {i:all_bcs.count(i) for i in list(set(all_bcs))}
 
     # Calculate cumulative fraction of reads
     all_bc_cumsum = np.cumsum(sorted(list(all_bc_counts.values()), reverse=True))/n_all_bcs
 
-    #%% plotting summary graphs
+    ## plotting summary graphs
     fig, axes = plt.subplots(2,2)
     axes = axes.ravel()
 
@@ -468,11 +455,11 @@ if __name__ == '__main__':
     fig.set_size_inches(12,7)
     fig.savefig(os.path.join(out_dir,'barcode_filtering_summary.pdf'),bbox_inches='tight')
 
-    #%% Stop timing
+    ## Stop timing
     t_stop = datetime.now()
     t_elapsed = t_stop-t_start
 
-    #%% Save the QC output
+    ## Save the QC output
     f = h5py.File(os.path.join(out_dir,'splitseq_filtering_QC_data.hdf5'), 'w')
 
     for name in coord_names:
@@ -483,5 +470,5 @@ if __name__ == '__main__':
 
     f.close()
 
-    #%% print info to stdout
+    ## print info to stdout
     print("Summary generated. Elapsed time: " + str(t_elapsed), flush=True)

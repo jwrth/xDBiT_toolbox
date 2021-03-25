@@ -44,8 +44,6 @@ progname=`basename $0`
 splitseq_root=$(dirname $0)
 barcode_dir=$splitseq_root/data/barcode_lists
 jobs=1
-dist_alg=hamming
-dist_threshold=1
 mode=DbitX
 
 
@@ -66,7 +64,6 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -p                  : Reduce file I/O by pipeline commands together.  Requires more memory and processing power.
 -e                  : Echo commands instead of executing them.  Cannot use with -p.
 -a                  : String matching algorithm (hamming or levenshtein). Default: hamming.
--z                  : Threshold for string matching. Default: 1.
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
 -m                  : Mode. Searches for three barcodes.
@@ -116,7 +113,7 @@ function show_time () {
 }
 
 #getopts parses input options. Options followed by a : expect an input argument. The : at the very beginning prevents standard error messages.
-while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lm:" options; do
+while getopts ":d:t:o:pg:r:es:c::n:b:a:j:lm:" options; do
   case $options in
     d ) dropseq_root=$OPTARG;;
     t ) tmpdir=$OPTARG;;
@@ -129,8 +126,6 @@ while getopts ":d:t:o:pg:r:es:c::n:b:a:z:j:lm:" options; do
     s ) star_executable=$OPTARG;;
     c ) cutadapt_executable=$OPTARG;;
     e ) echo_prefix="echo";;
-    a ) dist_alg=$OPTARG;;
-    z ) dist_threshold=$OPTARG;;
     j ) jobs=$OPTARG;;
     l ) clear=1;;
     m ) mode=$OPTARG;;
@@ -175,19 +170,16 @@ fi
 echo ${mode}
 if [[ ${mode} == "DbitX" ]]
 then
-    echo here1
     min_lengths="35:94"
     multiwell=1
 elif [[ ${mode} == "Dbit-seq" ]]
 then
-    echo here2
     min_lengths="35:56"
     multiwell=0
 else
     echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'DbitX'/'Dbit-seq')"
     exit 1
 fi
-
 
 #Create output directories if they do not exist
 if [[ ! -d $outdir ]]
@@ -260,7 +252,7 @@ split_bam="bash ${splitseq_root}/src/splitbam.sh ${tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
 filter_barcodes="python ${splitseq_root}/src/DbitX_barcode_filtering.py --mode ${mode} -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
--b ${barcode_dir} -a ${dist_alg} -z ${dist_threshold} ${multithreading}"
+-b ${barcode_dir} ${multithreading}"
 
 # add header and merge all bam files for alignment
 merge_filtered_bam="bash ${splitseq_root}/src/mergebam.sh ${tmpdir}/tmp_split ${tagged_unmapped_bam}"
@@ -326,8 +318,6 @@ if [[ "${multithreading}" == "-m" ]]
 then $echo_prefix $merge_filtered_bam
 fi
 
-exit 0
-
 # Stage 4
 $echo_prefix $sam_to_fastq FASTQ=$tmpdir/unaligned_tagged_BC_filtered.fastq
 $echo_prefix $star_align --readFilesIn $tmpdir/unaligned_tagged_BC_filtered.fastq
@@ -356,4 +346,4 @@ $echo_prefix $rnaseq_metrics
 end_time=`date +%s`
 run_time=`expr $end_time - $start_time`
 total_time=`show_time $run_time`
-echo "Split-seq pipeline finished using ${dist_alg} algorithm in ${total_time}"
+echo "Split-seq pipeline finished using in ${total_time}"
