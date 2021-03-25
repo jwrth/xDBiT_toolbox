@@ -181,6 +181,16 @@ else
     exit 1
 fi
 
+# Check if all necessary python packages are loaded
+python -c "import sys, os, timeit, h5py, pysam, itertools, numpy, pandas, matplotlib, argparse, tqdm, datetime, subprocess, glob, collections, multiprocessing, Levenshtein, json"
+result="$?"
+if [ "$result" -ne 0 ]; then
+    echo "Not all Python packages installed. Script interrupted."
+    exit 1
+else
+    echo "All Python packages installed."
+fi
+
 #Create output directories if they do not exist
 if [[ ! -d $outdir ]]
 then mkdir $outdir
