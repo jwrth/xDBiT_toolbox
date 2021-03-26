@@ -293,7 +293,8 @@ if __name__ == '__main__':
     parser.add_argument("-n" "--est_num_cells", action="store", dest="est_num_cells", default=2500, help="Estimated number of cells. Defaults to 2500.",type=int)
     parser.add_argument("-d" "--out_dir", action="store", dest="out_dir", default=".", help="Directory to store logfiles and output plots. Defaults to the current directory.")
     parser.add_argument("-t" "--tmp_dir", action="store", dest="tmp_dir", default=".", help="Temp directory")
-    parser.add_argument("-b" "--bc_dir", action="store", dest="bc_dir", default="./barcodes/", help="Directory where the expected barcode files are stored. Defaults to the directory this script is in.")
+    #parser.add_argument("-b" "--bc_dir", action="store", dest="bc_dir", default="./barcodes/", help="Directory where the expected barcode files are stored. Defaults to the directory this script is in.")
+    parser.add_argument("-b" "--bc_file", action="store", dest="bc_file", default="./barcodes_legend.csv", help="Path to the barcode legend. Defaults to a file barcodes_legend.csv in the current directory.")
     parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
     parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
     parser.add_argument('-m', action='store_true', help="Use multithreading?")
@@ -311,7 +312,8 @@ if __name__ == '__main__':
     est_num_cells = args.est_num_cells
     out_dir = args.out_dir
     tmp_dir = args.tmp_dir
-    bc_dir = args.bc_dir
+    #bc_dir = args.bc_dir
+    bc_file = args.bc_file
     multi = args.m
     mode = args.mode
 
@@ -321,8 +323,8 @@ if __name__ == '__main__':
     stride = 500000
 
     # Fetch flags
-    if bc_dir==".":
-        bc_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
+    #if bc_dir==".":
+    #    bc_dir = os.path.abspath(os.path.dirname(sys.argv[0]))
 
     # check out mode
     if mode == 'Dbit-seq':
@@ -334,7 +336,9 @@ if __name__ == '__main__':
         sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
         
     ## Import barcode legend and extract information
-    barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
+    #barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])
+    barcode_legend = pd.read_csv(bc_file)
+
     # create barcode dictionary
     barcode_dicts = {name: create_barcode_dict(barcode_legend, name) for name in coord_names}
     # retrieve string matching settings
@@ -355,7 +359,8 @@ if __name__ == '__main__':
     print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
     print('Estimated number of cells: %d' % est_num_cells, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
     print('Output directory: %s' % out_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
-    print('Barcode directory: %s' % bc_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    #print('Barcode directory: %s' % bc_dir, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
+    print('Barcode legend file: %s' % bc_file, file = open(os.path.join(out_dir,'barcode_filtering_log.txt'),'a'))
 
     if store_discarded:
         if os.path.isfile(os.path.join(out_dir,'discarded_reads.txt')):
