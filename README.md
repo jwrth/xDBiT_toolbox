@@ -119,7 +119,7 @@ conda activate dbitx_toolbox
 
 # run pipeline
 nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> \
--b <BarcodeDir> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
+-b <BarcodeFile> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
 ```
 
 ## Supplementary notes
