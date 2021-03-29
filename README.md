@@ -7,12 +7,12 @@ The pipeline uses a bash script, custom Python scripts, and many tools from the 
 
 ## Requirements
 
-#### 1. Drop-seq toolbox
+### 1. Drop-seq toolbox
 
 This toolbox is based on the Drop-seq toolbox 2.1.0 which can be also downloaded here:
 https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
-#### 2. Samtools
+### 2. Samtools
 Download and instructions from: https://www.htslib.org/download/
 
 ```
@@ -42,7 +42,7 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-## Create environment for pipeline and install necessary packages
+### 3. Cutadapt
 ```
 # create python3 environment (cutadapt needs python 3 to use multiple cores)
 conda create -n dbitx_toolbox python=3
@@ -56,8 +56,20 @@ conda install -c anaconda ipykernel
 python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
 
+## Usage
 
-## Quality control using FastQC
+```
+# activate environment
+conda activate dbitx_toolbox
+
+# run pipeline
+nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> \
+-b <BarcodeDir> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
+```
+
+## Supplementary notes
+
+### Quality control using FastQC
 
 FastQC is an R package which performs a basic quality control on a sequencing run. Following code was used to run FastQC:
 
@@ -93,7 +105,19 @@ fastqc(fq.dir = fq_dir,
 
 For installation see: https://cran.r-project.org/web/packages/fastqcr/readme/README.html
 
-## About Adapter Trimming
+### Create test files
+
+```
+mkdir test_files
+
+# create test files for read 1 and read 2
+gzip -d -c 210319_NB552024_0035_AHCJ33AFX2/Data/Intensities/BaseCalls/37_28_Dbitseq_S1_R1_001.fastq.gz | head -n 400000 > test_files/r1_100k.fastq
+
+gzip -d -c 210319_NB552024_0035_AHCJ33AFX2/Data/Intensities/BaseCalls/37_28_Dbitseq_S1_R2_001.fastq.gz | head -n 400000 > test_files/r2_100k.fastq
+
+```
+
+### About Adapter Trimming
 
 I thought about it and did some research on adapter trimming again and came up with following conclusions:
 
@@ -115,25 +139,4 @@ However, since the FastQC for 37_28 gave 5-10 % adaptor content for "Illumina Un
 ```
 cutadapt -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length ${min_lengths} -j 4 \
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2} | tee ${tmpdir}/cutadapt_filter.out
-```
-
-### Create test files
-
-```
-mkdir test_files
-
-# create test files for read 1 and read 2
-gzip -d -c 210319_NB552024_0035_AHCJ33AFX2/Data/Intensities/BaseCalls/37_28_Dbitseq_S1_R1_001.fastq.gz | head -n 400000 > test_files/r1_100k.fastq
-
-gzip -d -c 210319_NB552024_0035_AHCJ33AFX2/Data/Intensities/BaseCalls/37_28_Dbitseq_S1_R2_001.fastq.gz | head -n 400000 > test_files/r2_100k.fastq
-
-```
-
-### Usage
-
-```
-# activate environment
-conda activate dbitx_toolbox
-
-nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> -b <BarcodeDir> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
 ```
