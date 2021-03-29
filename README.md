@@ -76,6 +76,22 @@ python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 
 ## Usage
 
+### Create STAR metadata
+
+Example for human genome:
+
+```
+# download and unzip reference genome and annotation file from ensembl
+wget ftp://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget ftp://ftp.ensembl.org/pub/release-100/gtf/homo_sapiens/Homo_sapiens.GRCh38.100.gtf.gz
+gzip -d Homo_sapiens.GRCh38.100.gtf.gz
+gzip -d Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+
+
+# run metadata script
+./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh -s Homo_sapiens -n Hs_metadata -r Homo_sapiens.GRCh38.dna.primary_assembly.fa -g Homo_sapiens.GRCh38.100.gtf -d ./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0
+```
+
 ### Create barcode legend file
 
 #### 1. Distribution of barcodes in wells
