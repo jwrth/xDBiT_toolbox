@@ -5,6 +5,17 @@ It is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq
 
 The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox.
 
+## Introduction
+
+### Barcoding layout
+![layout](https://user-images.githubusercontent.com/76480183/112812833-d859af00-907d-11eb-8c9c-613ac9166099.png)
+
+### Read structure
+
+![read](https://user-images.githubusercontent.com/76480183/112814912-0e982e00-9080-11eb-8ffe-d2c17c4660d8.png)
+
+
+
 ## Requirements
 
 ### 1. Drop-seq toolbox
@@ -60,15 +71,31 @@ python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 
 ### Create barcode legend file
 
-X_Coord	X_WellPosition	Y_Coord	Y_WellPosition	Z_Coord	Z_WellPosition
-49		0		0	A1
-48	B1	1	B1	0	C4
-47	C1	2	C1	0	D6
-46	D1	3	D1	0	F6
-45	A2	4	A2		
-44	B2	5	B2		
+#### 1. Distribution of barcodes in wells
 
+The `barcode_legend_empty.csv` file links barcode sequences to the well positions and three columns `X`, `Y`, and (optionally) `Z` which correspond to the dimensions that were barcoded in the experiment. Mandatory columns here are `WellPosition`, `Barcode`, `X`, `Y`. `Z` only if three barcoding rounds were applied.
 
+| Row | Column | WellPosition | Name      | Barcode  | X | Y | Z |
+|-----|--------|--------------|-----------|----------|---|---|---|
+| A   | 1      | A1           | Round1_01 | AACGTGAT |   |   |   |
+| B   | 1      | B1           | Round1_02 | AAACATCG |   |   |   |
+| C   | 1      | C1           | Round1_03 | ATGCCTAA |   |   |   |
+| D   | 1      | D1           | Round1_04 | AGTGGTCA |   |   |   |
+
+#### 2. Assignment of well position to spatial coordinate
+
+The `well_coord_assignment.csv` file contains three pairs of columns which assign well positions to spatial coordinates as shown in the following table.
+
+| X_Coord | X_WellPosition | Y_Coord | Y_WellPosition | Z_Coord | Z_WellPosition |
+|---------|----------------|---------|----------------|---------|----------------|
+| 49      |                | 0       |                | 0       | A1             |
+| 48      | B1             | 1       | B1             | 0       | C4             |
+| 47      | C1             | 2       | C1             | 0       | D6             |
+| 46      | D1             | 3       | D1             | 0       | F6             |
+
+#### 3. Filling of the barcode legend file
+
+To fill the columns `X`, `Y` (, `Z`) run following python script. The output is saved as `barcodes_legend.csv` to the input folder.
 
 ```
 # fill barcode legend file
@@ -76,6 +103,7 @@ python /path/to/script/fill_barcode_legend.py well_coord_assignment.csv barcodes
 ```
 
 ### Run pipeline
+
 ```
 # activate environment
 conda activate dbitx_toolbox
