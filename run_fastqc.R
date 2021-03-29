@@ -19,7 +19,7 @@ print("HTML results are saved in 'qc' subfolder of sequencing directory.")
 
 fastqc(fq.dir = fq_dir,
        qc.dir = qc_dir,
-       threads = 4)
+       threads = 2)
 
 #############
 # HTML results are saved in 'qc' subfolder of sequencing directory.
