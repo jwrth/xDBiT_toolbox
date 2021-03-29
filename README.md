@@ -12,7 +12,7 @@ The pipeline uses a bash script, custom Python scripts, and many tools from the 
 This toolbox is based on the Drop-seq toolbox 2.1.0 which can be also downloaded here:
 https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
-#### Samtools
+#### 2. Samtools
 Download and instructions from: https://www.htslib.org/download/
 
 ```
@@ -48,19 +48,14 @@ samtools view file.bam | head
 conda create -n dbitx_toolbox python=3
 conda activate dbitx_toolbox
 
+# install cutadapt
 python3 -m pip install --user --upgrade cutadapt
 
 # to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
 conda install -c anaconda ipykernel
- python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
+python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
- 
-## Generate fastq files from .bcl files
 
-```
-# run bcl2fastq without splitting the lanes
-nohup /usr/local/bin/bcl2fastq --runfolder-dir 201130_NB552024_0025_AHG3GMAFX2/ --no-lane-splitting -r 20 -p 20 &
-```
 
 ## Quality control using FastQC
 

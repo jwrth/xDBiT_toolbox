@@ -287,27 +287,27 @@ tag_with_gene_function="${dropseq_root}/TagReadWithGeneFunction O=${outdir}/gene
 start_time=`date +%s`
 
 # Stage 0
-$echo_prefix $filter_fastq | tee ${outdir}/cutadapt.out
-$echo_prefix $generate_bam | tee ${tmpdir}/FastqToSam.out
+# $echo_prefix $filter_fastq | tee ${outdir}/cutadapt.out
+# $echo_prefix $generate_bam | tee ${tmpdir}/FastqToSam.out
 
-# Stage 1
-$echo_prefix $tag_molecules OUTPUT=$tmpdir/unaligned_tagged_Molecular.bam
+# # Stage 1
+# $echo_prefix $tag_molecules OUTPUT=$tmpdir/unaligned_tagged_Molecular.bam
 
-if (( $multiwell == 1))
-then
-    $echo_prefix $tag_cells_well INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MW.bam
-    $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_MW.bam OUTPUT=$tmpdir/unaligned_tagged_MWY.bam
-    $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MWY.bam OUTPUT=$tmpdir/unaligned_tagged_MWYX.bam
-    $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
-else
-    $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MY.bam
-    $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MY.bam OUTPUT=$tmpdir/unaligned_tagged_MYX.bam
-    $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
-fi
+# if (( $multiwell == 1))
+# then
+#     $echo_prefix $tag_cells_well INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MW.bam
+#     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_MW.bam OUTPUT=$tmpdir/unaligned_tagged_MWY.bam
+#     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MWY.bam OUTPUT=$tmpdir/unaligned_tagged_MWYX.bam
+#     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+# else
+#     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MY.bam
+#     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MY.bam OUTPUT=$tmpdir/unaligned_tagged_MYX.bam
+#     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+# fi
 
-# Stage 2
-#$echo_prefix $trim_starting_sequence INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_tagged_trimmed_smart.bam
-$echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_mc_tagged_polyA_filtered.bam
+# # Stage 2
+# #$echo_prefix $trim_starting_sequence INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_tagged_trimmed_smart.bam
+# $echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_mc_tagged_polyA_filtered.bam
 
 files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MC1.bam $tmpdir/unaligned_tagged_MC1C2.bam \
                 $tmpdir/unaligned_tagged_filtered.bam"
