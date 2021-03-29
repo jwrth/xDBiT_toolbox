@@ -58,6 +58,24 @@ python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 
 ## Usage
 
+### Create barcode legend file
+
+X_Coord	X_WellPosition	Y_Coord	Y_WellPosition	Z_Coord	Z_WellPosition
+49		0		0	A1
+48	B1	1	B1	0	C4
+47	C1	2	C1	0	D6
+46	D1	3	D1	0	F6
+45	A2	4	A2		
+44	B2	5	B2		
+
+
+
+```
+# fill barcode legend file
+python /path/to/script/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
+```
+
+### Run pipeline
 ```
 # activate environment
 conda activate dbitx_toolbox
