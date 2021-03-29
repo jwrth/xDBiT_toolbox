@@ -2,3 +2,6 @@
 
 # remote server settings
 sftp-config.json
+
+# data folder
+data/
