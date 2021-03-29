@@ -5,6 +5,8 @@ It is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq
 
 The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox.
 
+The pipeline was created in a Linux server environment and the STAR alignment step requires more than 30 GB RAM.
+
 ## Introduction
 
 ### Barcoding layout
@@ -14,6 +16,11 @@ The pipeline uses a bash script, custom Python scripts, and many tools from the 
 
 ![read](https://user-images.githubusercontent.com/76480183/112814912-0e982e00-9080-11eb-8ffe-d2c17c4660d8.png)
 
+### DbitX toolbox pipeline
+
+The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NGS run and generates a spot x gene matrix which can then be used for further analyses.
+
+![pipeline](https://user-images.githubusercontent.com/76480183/112817236-7e0f1d00-9082-11eb-80c3-2d70ea13b838.png)
 
 
 ## Requirements
@@ -102,6 +109,8 @@ To fill the columns `X`, `Y` (, `Z`) run following python script. The output is 
 python /path/to/script/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
 ```
 
+Examples for the .csv files can be find in the folder `/barcodes/`
+
 ### Run pipeline
 
 ```
@@ -114,6 +123,13 @@ nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> 
 ```
 
 ## Supplementary notes
+
+## Generate fastq files from .bcl files
+
+```
+# run bcl2fastq without splitting the lanes
+nohup /usr/local/bin/bcl2fastq --runfolder-dir 201130_NB552024_0025_AHG3GMAFX2/ --no-lane-splitting -r 20 -p 20 &
+```
 
 ### Quality control using FastQC
 
