@@ -29,6 +29,23 @@ The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NG
 
 ## Requirements
 
+
+### Clone repository
+
+```
+git clone https://github.com/jwrth/DbitX_toolbox.git
+```
+
+### Install python environment
+
+```
+# go into repo
+cd DbitX_toolbox
+
+# install environment from file
+conda env create -f environment.yml
+```
+
 ### 1. Samtools
 Download and instructions from: https://www.htslib.org/download/
 
@@ -102,11 +119,6 @@ export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
 
 ## Usage
 
-### Clone repository
-
-```
-git clone https://github.com/jwrth/DbitX_toolbox.git
-```
 
 ### Create STAR metadata
 
