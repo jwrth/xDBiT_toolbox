@@ -34,14 +34,15 @@ The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NG
 
 ```
 git clone https://github.com/jwrth/DbitX_toolbox.git
+
+# make drop seq toolbox executable
+cd /path/to/repo/DbitX_toolbox
+chmod u=rwx,g=r,o=r ./external_tools/Drop-seq_tools-2.1.0/*
 ```
 
 ### Install python environment
 
 ```
-# go into repo
-cd DbitX_toolbox
-
 # install environment from file
 conda env create -f environment.yml python=3
 
@@ -184,6 +185,22 @@ conda activate dbitx_toolbox
 # run pipeline
 nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> \
 -b <BarcodeFile> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
+```
+
+### Test run for use on HPC server in Meier lab
+
+```
+cd /path/to/repo/DbitX_toolbox/
+cd test_files/
+
+# create barcode .csv file
+python ../src/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
+
+# activate environment
+conda activate dbitx_toolbox
+
+# run test run
+nohup bash ../DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ -r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ./barcodes_legend.csv -n 2300 -m DbitX -j 1 ./r1_100k.fastq ./r2_100k.fastq &
 ```
 
 ## Supplementary notes
