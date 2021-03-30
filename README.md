@@ -31,7 +31,9 @@ The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NG
 
 ### 1. Drop-seq toolbox
 
-This toolbox is based on the Drop-seq toolbox 2.1.0 which can be also downloaded here:
+This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in this repository so it will be downloaded when cloning it.
+
+Just the same it could be downloaded here:
 https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
 ### 2. Samtools
@@ -99,6 +101,12 @@ export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
 ```
 
 ## Usage
+
+### Clone repository
+
+```
+git clone https://github.com/jwrth/DbitX_toolbox.git
+```
 
 ### Create STAR metadata
 
