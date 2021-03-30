@@ -54,7 +54,7 @@ conda install -c anaconda ipykernel
 python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
 
-### 1. Samtools
+### Samtools
 Download and instructions from: https://www.htslib.org/download/
 
 ```
@@ -82,14 +82,14 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-### 2. Cutadapt (gets already installed with the environment)
+### Cutadapt (gets already installed with the environment)
 ```
 # install or upgrade cutadapt
 conda activate dbitx_toolbox
 python3 -m pip install --user --upgrade cutadapt
 ```
 
-### 3. STAR aligner
+### STAR aligner
 
 Manual on: https://github.com/alexdobin/STAR
 
@@ -113,7 +113,7 @@ export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
 # export PATH=$PATH:/home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/
 ```
 
-### 4. Drop-seq toolbox
+### Drop-seq toolbox
 
 This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in this repository so it will be downloaded when cloning it.
 
