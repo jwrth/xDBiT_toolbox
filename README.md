@@ -29,14 +29,7 @@ The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NG
 
 ## Requirements
 
-### 1. Drop-seq toolbox
-
-This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in this repository so it will be downloaded when cloning it.
-
-Just the same it could be downloaded here:
-https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
-
-### 2. Samtools
+### 1. Samtools
 Download and instructions from: https://www.htslib.org/download/
 
 ```
@@ -64,7 +57,7 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-### 3. Cutadapt
+### 2. Cutadapt
 ```
 # create python3 environment (cutadapt needs python 3 to use multiple cores)
 conda create -n dbitx_toolbox python=3
@@ -77,9 +70,16 @@ python3 -m pip install --user --upgrade cutadapt
 conda install -c anaconda ipykernel
 python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
-### 4. STAR aligner
+### 3. STAR aligner
 
 Manual on: https://github.com/alexdobin/STAR
+
+### 4. Drop-seq toolbox
+
+This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in this repository so it will be downloaded when cloning it.
+
+Just the same it could be downloaded here:
+https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
 #### Installation
 ```
