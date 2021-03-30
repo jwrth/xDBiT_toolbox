@@ -43,7 +43,14 @@ git clone https://github.com/jwrth/DbitX_toolbox.git
 cd DbitX_toolbox
 
 # install environment from file
-conda env create -f environment.yml
+conda env create -f environment.yml python=3
+
+# activate environment
+conda activate dbitx_toolbox
+
+# to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
+conda install -c anaconda ipykernel
+python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
 
 ### 1. Samtools
@@ -74,22 +81,30 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-### 2. Cutadapt
+### 2. Cutadapt (gets already installed with the environment)
 ```
-# create python3 environment (cutadapt needs python 3 to use multiple cores)
-conda create -n dbitx_toolbox python=3
+# install or upgrade cutadapt
 conda activate dbitx_toolbox
-
-# install cutadapt
 python3 -m pip install --user --upgrade cutadapt
-
-# to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
-conda install -c anaconda ipykernel
-python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
 ### 3. STAR aligner
 
 Manual on: https://github.com/alexdobin/STAR
+
+#### Installation
+```
+# Get latest STAR source from releases
+wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
+tar -xzf 2.7.8a.tar.gz
+cd STAR-2.7.8a
+
+# Alternatively, get STAR source using git
+git clone https://github.com/alexdobin/STAR.git
+
+# Compile
+cd STAR/source
+make STAR
+```
 
 ### 4. Drop-seq toolbox
 
