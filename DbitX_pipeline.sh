@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 #
-# This is a script to process Split-seq reads. It is a modified version of \
+# This is a script to process DbitX reads. It is a modified version of \
 # Drop-seq_alignment.sh provided alongside of  Dropseqtools from Steve McCarroll's lab.
+# Also the code is based on work with a Copyright by Rebekka Wegmann (Snijderlab, ETH Zurich, 2019) which has been published in following GitHub repository: 
+# https://github.com/RebekkaWegmann/splitseq_toolbox
 #
-# Author: Rebekka Wegmann, Snijder lab, ETH Zurich
+# Author: Johannes Wirth, Meier Lab, Helmholtz Pioneer Campus, Helmholtz Zentrum Munich, 2021
 # Original version Copyright 2017 Broad Institute
 
 # MIT License
