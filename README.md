@@ -51,9 +51,8 @@ cd samtools-1.x    # and similarly for bcftools and htslib
 make
 make install
 
-# add permanently to path variable
+# open.bashrc file using a text editor (here nano)
 nano ~/.bashrc
-
 # add following command at the end of .bashrc file
 export PATH=/where/to/install/bin:$PATH
 
@@ -77,6 +76,28 @@ python3 -m pip install --user --upgrade cutadapt
 # to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
 conda install -c anaconda ipykernel
 python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
+```
+### 4. STAR aligner
+
+Manual on: https://github.com/alexdobin/STAR
+
+#### Installation
+```
+# Get latest STAR source from releases
+wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
+tar -xzf 2.7.8a.tar.gz
+cd STAR-2.7.8a
+
+# Compile
+cd STAR/source
+make STAR
+
+# Recommended: Add STAR to path variables
+nano ~/.bashrc
+# add following command at the end of .bashrc file
+export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
+# On the HPC server it is installed and accessible for the Meier lab using following path variable: 
+# export PATH=$PATH:/home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/
 ```
 
 ## Usage
