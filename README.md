@@ -44,8 +44,6 @@ wget https://github.com/samtools/samtools/releases/download/1.12/samtools-1.12.t
 # unzip
 tar -xf samtools-1.12.tar.bz2
 
-# install![layout](https://user-images.githubusercontent.com/76480183/112825471-11008500-908c-11eb-975c-f75c11a17349.png)
-
 cd samtools-1.x    # and similarly for bcftools and htslib
 ./configure --without-curses --prefix=/where/to/install
 make
