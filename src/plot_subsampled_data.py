@@ -12,24 +12,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import glob
 import os
+import sys
 
 # get inputs
 full_mtx_path = sys.argv[1]
 subsampled_path = sys.argv[2]
 
+output_file = './seq_saturation.png'
+
 # load full matrix and subsampled matrices
+print("Find files...", flush=True)
 adata_100 = sc.read_text(os.path.join(full_mtx_path, "DGE_matrix_with_introns_min100.txt.gz")).transpose()
 #adata_100 = sc.read_text("out/DGE_matrix_with_introns_min100.txt.gz").transpose()
 
 files = glob.glob(os.path.join(subsampled_path, 'DGE_matrix_with_introns_*'))
 #files = glob.glob(os.path.join('out/subsampling/DGE_matrix_with_introns_*'))
+print("Import files...", flush=True)
 adatas = [sc.read_text(elem).transpose() for elem in files]
 
 # append full adata set to subsampled sets
 adatas.append(adata_100)
 
 # give fractions in order of files
-fractions = [int(elem.split("_")[-1].split("p")[0]) / 100 for elem in files]
+fractions = [int(elem.split("_")[-1].split("p")[0]) / 100 for elem in files] + [1]
 #fractions = [0.1, 0.25, 0.5, 0.75, 1]
 
 # sorting of adatas by fractions
@@ -37,6 +42,7 @@ adatas_sorted = [x for _,x in sorted(zip(fractions, adatas))]
 fractions = sorted(fractions)
 
 # filter all adata sets
+print("Filter adata objects...", flush=True)
 for adata in adatas:
     #sc.plotting.highest_expr_genes(adata, n_top = 20)
     sc.preprocessing.filter_cells(adata, min_genes=100)
@@ -47,6 +53,7 @@ for adata in adatas:
     sc.preprocessing.filter_genes(adata, min_cells=3)
 
 # add parameters to adata sets
+print("Add mito percentage and counts to adata object...", flush=True)
 for adata in adatas:
     mito_genes = adata.var_names.str.contains('MT-', case = False)
 
@@ -63,10 +70,12 @@ for adata in adatas:
     #                  )
 
 # Calculate mean of genes and UMIs per cell
+print("Calculate mean of genes and UMIs...", flush=True)
 genes_means = [np.mean(adata.obs['n_genes']) for adata in adatas]
 umi_means = [np.mean(adata.obs['n_counts']) for adata in adatas]
 
 # Plotting
+print("Plotting...", flush=True)
 fig, ax = plt.subplots(1, 2, figsize=(15, 5))
 
 plt.suptitle('Analysis of sequencing saturation by subsampling of reads')
@@ -79,4 +88,6 @@ ax[1].plot(fractions, genes_means)
 ax[1].set_xlabel('Fractions of reads')
 ax[1].set_ylabel('Mean genes per cell')
 
-plt.savefig('./seq_saturation.png', bbox_inches='tight', dpi=100)
+plt.savefig(output_file, bbox_inches='tight', dpi=100)
+
+print("Plot saved in " + output_file, flush=True)
