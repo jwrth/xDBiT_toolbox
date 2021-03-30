@@ -87,6 +87,7 @@ samtools view file.bam | head
 conda activate dbitx_toolbox
 python3 -m pip install --user --upgrade cutadapt
 ```
+
 ### 3. STAR aligner
 
 Manual on: https://github.com/alexdobin/STAR
@@ -98,12 +99,17 @@ wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
 tar -xzf 2.7.8a.tar.gz
 cd STAR-2.7.8a
 
-# Alternatively, get STAR source using git
-git clone https://github.com/alexdobin/STAR.git
-
 # Compile
 cd STAR/source
 make STAR
+
+# Recommended: Add STAR to path variables
+nano ~/.bashrc
+# add following command at the end of .bashrc file
+export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
+
+# On the HPC server it is installed and accessible for the Meier lab using following path variable: 
+# export PATH=$PATH:/home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/
 ```
 
 ### 4. Drop-seq toolbox
