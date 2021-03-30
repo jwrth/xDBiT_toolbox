@@ -119,25 +119,6 @@ This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in 
 Just the same it could be downloaded here:
 https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
-#### Installation
-```
-# Get latest STAR source from releases
-wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
-tar -xzf 2.7.8a.tar.gz
-cd STAR-2.7.8a
-
-# Compile
-cd STAR/source
-make STAR
-
-# Recommended: Add STAR to path variables
-nano ~/.bashrc
-# add following command at the end of .bashrc file
-export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
-# On the HPC server it is installed and accessible for the Meier lab using following path variable: 
-# export PATH=$PATH:/home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/
-```
-
 ## Usage
 
 
