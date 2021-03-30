@@ -166,8 +166,9 @@ nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> 
 
 ## Supplementary notes
 
-## Generate fastq files from .bcl files
+### Generate fastq files from .bcl files
 
+If the sequencer did not generate fastq files one can use bcl2fastq to generate the fastq files.
 ```
 # run bcl2fastq without splitting the lanes
 nohup /usr/local/bin/bcl2fastq --runfolder-dir 201130_NB552024_0025_AHG3GMAFX2/ --no-lane-splitting -r 20 -p 20 &
@@ -176,7 +177,6 @@ nohup /usr/local/bin/bcl2fastq --runfolder-dir 201130_NB552024_0025_AHG3GMAFX2/ 
 ### Quality control using FastQC
 
 FastQC is an R package which performs a basic quality control on a sequencing run. Following code was used to run FastQC:
-
 ```
 ########################################
 # Script to run FastQC
