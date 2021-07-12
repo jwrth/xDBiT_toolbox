@@ -227,7 +227,7 @@ filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTG
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2}"
 
 # generate .bam file
-generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=37_13"
+generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=37_13 TMP_DIR=${tmpdir}"
 
 ## Stage 1: pre-alignment tag
 # Extract UMI (Bases 1-10 on Read 2)
@@ -268,7 +268,7 @@ filter_barcodes="python ${splitseq_root}/src/DbitX_barcode_filtering.py --mode $
 merge_filtered_bam="bash ${splitseq_root}/src/mergebam.sh ${tmpdir}/tmp_split ${tagged_unmapped_bam}"
 
 # Stage 4: alignment
-sam_to_fastq="java -Xmx500m -jar ${picard_jar} SamToFastq INPUT=${tagged_unmapped_bam}"
+sam_to_fastq="java -Xmx500m -jar ${picard_jar} SamToFastq INPUT=${tagged_unmapped_bam} TMP_DIR=${tmpdir}"
 star_align="$star_executable --genomeDir ${genomedir} --runThreadN 20 --quantMode GeneCounts --outFileNamePrefix ${tmpdir}/star."
 
 # Stage 5: Merge and tag BAM
@@ -278,7 +278,7 @@ SortSam INPUT=${aligned_sam} OUTPUT=${aligned_sorted_bam} SORT_ORDER=queryname T
 
 # merge and tag aligned reads
 merge_bam="java -Xmx4000m -jar ${picard_jar} MergeBamAlignment REFERENCE_SEQUENCE=${reference} UNMAPPED_BAM=${tagged_unmapped_bam} \
-ALIGNED_BAM=${aligned_sorted_bam} INCLUDE_SECONDARY_ALIGNMENTS=false PAIRED_RUN=false"
+ALIGNED_BAM=${aligned_sorted_bam} INCLUDE_SECONDARY_ALIGNMENTS=false PAIRED_RUN=false TMP_DIR=${tmpdir}"
 
 # This one is a more flexible version of ta with gene exon, introduced in version 2.0.0 of Drop-seq tools
 tag_with_gene_interval="${dropseq_root}/TagReadWithInterval INTERVALS=${gene_intervals} TAG=XG"
@@ -301,18 +301,23 @@ then
     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_MW.bam OUTPUT=$tmpdir/unaligned_tagged_MWY.bam
     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MWY.bam OUTPUT=$tmpdir/unaligned_tagged_MWYX.bam
     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+
+    files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MW.bam $tmpdir/unaligned_tagged_MWY.bam \
+                $tmpdir/unaligned_tagged_MWYX.bam $tmpdir/unaligned_tagged_filtered.bam"
 else
     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MY.bam
     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MY.bam OUTPUT=$tmpdir/unaligned_tagged_MYX.bam
     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+
+    files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MY.bam $tmpdir/unaligned_tagged_MYX.bam \
+                $tmpdir/unaligned_tagged_filtered.bam"
 fi
 
 # Stage 2
 #$echo_prefix $trim_starting_sequence INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_tagged_trimmed_smart.bam
-$echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_mc_tagged_polyA_filtered.bam
+$echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=${tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
 
-files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MC1.bam $tmpdir/unaligned_tagged_MC1C2.bam \
-                $tmpdir/unaligned_tagged_filtered.bam"
+
 
 # Stage 3
 if [[ "${multithreading}" == "-m" ]]; then 
@@ -338,9 +343,6 @@ $echo_prefix $merge_bam OUTPUT=$tmpdir/merged.bam
 $echo_prefix $tag_with_gene_interval I=$tmpdir/merged.bam O=$tmpdir/gene_tagged.bam TMP_DIR=${tmpdir}
 $echo_prefix $tag_with_gene_function INPUT=$tmpdir/merged.bam
 files_to_delete="$files_to_delete $tmpdir/merged.bam $tmpdir/gene_tagged.bam"
-if (($clear == 1 ))
-then $echo_prefix rm $files_to_delete
-fi
 
 
 ## Stage 6: create DGE matrix
@@ -356,4 +358,10 @@ $echo_prefix $rnaseq_metrics
 end_time=`date +%s`
 run_time=`expr $end_time - $start_time`
 total_time=`show_time $run_time`
-echo "Split-seq pipeline finished using in ${total_time}"
+echo "Split-seq pipeline finished in ${total_time}"
+
+if (($clear == 1 ))
+then
+    echo "Delete temporary files." 
+    $echo_prefix rm $files_to_delete
+fi
