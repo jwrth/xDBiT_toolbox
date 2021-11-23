@@ -1,0 +1,191 @@
+STAR version=2.7.4a
+STAR compilation time,server,dir=Mon Jun 1 12:21:51 EDT 2020 vega:/home/dobin/data/STAR/STARcode/STAR.master/source
+##### Command Line:
+STAR --genomeDir /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ --runThreadN 20 --quantMode GeneCounts --outFileNamePrefix tmp/star. --readFilesIn tmp/unaligned_tagged_BC_filtered.fastq
+##### Initial USER parameters from Command Line:
+outFileNamePrefix                 tmp/star.
+###### All USER parameters from Command Line:
+genomeDir                     /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/     ~RE-DEFINED
+runThreadN                    20     ~RE-DEFINED
+quantMode                     GeneCounts        ~RE-DEFINED
+outFileNamePrefix             tmp/star.     ~RE-DEFINED
+readFilesIn                   tmp/unaligned_tagged_BC_filtered.fastq        ~RE-DEFINED
+##### Finished reading parameters from all sources
+
+##### Final user re-defined parameters-----------------:
+runThreadN                        20
+genomeDir                         /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/
+readFilesIn                       tmp/unaligned_tagged_BC_filtered.fastq   
+outFileNamePrefix                 tmp/star.
+quantMode                         GeneCounts   
+
+-------------------------------
+##### Final effective command line:
+STAR   --runThreadN 20   --genomeDir /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/   --readFilesIn tmp/unaligned_tagged_BC_filtered.fastq      --outFileNamePrefix tmp/star.   --quantMode GeneCounts   
+----------------------------------------
+
+Finished loading and checking parameters
+Reading genome generation parameters:
+### /home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/STAR   --runMode genomeGenerate   --runThreadN 20   --genomeDir ./STAR   --genomeFastaFiles ./Mm_metadata.fasta      --limitGenomeGenerateRAM 250000000000   --sjdbGTFfile ./Mm_metadata.gtf   --sjdbOverhang 100
+### GstrandBit=32
+versionGenome                 2.7.4a     ~RE-DEFINED
+genomeFastaFiles              ./Mm_metadata.fasta        ~RE-DEFINED
+genomeSAindexNbases           14     ~RE-DEFINED
+genomeChrBinNbits             18     ~RE-DEFINED
+genomeSAsparseD               1     ~RE-DEFINED
+sjdbOverhang                  100     ~RE-DEFINED
+sjdbFileChrStartEnd           -        ~RE-DEFINED
+sjdbGTFfile                   ./Mm_metadata.gtf     ~RE-DEFINED
+sjdbGTFchrPrefix              -     ~RE-DEFINED
+sjdbGTFfeatureExon            exon     ~RE-DEFINED
+sjdbGTFtagExonParentTranscripttranscript_id     ~RE-DEFINED
+sjdbGTFtagExonParentGene      gene_id     ~RE-DEFINED
+sjdbInsertSave                Basic     ~RE-DEFINED
+genomeFileSizes               2798565611   22356046436        ~RE-DEFINED
+Genome version is compatible with current STAR
+Number of real (reference) chromosomes= 66
+1	1	195471971	0
+2	10	130694993	195559424
+3	11	122082543	326369280
+4	12	120129022	448528384
+5	13	120421639	568852480
+6	14	124902244	689438720
+7	15	104043685	814481408
+8	16	98207768	918552576
+9	17	94987271	1016856576
+10	18	90702639	1112014848
+11	19	61431566	1202978816
+12	2	182113224	1264582656
+13	3	160039680	1446772736
+14	4	156508116	1606942720
+15	5	151834684	1763704832
+16	6	149736546	1915748352
+17	7	145441459	2065694720
+18	8	129401213	2211184640
+19	9	124595110	2340683776
+20	MT	16299	2465464320
+21	X	171031299	2465726464
+22	Y	91744698	2636906496
+23	JH584299.1	953012	2728656896
+24	GL456233.1	336933	2729705472
+25	JH584301.1	259875	2730229760
+26	GL456211.1	241735	2730491904
+27	GL456350.1	227966	2730754048
+28	JH584293.1	207968	2731016192
+29	GL456221.1	206961	2731278336
+30	JH584297.1	205776	2731540480
+31	JH584296.1	199368	2731802624
+32	GL456354.1	195993	2732064768
+33	JH584294.1	191905	2732326912
+34	JH584298.1	184189	2732589056
+35	JH584300.1	182347	2732851200
+36	GL456219.1	175968	2733113344
+37	GL456210.1	169725	2733375488
+38	JH584303.1	158099	2733637632
+39	JH584302.1	155838	2733899776
+40	GL456212.1	153618	2734161920
+41	JH584304.1	114452	2734424064
+42	GL456379.1	72385	2734686208
+43	GL456216.1	66673	2734948352
+44	GL456393.1	55711	2735210496
+45	GL456366.1	47073	2735472640
+46	GL456367.1	42057	2735734784
+47	GL456239.1	40056	2735996928
+48	GL456213.1	39340	2736259072
+49	GL456383.1	38659	2736521216
+50	GL456385.1	35240	2736783360
+51	GL456360.1	31704	2737045504
+52	GL456378.1	31602	2737307648
+53	GL456389.1	28772	2737569792
+54	GL456372.1	28664	2737831936
+55	GL456370.1	26764	2738094080
+56	GL456381.1	25871	2738356224
+57	GL456387.1	24685	2738618368
+58	GL456390.1	24668	2738880512
+59	GL456394.1	24323	2739142656
+60	GL456392.1	23629	2739404800
+61	GL456382.1	23158	2739666944
+62	GL456359.1	22974	2739929088
+63	GL456396.1	21240	2740191232
+64	GL456368.1	20208	2740453376
+65	JH584292.1	14945	2740715520
+66	JH584295.1	1976	2740977664
+--sjdbOverhang = 100 taken from the generated genome
+Started loading the genome: Sun May  2 18:57:05 2021
+
+Genome: size given as a parameter = 2798565611
+SA: size given as a parameter = 22356046436
+SAindex: size given as a parameter = 1
+Read from SAindex: pGe.gSAindexNbases=14  nSAi=357913940
+nGenome=2798565611;  nSAbyte=22356046436
+GstrandBit=32   SA number of indices=5419647620
+Shared memory is not used for genomes. Allocated a private copy of the genome.
+Genome file size: 2798565611 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading Genome ... done! state: good=1 eof=0 fail=0 bad=0; loaded 2798565611 bytes
+SA file size: 22356046436 bytes; state: good=1 eof=0 fail=0 bad=0
+Loading SA ... done! state: good=1 eof=0 fail=0 bad=0; loaded 22356046436 bytes
+Loading SAindex ... done: 1565873619 bytes
+Finished loading the genome: Sun May  2 19:24:15 2021
+
+Processing splice junctions database sjdbN=285203,   pGe.sjdbOverhang=100 
+alignIntronMax=alignMatesGapMax=0, the max intron size will be approximately determined by (2^winBinNbits)*winAnchorDistNbins=589824
+Created thread # 1
+Created thread # 2
+Created thread # 3
+Created thread # 4
+Created thread # 5
+Created thread # 6
+Created thread # 7
+Created thread # 8
+Created thread # 9
+Created thread # 10
+Created thread # 11
+Created thread # 12
+Created thread # 13
+Created thread # 14
+Created thread # 15
+Created thread # 16
+Created thread # 17
+Created thread # 18
+Created thread # 19
+Thread #1 end of input stream, nextChar=-1
+Completed: thread #2
+Completed: thread #3
+Completed: thread #6
+Completed: thread #4
+Completed: thread #7
+Completed: thread #8
+Completed: thread #9
+Completed: thread #5
+Completed: thread #10
+Completed: thread #11
+Completed: thread #12
+Completed: thread #15
+Completed: thread #18
+Completed: thread #0
+Completed: thread #17
+Completed: thread #13
+Completed: thread #14
+Completed: thread #19
+Completed: thread #16
+Completed: thread #1
+Joined thread # 1
+Joined thread # 2
+Joined thread # 3
+Joined thread # 4
+Joined thread # 5
+Joined thread # 6
+Joined thread # 7
+Joined thread # 8
+Joined thread # 9
+Joined thread # 10
+Joined thread # 11
+Joined thread # 12
+Joined thread # 13
+Joined thread # 14
+Joined thread # 15
+Joined thread # 16
+Joined thread # 17
+Joined thread # 18
+Joined thread # 19
+ALL DONE!

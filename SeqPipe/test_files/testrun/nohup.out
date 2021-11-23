@@ -1,0 +1,530 @@
+DbitX
+All Python packages installed.
+This is cutadapt 3.3 with Python 3.9.2
+Command line parameters: -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTGTCTCTTATACACATCTGACGCTGCCGACGA --minimum-length 35:94 -j 4 -o out/R1_filtered.fastq.gz -p out/R2_filtered.fastq.gz ../r1_100k.fastq ../r2_100k.fastq
+Processing reads on 4 cores in paired-end mode ...
+Finished in 1.82 s (18 µs/read; 3.29 M reads/minute).
+
+=== Summary ===
+
+Total read pairs processed:            100,000
+  Read 1 with adapter:                   9,938 (9.9%)
+  Read 2 with adapter:                  16,177 (16.2%)
+Pairs that were too short:              16,577 (16.6%)
+Pairs written (passing filters):        83,423 (83.4%)
+
+Total basepairs processed:    16,200,000 bp
+  Read 1:     6,600,000 bp
+  Read 2:     9,600,000 bp
+Total written (filtered):     13,509,151 bp (83.4%)
+  Read 1:     5,500,543 bp
+  Read 2:     8,008,608 bp
+
+=== First read: Adapter 1 ===
+
+Sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA; Type: regular 3'; Length: 33; Trimmed: 9938 times
+
+No. of allowed errors:
+1-9 bp: 0; 10-19 bp: 1; 20-29 bp: 2; 30-33 bp: 3
+
+Bases preceding removed adapters:
+  A: 33.6%
+  C: 23.8%
+  G: 22.2%
+  T: 17.6%
+  none/other: 2.7%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+3	1247	1562.5	0	1247
+4	331	390.6	0	331
+5	117	97.7	0	117
+6	270	24.4	0	270
+7	797	6.1	0	797
+8	170	1.5	0	170
+9	258	0.4	0	257 1
+10	57	0.1	1	52 5
+11	499	0.0	1	481 18
+12	475	0.0	1	453 22
+13	192	0.0	1	186 6
+14	282	0.0	1	268 14
+15	43	0.0	1	36 7
+16	84	0.0	1	82 2
+17	130	0.0	1	122 8
+18	66	0.0	1	63 3
+19	1127	0.0	1	1050 73 4
+20	160	0.0	2	149 9 2
+21	30	0.0	2	26 3 1
+22	29	0.0	2	26 1 2
+23	7	0.0	2	6 1
+24	38	0.0	2	36 2
+25	54	0.0	2	45 6 3
+26	7	0.0	2	4 3
+27	35	0.0	2	34 0 1
+28	9	0.0	2	7 2
+29	31	0.0	2	27 4
+30	206	0.0	3	189 13 3 1
+31	31	0.0	3	27 3 1
+32	213	0.0	3	198 11 2 2
+33	16	0.0	3	11 3 2
+34	10	0.0	3	7 1 1 1
+35	30	0.0	3	24 4 2
+36	16	0.0	3	12 4
+37	194	0.0	3	164 23 4 3
+38	53	0.0	3	47 3 2 1
+39	39	0.0	3	32 5 1 1
+40	15	0.0	3	13 1 0 1
+41	21	0.0	3	17 2 2
+42	77	0.0	3	56 16 3 2
+43	95	0.0	3	90 2 2 1
+44	58	0.0	3	47 9 1 1
+45	65	0.0	3	51 7 7
+46	77	0.0	3	67 6 4
+47	440	0.0	3	385 33 12 10
+48	38	0.0	3	35 3
+49	271	0.0	3	237 25 6 3
+50	75	0.0	3	64 7 1 3
+51	121	0.0	3	105 13 2 1
+52	78	0.0	3	58 12 4 4
+53	61	0.0	3	49 8 3 1
+54	93	0.0	3	86 5 1 1
+55	78	0.0	3	67 9 2
+56	59	0.0	3	49 6 3 1
+57	179	0.0	3	155 16 6 2
+58	40	0.0	3	34 6
+59	105	0.0	3	89 14 0 2
+60	29	0.0	3	24 3 2
+61	96	0.0	3	84 8 1 3
+62	104	0.0	3	86 15 3
+63	4	0.0	3	3 1
+64	11	0.0	3	10 1
+65	22	0.0	3	18 1 2 1
+66	273	0.0	3	5 229 25 14
+
+
+=== Second read: Adapter 2 ===
+
+Sequence: CTGTCTCTTATACACATCTGACGCTGCCGACGA; Type: regular 3'; Length: 33; Trimmed: 16177 times
+
+No. of allowed errors:
+1-9 bp: 0; 10-19 bp: 1; 20-29 bp: 2; 30-33 bp: 3
+
+Bases preceding removed adapters:
+  A: 9.1%
+  C: 43.3%
+  G: 32.3%
+  T: 15.2%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+3	632	1562.5	0	632
+4	212	390.6	0	212
+5	183	97.7	0	183
+6	223	24.4	0	223
+7	184	6.1	0	184
+8	654	1.5	0	654
+9	278	0.4	0	278
+10	390	0.1	1	376 14
+11	128	0.0	1	118 10
+12	84	0.0	1	77 7
+13	138	0.0	1	128 10
+14	286	0.0	1	270 16
+15	926	0.0	1	848 78
+16	207	0.0	1	192 15
+17	74	0.0	1	64 10
+18	102	0.0	1	85 17
+19	49	0.0	1	38 5 6
+20	321	0.0	2	292 27 2
+21	57	0.0	2	43 8 6
+22	339	0.0	2	299 30 10
+23	227	0.0	2	200 20 7
+24	236	0.0	2	214 18 4
+25	1148	0.0	2	982 129 37
+26	110	0.0	2	98 9 3
+27	115	0.0	2	105 6 4
+28	39	0.0	2	36 1 2
+29	124	0.0	2	106 13 5
+30	92	0.0	3	76 11 4 1
+31	325	0.0	3	265 41 15 4
+32	49	0.0	3	41 7 1
+33	295	0.0	3	244 40 9 2
+34	106	0.0	3	91 12 3
+35	64	0.0	3	50 12 2
+36	265	0.0	3	213 43 3 6
+37	802	0.0	3	671 100 22 9
+38	171	0.0	3	148 19 2 2
+39	256	0.0	3	207 35 10 4
+40	53	0.0	3	46 4 3
+41	497	0.0	3	426 48 15 8
+42	468	0.0	3	383 66 12 7
+43	189	0.0	3	157 27 5
+44	279	0.0	3	238 33 5 3
+45	39	0.0	3	36 2 0 1
+46	82	0.0	3	70 11 1
+47	123	0.0	3	99 16 6 2
+48	65	0.0	3	52 10 2 1
+49	1107	0.0	3	929 137 18 23
+50	156	0.0	3	122 24 8 2
+51	30	0.0	3	22 6 1 1
+52	28	0.0	3	20 6 2
+53	6	0.0	3	4 2
+54	34	0.0	3	25 8 0 1
+55	52	0.0	3	44 6 2
+56	5	0.0	3	4 1
+57	34	0.0	3	25 5 2 2
+58	9	0.0	3	7 1 1
+59	31	0.0	3	24 7
+60	203	0.0	3	163 28 8 4
+61	29	0.0	3	24 4 1
+62	211	0.0	3	176 27 4 4
+63	12	0.0	3	9 3
+64	8	0.0	3	5 2 0 1
+65	30	0.0	3	23 5 1 1
+66	13	0.0	3	10 3
+67	188	0.0	3	144 31 9 4
+68	52	0.0	3	41 11
+69	36	0.0	3	22 12 0 2
+70	14	0.0	3	5 6 3
+71	20	0.0	3	14 4 1 1
+72	71	0.0	3	60 8 2 1
+73	91	0.0	3	73 12 3 3
+74	55	0.0	3	47 5 2 1
+75	59	0.0	3	37 14 5 3
+76	72	0.0	3	45 19 5 3
+77	433	0.0	3	337 75 10 11
+78	38	0.0	3	31 4 1 2
+79	266	0.0	3	209 37 13 7
+80	71	0.0	3	53 12 4 2
+81	117	0.0	3	98 12 5 2
+82	73	0.0	3	50 17 3 3
+83	60	0.0	3	39 15 3 3
+84	89	0.0	3	51 25 12 1
+85	76	0.0	3	45 19 7 5
+86	55	0.0	3	23 28 3 1
+87	167	0.0	3	83 63 16 5
+88	37	0.0	3	25 7 2 3
+89	98	0.0	3	54 34 7 3
+90	26	0.0	3	8 15 2 1
+91	94	0.0	3	73 9 8 4
+92	95	0.0	3	27 47 15 6
+93	4	0.0	3	0 4
+94	11	0.0	3	6 4 0 1
+95	18	0.0	3	2 9 6 1
+96	7	0.0	3	3 1 3
+INFO	2021-05-02 18:55:44	FastqToSam	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    FastqToSam -F1 out/R1_filtered.fastq.gz -F2 out/R2_filtered.fastq.gz -O out/unmapped.bam -SM 37_13 -TMP_DIR tmp
+**********
+
+
+18:55:46.784 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/3rdParty/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 18:55:46 CEST 2021] FastqToSam FASTQ=out/R1_filtered.fastq.gz FASTQ2=out/R2_filtered.fastq.gz OUTPUT=out/unmapped.bam SAMPLE_NAME=37_13 TMP_DIR=[tmp]    USE_SEQUENTIAL_FASTQS=false READ_GROUP_NAME=A SORT_ORDER=queryname MIN_Q=0 MAX_Q=93 STRIP_UNPAIRED_MATE_NUMBER=false ALLOW_AND_IGNORE_EMPTY_LINES=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:55:46 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.14-SNAPSHOT
+INFO	2021-05-02 18:55:46	FastqToSam	Auto-detected quality format as: Standard.
+INFO	2021-05-02 18:55:47	FastqToSam	Processed 83423 fastq reads
+[Sun May 02 18:55:48 CEST 2021] picard.sam.FastqToSam done. Elapsed time: 0.06 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:06	TagBamWithReadSequenceExtended	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagBamWithReadSequenceExtended -SUMMARY out/unaligned_tagged_Molecular.bam_summary.txt -BASE_RANGE 1-10 -BASE_QUALITY 10 -BARCODED_READ 2 -DISCARD_READ false -TAG_NAME XM -NUM_BASES_BELOW_QUALITY 1 -INPUT out/unmapped.bam -OUTPUT tmp/unaligned_tagged_Molecular.bam
+**********
+
+
+18:56:14.010 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:14.019 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:14.020 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:14.020 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:14 CEST 2021] TagBamWithReadSequenceExtended INPUT=out/unmapped.bam OUTPUT=tmp/unaligned_tagged_Molecular.bam SUMMARY=out/unaligned_tagged_Molecular.bam_summary.txt BASE_RANGE=1-10 BARCODED_READ=2 DISCARD_READ=false BASE_QUALITY=10 NUM_BASES_BELOW_QUALITY=1 TAG_NAME=XM    TAG_BARCODED_READ=false HARD_CLIP_BASES=false TAG_QUALITY=XQ VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:14 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:14.039 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:14.087 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 18:56:15 CEST 2021] org.broadinstitute.dropseqrna.utils.TagBamWithReadSequenceExtended done. Elapsed time: 0.03 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:15	TagBamWithReadSequenceExtended	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagBamWithReadSequenceExtended -SUMMARY out/unaligned_tagged_Cellular_2.bam_summary.txt -BASE_RANGE 87-94 -BASE_QUALITY 10 -BARCODED_READ 2 -DISCARD_READ false -TAG_NAME XZ -NUM_BASES_BELOW_QUALITY 1 -INPUT tmp/unaligned_tagged_Molecular.bam -OUTPUT tmp/unaligned_tagged_MW.bam
+**********
+
+
+18:56:15.965 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:15.970 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:15.971 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:15.971 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:15 CEST 2021] TagBamWithReadSequenceExtended INPUT=tmp/unaligned_tagged_Molecular.bam OUTPUT=tmp/unaligned_tagged_MW.bam SUMMARY=out/unaligned_tagged_Cellular_2.bam_summary.txt BASE_RANGE=87-94 BARCODED_READ=2 DISCARD_READ=false BASE_QUALITY=10 NUM_BASES_BELOW_QUALITY=1 TAG_NAME=XZ    TAG_BARCODED_READ=false HARD_CLIP_BASES=false TAG_QUALITY=XQ VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:15 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:15.980 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:16.000 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 18:56:17 CEST 2021] org.broadinstitute.dropseqrna.utils.TagBamWithReadSequenceExtended done. Elapsed time: 0.02 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:17	TagBamWithReadSequenceExtended	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagBamWithReadSequenceExtended -SUMMARY out/unaligned_tagged_Cellular_2.bam_summary.txt -BASE_RANGE 49-56 -BASE_QUALITY 10 -BARCODED_READ 2 -DISCARD_READ false -TAG_NAME XY -NUM_BASES_BELOW_QUALITY 1 -INPUT tmp/unaligned_tagged_MW.bam -OUTPUT tmp/unaligned_tagged_MWY.bam
+**********
+
+
+18:56:17.902 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:17.907 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:17.908 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:17.908 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:17 CEST 2021] TagBamWithReadSequenceExtended INPUT=tmp/unaligned_tagged_MW.bam OUTPUT=tmp/unaligned_tagged_MWY.bam SUMMARY=out/unaligned_tagged_Cellular_2.bam_summary.txt BASE_RANGE=49-56 BARCODED_READ=2 DISCARD_READ=false BASE_QUALITY=10 NUM_BASES_BELOW_QUALITY=1 TAG_NAME=XY    TAG_BARCODED_READ=false HARD_CLIP_BASES=false TAG_QUALITY=XQ VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:17 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:17.916 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:17.937 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 18:56:19 CEST 2021] org.broadinstitute.dropseqrna.utils.TagBamWithReadSequenceExtended done. Elapsed time: 0.03 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:19	TagBamWithReadSequenceExtended	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagBamWithReadSequenceExtended -SUMMARY out/unaligned_tagged_Cellular_3.bam_summary.txt -BASE_RANGE 11-18 -BASE_QUALITY 10 -BARCODED_READ 2 -DISCARD_READ true -TAG_NAME XX -NUM_BASES_BELOW_QUALITY 1 -INPUT tmp/unaligned_tagged_MWY.bam -OUTPUT tmp/unaligned_tagged_MWYX.bam
+**********
+
+
+18:56:19.923 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:19.928 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:19.929 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:19.929 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:19 CEST 2021] TagBamWithReadSequenceExtended INPUT=tmp/unaligned_tagged_MWY.bam OUTPUT=tmp/unaligned_tagged_MWYX.bam SUMMARY=out/unaligned_tagged_Cellular_3.bam_summary.txt BASE_RANGE=11-18 BARCODED_READ=2 DISCARD_READ=true BASE_QUALITY=10 NUM_BASES_BELOW_QUALITY=1 TAG_NAME=XX    TAG_BARCODED_READ=false HARD_CLIP_BASES=false TAG_QUALITY=XQ VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:19 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:19.938 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:19.959 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 18:56:21 CEST 2021] org.broadinstitute.dropseqrna.utils.TagBamWithReadSequenceExtended done. Elapsed time: 0.02 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:21	FilterBam	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    FilterBam -TAG_REJECT XQ -INPUT tmp/unaligned_tagged_MWYX.bam -OUTPUT tmp/unaligned_tagged_filtered.bam
+**********
+
+
+18:56:21.549 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:21.555 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:21.555 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:21.555 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:21 CEST 2021] FilterBam INPUT=tmp/unaligned_tagged_MWYX.bam OUTPUT=tmp/unaligned_tagged_filtered.bam TAG_REJECT=[XQ]    FILTER_PCR_DUPES=false RETAIN_ONLY_PRIMARY_READS=false DROP_REJECTED_REF=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:21 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:21.564 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:21.579 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 18:56:22 CEST 2021] org.broadinstitute.dropseqrna.utils.FilterBam done. Elapsed time: 0.01 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 18:56:22	PolyATrimmer	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    PolyATrimmer -OUTPUT_SUMMARY out/polyA_trimming_report.txt -MISMATCHES 0 -NUM_BASES 6 -INPUT tmp/unaligned_tagged_filtered.bam -OUTPUT tmp/unaligned_mc_tagged_polyA_filtered.bam
+**********
+
+
+18:56:22.791 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:22.797 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+18:56:22.798 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+18:56:22.798 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 18:56:22 CEST 2021] PolyATrimmer INPUT=tmp/unaligned_tagged_filtered.bam OUTPUT=tmp/unaligned_mc_tagged_polyA_filtered.bam OUTPUT_SUMMARY=out/polyA_trimming_report.txt MISMATCHES=0 NUM_BASES=6    USE_NEW_TRIMMER=false TRIM_TAG=ZP ADAPTER=^XM^XCACGTACTCTGCGTTGCTACCACTG MAX_ADAPTER_ERROR_RATE=0.1 MIN_ADAPTER_MATCH=4 MIN_POLY_A_LENGTH=20 MIN_POLY_A_LENGTH_NO_ADAPTER_MATCH=6 DUBIOUS_ADAPTER_MATCH_LENGTH=6 MAX_POLY_A_ERROR_RATE=0.1 VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:56:22 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+18:56:22.807 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+18:56:22.821 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+INFO	2021-05-02 18:56:23	PolyATrimmer	Number of reads trimmed: 7499
+INFO	2021-05-02 18:56:23	PolyATrimmer	Number of reads completely trimmed: 127
+[Sun May 02 18:56:23 CEST 2021] org.broadinstitute.dropseqrna.readtrimming.PolyATrimmer done. Elapsed time: 0.01 minutes.
+Runtime.totalMemory()=2058354688
+Splitting of bam files initiated...
+2021-05-02 18:56:23 - Creating header file
+2021-05-02 18:56:27 - Header file created
+2021-05-02 18:56:27 - Splitting of files initiated...
+2021-05-02 18:56:27 - Splitting finished.
+2021-05-02 18:56:27 - Conversion to BAM files initiated...
+2021-05-02 18:56:28 - Conversion to BAM files finished.
+2021-05-02 18:56:28 - tmp/unaligned_mc_tagged_polyA_filtered.bam split into 4 and saved to tmp/tmp_split in 0h 0m 5s
+Count number of reads in input bam...
+Count number of reads in input bam...
+Count number of reads in input bam...
+Count number of reads in input bam...
+[E::idx_find_and_load] [E::idx_find_and_load] [E::idx_find_and_load] [E::idx_find_and_load] Could not retrieve index file for 'tmp/tmp_split/xaa.bam'Could not retrieve index file for 'tmp/tmp_split/xac.bam'Could not retrieve index file for 'tmp/tmp_split/xab.bam'Could not retrieve index file for 'tmp/tmp_split/xad.bam'
+
+
+
+Filtering started...
+Filtering started...
+Filtering started...
+Filtering started...
+Filtering finished.
+Filtering finished.
+Filtering finished.
+Filtering finished.
+Generate summary...
+Summary generated. Elapsed time: 0:00:03.242643
+2021-05-02 18:56:59 - Start adding headers to the split files...
+2021-05-02 18:56:59 - Headers added to files.
+2021-05-02 18:56:59 - Merging of BAM files initiated...
+2021-05-02 18:56:59 - Merging successful - ready to delete the unnecessary files
+2021-05-02 18:56:59 - Temporary files deleted.
+INFO	2021-05-02 18:57:00	SamToFastq	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    SamToFastq -INPUT tmp/unaligned_tagged_BC_filtered.bam -TMP_DIR tmp -FASTQ tmp/unaligned_tagged_BC_filtered.fastq
+**********
+
+
+18:57:00.398 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/3rdParty/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 18:57:00 CEST 2021] SamToFastq INPUT=tmp/unaligned_tagged_BC_filtered.bam FASTQ=tmp/unaligned_tagged_BC_filtered.fastq TMP_DIR=[tmp]    OUTPUT_PER_RG=false COMPRESS_OUTPUTS_PER_RG=false RG_TAG=PU RE_REVERSE=true INTERLEAVE=false INCLUDE_NON_PF_READS=false CLIPPING_MIN_LENGTH=0 READ1_TRIM=0 READ2_TRIM=0 INCLUDE_NON_PRIMARY_ALIGNMENTS=false VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 18:57:00 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.14-SNAPSHOT
+[Sun May 02 18:57:00 CEST 2021] picard.sam.SamToFastq done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=502792192
+May 02 18:57:05 ..... started STAR run
+May 02 18:57:05 ..... loading genome
+May 02 19:24:16 ..... started mapping
+May 02 19:24:19 ..... finished mapping
+May 02 19:24:22 ..... finished successfully
+INFO	2021-05-02 19:24:22	SortSam	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    SortSam -INPUT tmp/star.Aligned.out.sam -OUTPUT tmp/aligned.sorted.bam -SORT_ORDER queryname -TMP_DIR tmp
+**********
+
+
+19:24:22.850 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/3rdParty/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 19:24:22 CEST 2021] SortSam INPUT=tmp/star.Aligned.out.sam OUTPUT=tmp/aligned.sorted.bam SORT_ORDER=queryname TMP_DIR=[tmp]    VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 19:24:22 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.14-SNAPSHOT
+INFO	2021-05-02 19:24:24	SortSam	Finished reading inputs, merging and writing to output now.
+[Sun May 02 19:24:24 CEST 2021] picard.sam.SortSam done. Elapsed time: 0.03 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 19:24:24	MergeBamAlignment	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    MergeBamAlignment -REFERENCE_SEQUENCE /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -UNMAPPED_BAM tmp/unaligned_tagged_BC_filtered.bam -ALIGNED_BAM tmp/aligned.sorted.bam -INCLUDE_SECONDARY_ALIGNMENTS false -PAIRED_RUN false -TMP_DIR tmp -OUTPUT tmp/merged.bam
+**********
+
+
+19:24:24.946 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/3rdParty/picard/picard.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 19:24:24 CEST 2021] MergeBamAlignment UNMAPPED_BAM=tmp/unaligned_tagged_BC_filtered.bam ALIGNED_BAM=[tmp/aligned.sorted.bam] OUTPUT=tmp/merged.bam PAIRED_RUN=false INCLUDE_SECONDARY_ALIGNMENTS=false TMP_DIR=[tmp] REFERENCE_SEQUENCE=/home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta    ADD_PG_TAG_TO_READS=true CLIP_ADAPTERS=true IS_BISULFITE_SEQUENCE=false ALIGNED_READS_ONLY=false MAX_INSERTIONS_OR_DELETIONS=1 ATTRIBUTES_TO_REVERSE=[OQ, U2] ATTRIBUTES_TO_REVERSE_COMPLEMENT=[E2, SQ] READ1_TRIM=0 READ2_TRIM=0 ALIGNER_PROPER_PAIR_FLAGS=false SORT_ORDER=coordinate PRIMARY_ALIGNMENT_STRATEGY=BestMapq CLIP_OVERLAPPING_READS=true ADD_MATE_CIGAR=true UNMAP_CONTAMINANT_READS=false MIN_UNCLIPPED_BASES=32 MATCHING_DICTIONARY_TAGS=[M5, LN] UNMAPPED_READ_STRATEGY=DO_NOT_CHANGE VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 19:24:24 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.18.14-SNAPSHOT
+INFO	2021-05-02 19:24:26	SamAlignmentMerger	Processing SAM file(s): [tmp/aligned.sorted.bam]
+INFO	2021-05-02 19:28:23	AbstractAlignmentMerger	Wrote 33136 alignment records and 2821 unmapped reads.
+[Sun May 02 19:28:23 CEST 2021] picard.sam.MergeBamAlignment done. Elapsed time: 3.98 minutes.
+Runtime.totalMemory()=1985478656
+INFO	2021-05-02 19:28:23	TagReadWithInterval	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagReadWithInterval -INTERVALS /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.genes.intervals -TAG XG -I tmp/merged.bam -O tmp/gene_tagged.bam -TMP_DIR tmp
+**********
+
+
+19:28:24.190 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 19:28:25 CEST 2021] TagReadWithInterval INPUT=tmp/merged.bam INTERVALS=/home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.genes.intervals OUTPUT=tmp/gene_tagged.bam TAG=XG TMP_DIR=[tmp]    VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 19:28:25 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+[Sun May 02 19:28:30 CEST 2021] org.broadinstitute.dropseqrna.metrics.TagReadWithInterval done. Elapsed time: 0.11 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 19:28:31	TagReadWithGeneFunction	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    TagReadWithGeneFunction -O out/gene_function_tagged.bam -ANNOTATIONS_FILE /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.refFlat -INPUT tmp/merged.bam
+**********
+
+
+19:28:31.570 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+19:28:31.575 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+19:28:31.576 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+19:28:31.576 WARN  NativeLibraryLoader - Unable to load libgkl_compression.so from native/libgkl_compression.so (No such file or directory)
+[Sun May 02 19:28:31 CEST 2021] TagReadWithGeneFunction INPUT=tmp/merged.bam OUTPUT=out/gene_function_tagged.bam ANNOTATIONS_FILE=/home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.refFlat    GENE_NAME_TAG=gn GENE_STRAND_TAG=gs GENE_FUNCTION_TAG=gf READ_FUNCTION_TAG=XF USE_STRAND_INFO=true VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 19:28:31 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Jdk; Inflater: Jdk; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+19:28:31.585 WARN  IntelDeflaterFactory - IntelInflater is not supported, using Java.util.zip.Inflater
+19:28:42.978 WARN  IntelDeflaterFactory - IntelDeflater is not supported, using Java.util.zip.Deflater
+[Sun May 02 19:28:43 CEST 2021] org.broadinstitute.dropseqrna.metrics.TagReadWithGeneFunction done. Elapsed time: 0.20 minutes.
+Runtime.totalMemory()=2058354688
+INFO	2021-05-02 19:28:44	DigitalExpression	
+
+********** NOTE: Picard's command line syntax is changing.
+**********
+********** For more information, please see:
+********** https://github.com/broadinstitute/picard/wiki/Command-Line-Syntax-Transition-For-Users-(Pre-Transition)
+**********
+********** The command line looks like this in the new syntax:
+**********
+**********    DigitalExpression -I out/gene_function_tagged.bam -O out/DGE_matrix_min100.txt.gz -READ_MQ 10 -EDIT_DISTANCE 1 -MIN_NUM_GENES_PER_CELL 100 -TMP_dir tmp
+**********
+
+
+19:28:44.354 INFO  NativeLibraryLoader - Loading libgkl_compression.so from jar:file:/home/jwirth/projects/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/jar/lib/picard-2.18.14.jar!/com/intel/gkl/native/libgkl_compression.so
+[Sun May 02 19:28:44 CEST 2021] DigitalExpression OUTPUT=out/DGE_matrix_min100.txt.gz INPUT=out/gene_function_tagged.bam EDIT_DISTANCE=1 READ_MQ=10 MIN_NUM_GENES_PER_CELL=100 TMP_DIR=[tmp]    OUTPUT_READS_INSTEAD=false CELL_BARCODE_TAG=XC MOLECULAR_BARCODE_TAG=XM MIN_BC_READ_THRESHOLD=0 USE_STRAND_INFO=true RARE_UMI_FILTER_THRESHOLD=0.0 GENE_NAME_TAG=gn GENE_STRAND_TAG=gs GENE_FUNCTION_TAG=gf STRAND_STRATEGY=SENSE LOCUS_FUNCTION_LIST=[CODING, UTR] VERBOSITY=INFO QUIET=false VALIDATION_STRINGENCY=STRICT COMPRESSION_LEVEL=5 MAX_RECORDS_IN_RAM=500000 CREATE_INDEX=false CREATE_MD5_FILE=false GA4GH_CLIENT_SECRETS=client_secrets.json USE_JDK_DEFLATER=false USE_JDK_INFLATER=false
+[Sun May 02 19:28:44 CEST 2021] Executing as jwirth@hdc-server.scidom.de on Linux 3.10.0-1062.9.1.el7.x86_64 amd64; OpenJDK 64-Bit Server VM 1.8.0_232-b09; Deflater: Intel; Inflater: Intel; Provider GCS is not available; Picard version: 2.1.0(e9a342e_1547567906)
+INFO	2021-05-02 19:28:44	BarcodeListRetrieval	Looking for cell barcodes that have at least 100 genes
+INFO	2021-05-02 19:28:44	CustomBAMIterators	Reading in records for TAG name sorting
+INFO	2021-05-02 19:28:44	CustomBAMIterators	Sorting finished.
+ERROR	2021-05-02 19:28:44	DigitalExpression	Running digital expression without somehow selecting a set of barcodes to process no longer supported.
+[Sun May 02 19:28:44 CEST 2021] org.broadinstitute.dropseqrna.barnyard.DigitalExpression done. Elapsed time: 0.00 minutes.
+Runtime.totalMemory()=2058354688
