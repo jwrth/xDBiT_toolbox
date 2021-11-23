@@ -6,10 +6,13 @@
 # https://github.com/RebekkaWegmann/splitseq_toolbox
 #
 # Author: Johannes Wirth, Meier Lab, Helmholtz Pioneer Campus, Helmholtz Zentrum Munich, 2021
-# Original version Copyright 2017 Broad Institute
+# Original version Copyrights: 
+#   - Copyright (c) 2018 Broad Institute
+#   - Copyright (c) Rebekka Wegmann, 2019
 
 # MIT License
 #
+# Copyright (c) Johannes Wirth, 2022
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +71,7 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -a                  : String matching algorithm (hamming or levenshtein). Default: hamming.
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
--m                  : Mode. Searches for three barcodes.
+-m                  : Mode. "DbitX" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
 EOF
 }
 
@@ -288,36 +291,34 @@ tag_with_gene_function="${dropseq_root}/TagReadWithGeneFunction O=${outdir}/gene
 #### Start pipeline
 start_time=`date +%s`
 
-# Stage 0
-$echo_prefix $filter_fastq | tee ${outdir}/cutadapt.out
-$echo_prefix $generate_bam | tee ${tmpdir}/FastqToSam.out
+# # Stage 0
+# $echo_prefix $filter_fastq | tee ${outdir}/cutadapt.out
+# $echo_prefix $generate_bam | tee ${tmpdir}/FastqToSam.out
 
-# Stage 1
-$echo_prefix $tag_molecules OUTPUT=$tmpdir/unaligned_tagged_Molecular.bam
+# # Stage 1
+# $echo_prefix $tag_molecules OUTPUT=$tmpdir/unaligned_tagged_Molecular.bam
 
-if (( $multiwell == 1))
-then
-    $echo_prefix $tag_cells_well INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MW.bam
-    $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_MW.bam OUTPUT=$tmpdir/unaligned_tagged_MWY.bam
-    $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MWY.bam OUTPUT=$tmpdir/unaligned_tagged_MWYX.bam
-    $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+# if (( $multiwell == 1))
+# then
+#     $echo_prefix $tag_cells_well INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MW.bam
+#     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_MW.bam OUTPUT=$tmpdir/unaligned_tagged_MWY.bam
+#     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MWY.bam OUTPUT=$tmpdir/unaligned_tagged_MWYX.bam
+#     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
 
-    files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MW.bam $tmpdir/unaligned_tagged_MWY.bam \
-                $tmpdir/unaligned_tagged_MWYX.bam $tmpdir/unaligned_tagged_filtered.bam"
-else
-    $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MY.bam
-    $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MY.bam OUTPUT=$tmpdir/unaligned_tagged_MYX.bam
-    $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
+#     files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MW.bam $tmpdir/unaligned_tagged_MWY.bam \
+#                 $tmpdir/unaligned_tagged_MWYX.bam $tmpdir/unaligned_tagged_filtered.bam"
+# else
+#     $echo_prefix $tag_cells_y INPUT=$tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$tmpdir/unaligned_tagged_MY.bam
+#     $echo_prefix $tag_cells_x INPUT=$tmpdir/unaligned_tagged_MY.bam OUTPUT=$tmpdir/unaligned_tagged_MYX.bam
+#     $echo_prefix $filter_bam INPUT=$tmpdir/unaligned_tagged_MYX.bam OUTPUT=$tmpdir/unaligned_tagged_filtered.bam
 
-    files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MY.bam $tmpdir/unaligned_tagged_MYX.bam \
-                $tmpdir/unaligned_tagged_filtered.bam"
-fi
+#     files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_Molecular.bam $tmpdir/unaligned_tagged_MY.bam $tmpdir/unaligned_tagged_MYX.bam \
+#                 $tmpdir/unaligned_tagged_filtered.bam"
+# fi
 
-# Stage 2
-#$echo_prefix $trim_starting_sequence INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_tagged_trimmed_smart.bam
-$echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=${tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
-
-
+# # Stage 2
+# #$echo_prefix $trim_starting_sequence INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=$tmpdir/unaligned_tagged_trimmed_smart.bam
+# $echo_prefix $trim_poly_a INPUT=$tmpdir/unaligned_tagged_filtered.bam OUTPUT=${tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
 
 # Stage 3
 if [[ "${multithreading}" == "-m" ]]; then 
