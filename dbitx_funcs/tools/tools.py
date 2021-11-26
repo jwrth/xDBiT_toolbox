@@ -8,14 +8,27 @@ from scipy import ndimage
 import seaborn as sns
 import math
 from typing import Optional, Tuple
-from skmisc.loess import loess
 from gprofiler import GProfiler
 import gseapy
 import anndata
 from PIL import Image
 import scanpy as sc
-import bbknn
+
 #from ..plotting import volcano_plot
+
+# Some modules make problems on Windows. Therefore I imported them conditionally
+try:
+    from skmisc.loess import loess
+except ImportError:
+    print("Import issue with loess function detected. Probably due to Windows. Error ignored.")
+    pass
+
+try:
+    import bbknn
+except ModuleNotFoundError:
+    print("Package 'bbknn' not installed here. Error ignored.")
+    pass
+
 
 
 def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spatialde', use_raw=False):

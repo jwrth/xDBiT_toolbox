@@ -38,7 +38,7 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         [coord_to_um(c, resolution) for c in adata.obs['array_row']])
     adata.obs['um_col'] = np.array(
         [coord_to_um(c, resolution) for c in adata.obs['array_col']])
-    
+    print(adata.obs_names[0])
     if dbitx:
         adata.obs['well'] = np.array(
             [str(elem.split(sep)[2]) for elem in adata.obs_names])

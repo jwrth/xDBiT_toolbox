@@ -111,16 +111,17 @@ def multi_grayscale_to_rgb(r=None, g=None, b=None, bit_type="8bit", lowers=[None
     return rgb
 
 
-def align_image(image, vertices, frame=100):
+def align_image(image, vertices, frame:int = 100):
     '''
     Function to align image based on four vertices using perspective transformation.
     '''
+
 
     # order vertices clockwise
     vertices = order_points_clockwise(vertices)
 
     # calculate the width of the alignment marker square
-    pxl_width = dist_points(vertices[0], vertices[1]).astype(int)
+    pxl_width = int(dist_points(vertices[0], vertices[1]).astype(int))
 
     # x/y coordinates need to be flipped for opencv
     pts1 = np.flip(vertices, axis=1).astype(np.float32)
@@ -136,7 +137,8 @@ def align_image(image, vertices, frame=100):
 
     return aligned
 
-def align_to_dict(images, labels, vertices, resolution, n_channels, frame=100, bit_type='8bit'):
+def align_to_dict(images, labels, vertices, resolution: int, n_channels: int, 
+    frame: int = 100, bit_type='8bit'):
 
     # Part 1: Align image
     print("     Align images...")
