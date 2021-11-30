@@ -1,17 +1,17 @@
->parameters,category,value,,,
-,channel_names,C00 C01* C02 C03,,,
-,channel_labels,bf align phalloidin dapi,,,
-,n_channels,38,,,
-,spot_width,50,,,
-,frame,100,,,
-,,,,,
-,,,,,
->directories,input_transcriptome,input_images,output,vertices_x,vertices_y
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=0*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A1.h5ad,1558 10559 10179 1171,931 1336 10323 9910
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A2\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=1*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A2.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=2*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A3.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\B1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=3*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_B1.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\B3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=5*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_B3.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=6*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C1.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C2\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=7*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C2.h5ad,,
-,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=8*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C3.h5ad,,
+>parameters,,,category,value,,,
+,,,channel_names,C00 C01* C02 C03,,,
+,,,channel_labels,bf align phalloidin dapi,,,
+,,,n_channels,38,,,
+,,,spot_width,50,,,
+,,,frame,100,,,
+,,,,,,,
+,,,,,,,
+>directories,experiment_id,unique_id,input_transcriptome,input_images,output,vertices_x,vertices_y
+,37_30,A1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=0*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A1.h5ad,1567 10566 10176 1179,937 1335 10316 9911
+,37_30,A2,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A2\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=1*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A2.h5ad,1457 10424 10022 1058,961 1360 10347 9943
+,37_30,A3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\A3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=2*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_A3.h5ad,1515 10497 10137 1121,913 1323 10300 9895
+,37_30,B1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\B1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=3*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_B1.h5ad,1368 10380 9984 1006,892 1302 10267 9947
+,37_30,B3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\B3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=5*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_B3.h5ad,1426 10443 10049 1033,951 1344 10321 9919
+,37_30,C1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C1\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=6*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C1.h5ad,1410 10387 10007 1001,876 1277 10257 9839
+,37_30,C2,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C2\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=7*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C2.h5ad,1458 10445 10033 1070,867 1214 10189 9778
+,37_30,C3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\raw_matrices\wells\C3\DGE_matrix_with_introns_min100.txt.gz,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\images\37_30_10X_13x10_20%\B=0\Stitched\S=8*,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30\data\anndata\37_30_adata_raw_with_images_C3.h5ad,1385 10341 10043 983,841 1219 10223 9836

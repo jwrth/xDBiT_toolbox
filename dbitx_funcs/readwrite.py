@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
 from .images.image_processing import align_to_dict
+from datetime import datetime
 
 
-def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, dbitx=False, frame=100, 
+def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, 
+                        #dbitx=False, 
+                        frame=100, unique_id=None,
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
                         manual_pixel_offset_y=0, savepath=None):
     """
@@ -19,12 +22,21 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
     - Image: RGB image as numpy array.
 
     """
-    print("Create adata object in '" + ["Dbit-seq", "DbitX"][dbitx] + "' mode")
+    #print("Create adata object in '" + ["Dbit-seq", "DbitX"][dbitx] + "' mode")
     print("Read transcriptome matrix from {}...".format(matrix_path))
     if transpose:
         adata = sc.read_text(matrix_path).transpose()
     else:
         adata = sc.read_text(matrix_path)
+
+    if unique_id is None:
+        # take current time as unique identifier for this experiment
+        unique_id = f"{datetime.now():%Y-%m-%d_%H:%M:%S}"
+
+    # check if input has three or two coordinates
+    dbitx = False
+    if len(adata.obs_names[0].split(sep)) == 3:
+        dbitx = True
 
     # add coordinates to adata object
     adata.obs['array_row'] = np.array(
@@ -38,10 +50,13 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         [coord_to_um(c, resolution) for c in adata.obs['array_row']])
     adata.obs['um_col'] = np.array(
         [coord_to_um(c, resolution) for c in adata.obs['array_col']])
-    print(adata.obs_names[0])
+
     if dbitx:
-        adata.obs['well'] = np.array(
-            [str(elem.split(sep)[2]) for elem in adata.obs_names])
+        # adata.obs['well'] = np.array(
+        #     [str(elem.split(sep)[2]) for elem in adata.obs_names])
+        adata.obs_names = np.array(["{e}_{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
+    else:
+        adata.obs_names = np.array(["{e}{s}{uid}".format(e=elem, s=sep, uid=unique_id) for elem in adata.obs_names])
 
     if images is not None:
         assert labels is not None, "No labels given."
