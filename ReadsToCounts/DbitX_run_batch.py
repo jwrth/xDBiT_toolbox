@@ -29,6 +29,8 @@ import time
 import numpy as np
 
 print("Starting DbitX pipeline batch processing...", flush=True)
+## Start timing
+t_start = datetime.now()
 
 print("Reading batch parameters from {}".format(sys.argv[1]))
 settings = pd.read_csv(sys.argv[1])
@@ -40,6 +42,8 @@ for b in batch_numbers:
     batch = settings.query('batch == {}'.format(b))
 
     print("{} : Start processing batch {} of {} with {} files".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", b, batch_numbers[-1], len(batch)), flush=True)
+    ## Start timing of batch
+    t_start_batch = datetime.now()
 
     ## Generate Commands
     commands = []
@@ -67,6 +71,7 @@ for b in batch_numbers:
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
+        "-l", # clear tmp files after finishing the script
         #"-e", # for testing
         s["fastq_R1"], s["fastq_R2"]]
         )
@@ -89,11 +94,19 @@ for b in batch_numbers:
             if output:
                 print(output.decode("utf-8").strip(), file=log_files[i], flush=True)
         if not np.any(running):
-            print("{}: All processes of batch {} finished.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", b))
+            ## Stop timing
+            t_stop_batch = datetime.now()
+            t_elapsed_batch = t_stop_batch-t_start_batch
+            print("{}: All processes of batch {} finished after {}.".format(
+                f"{datetime.now():%Y-%m-%d %H:%M:%S}", b, str(t_elapsed_batch)), flush=True)
             break
 
     # close log files
     for f in log_files:
         f.close()
+
+## Stop timing
+t_stop = datetime.now()
+t_elapsed = t_stop-t_start
     
-print("{}: All batches finished.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"), flush=True)
+print("{}: All batches finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
