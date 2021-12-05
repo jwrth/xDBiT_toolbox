@@ -9,7 +9,6 @@ from ..calculations import dist_points, rotation_angle
 #import anndata
 
 
-
 def set_histogram(data, lower=0, upper=None, bit_type=np.uint8, clip=True):
     '''
     Set histogram of image.
@@ -111,11 +110,10 @@ def multi_grayscale_to_rgb(r=None, g=None, b=None, bit_type="8bit", lowers=[None
     return rgb
 
 
-def align_image(image, vertices, frame:int = 100):
+def align_image(image, vertices, frame: int = 100):
     '''
     Function to align image based on four vertices using perspective transformation.
     '''
-
 
     # order vertices clockwise
     vertices = order_points_clockwise(vertices)
@@ -137,8 +135,9 @@ def align_image(image, vertices, frame:int = 100):
 
     return aligned
 
-def align_to_dict(images, labels, vertices, resolution: int, n_channels: int, 
-    frame: int = 100, bit_type='8bit'):
+
+def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
+                  frame: int = 100, bit_type='8bit'):
 
     # Part 1: Align image
     print("     Align images...")
@@ -209,32 +208,33 @@ def create_image_metadata(vertices, resolution, n_channels):
 
     return image_metadata
 
+
 def resize_images_in_adata(adata, scale_factor):
-    
     '''
     Resizes images of all img_keys in an adata by a certain `scale_factor` and saves them in `adata.uns['spatial'][img_key]['images']['lowres']`.
     Key `tissue_lowres_scalef` is added to image metadata.
     '''
 
     img_keys = adata.uns['spatial'].keys()
-    
+
     for key in img_keys:
         img = adata.uns['spatial'][key]['images']['hires']
         width = int(img.shape[1] * scale_factor)
         height = int(img.shape[0] * scale_factor)
         dim = (width, height)
 
-        adata.uns['spatial'][key]['images']['lowres'] = cv2.resize(img, dim).copy()
+        adata.uns['spatial'][key]['images']['lowres'] = cv2.resize(
+            img, dim).copy()
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
-    
-def register_image(image, template, maxFeatures=500, keepFraction=0.2, 
-                debug=False, method="sift", ratio_test=True, flann=True, do_registration=True):
-    
+
+def register_image(image, template, maxFeatures=500, keepFraction=0.2,
+                   debug=False, method="sift", ratio_test=True, flann=True, do_registration=True):
+
     if len(image.shape) == 3:
         print("Convert image to grayscale...")
         imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        
+
     if len(template.shape) == 3:
         print("Convert template to grayscale...")
         templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
@@ -243,52 +243,56 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
     # Get features
     if method == "sift":
         print("     Method: SIFT...")
-        #sift
+        # sift
         sift = cv2.SIFT_create()
 
-        (kpsA, descsA) = sift.detectAndCompute(image,None)
-        (kpsB, descsB) = sift.detectAndCompute(template,None)
+        (kpsA, descsA) = sift.detectAndCompute(image, None)
+        (kpsB, descsB) = sift.detectAndCompute(template, None)
 
     elif method == "surf":
         print("     Method: SURF...")
         surf = cv2.xfeatures2d.SURF_create(400)
 
-        (kpsA, descsA) = surf.detectAndCompute(image,None)
-        (kpsB, descsB) = surf.detectAndCompute(template,None)
-    
+        (kpsA, descsA) = surf.detectAndCompute(image, None)
+        (kpsB, descsB) = surf.detectAndCompute(template, None)
+
     else:
         print("Unknown method. Aborted.")
-        return 
+        return
 
     if flann:
-        print("{}: Compute matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        print("{}: Compute matches...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         # FLANN parameters
         FLANN_INDEX_KDTREE = 1
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
+        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
         search_params = dict(checks=50)   # or pass empty dictionary
 
         # runn Flann matcher
-        flann = cv2.FlannBasedMatcher(index_params,search_params)
-        matches = flann.knnMatch(descsA,descsB,k=2)
+        flann = cv2.FlannBasedMatcher(index_params, search_params)
+        matches = flann.knnMatch(descsA, descsB, k=2)
 
     else:
-        print("{}: Compute matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        #feature matching
+        print("{}: Compute matches...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        # feature matching
         #bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=True)
         bf = cv2.BFMatcher()
-        matches = bf.knnMatch(descsA,descsB, k=2)
-    
+        matches = bf.knnMatch(descsA, descsB, k=2)
+
     if ratio_test:
-        print("{}: Filter matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        print("{}: Filter matches...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         # store all the good matches as per Lowe's ratio test.
         good_matches = []
-        for m,n in matches:
+        for m, n in matches:
             if m.distance < 0.7*n.distance:
                 good_matches.append(m)
     else:
-        print("{}: Filter matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        print("{}: Filter matches...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         # sort the matches by their distance (the smaller the distance, the "more similar" the features are)
-        matches = sorted(matches, key = lambda x:x.distance)
+        matches = sorted(matches, key=lambda x: x.distance)
         # keep only the top matches
         keep = int(len(matches) * keepFraction)
         good_matches = matches[:keep]
@@ -314,19 +318,19 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
     #     keep = int(len(matches) * keepFraction)
     #     good_matches = matches[:keep]
 
-
     # check to see if we should visualize the matched keypoints
     if debug:
         print("{}: Debugging mode - Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         matchedVis = cv2.drawMatches(image, kpsA, template, kpsB,
-            good_matches, None)
+                                     good_matches, None)
         matchedVis = imutils.resize(matchedVis, width=1000)
         plt.imshow(matchedVis)
         plt.show()
 
-    ### Compute homography matrix
+    # Compute homography matrix
 
-    print("{}: Fetch keypoints...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+    print("{}: Fetch keypoints...".format(
+        f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     # allocate memory for the keypoints (x, y)-coordinates from the
     # top matches -- we'll use these coordinates to compute our
     # homography matrix
@@ -338,9 +342,10 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
         # map to each other
         ptsA[i] = kpsA[m.queryIdx].pt
         ptsB[i] = kpsB[m.trainIdx].pt
-    
+
     if debug:
-        print("{}: Debugging mode - Display image and template with keypoints...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        print("{}: Debugging mode - Display image and template with keypoints...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         # plot keypoints for image
         fig, axs = plt.subplots(1, 2, figsize=(12, 6))
         axs[0].imshow(image)
@@ -355,13 +360,15 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
 
     # compute the homography matrix between the two sets of matched
     # points
-    print("{}: Compute homography matrix...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+    print("{}: Compute homography matrix...".format(
+        f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
     # use the homography matrix to register the images
     (h, w) = template.shape[:2]
 
     if do_registration:
-        print("{}: Register image...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        print("{}: Register image...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         registered = cv2.warpPerspective(image, H, (w, h))
     else:
         registered = None
@@ -369,8 +376,8 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
     # return the registered image
     return registered, H
 
-def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle_and_pivot=False):
 
+def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle_and_pivot=False):
     '''
     Recalculates the scale `pixel_per_um` of all images of a given `group` in an anndata object.
     Expects the images in `adata.uns[spatial_key]`
@@ -388,10 +395,12 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle
     # find two orthogonal spots with maximal distance
     while True:
         # extract spot in first row
-        spot1 = a.obs[(a.obs['array_row'] == min_row) & (a.obs['array_col'] == min_col)]
+        spot1 = a.obs[(a.obs['array_row'] == min_row) &
+                      (a.obs['array_col'] == min_col)]
 
         # extract spot in last row
-        spot2 = a.obs[(a.obs['array_row'] == max_row) & (a.obs['array_col'] == min_col)]
+        spot2 = a.obs[(a.obs['array_row'] == max_row) &
+                      (a.obs['array_col'] == min_col)]
 
         # check if both spots exist
         if (len(spot1) == 1) & (len(spot2) == 1):
@@ -401,7 +410,7 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle
 
             upper_spot_ar = spot1[['array_col', 'array_row']].values[0]
             lower_spot_ar = spot2[['array_col', 'array_row']].values[0]
-            
+
             # fetch images keys
             keys = a.uns[spatial_key].keys()
 
@@ -428,9 +437,9 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle
         return rot_angle, upper_spot_px
 
 
-def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi', 
-    spatial_key='spatial', resolution_key='hires',
-    keepFraction=0.2, method='sift', debug=False, in_place=False):
+def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi',
+                                        spatial_key='spatial', resolution_key='hires',
+                                        keepFraction=0.2, method='sift', debug=False, in_place=False):
     '''
     Function to add new images to an adata object and register the coordinates accordingly.
 
@@ -442,14 +451,16 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
     if groups is None:
         groups = list(adata.obs[groupby].unique())
-    
+
     groups = [groups] if isinstance(groups, str) else list(groups)
 
     for group in groups:
-        print("{}: Process group {}...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", group))
+        print("{}: Process group {}...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}", group))
 
         # extract group from adata
-        adata_subset, obs_mask = extract_groups(adata, groupby=groupby, groups=group, extract_uns=True, return_mask=True)
+        adata_subset, obs_mask = extract_groups(
+            adata, groupby=groupby, groups=group, extract_uns=True, return_mask=True)
 
         # fetch name of registration channel
         image_keys = adata_subset.uns[spatial_key].keys()
@@ -458,7 +469,8 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         if len(reg_key) == 1:
             reg_key = reg_key[0]
         else:
-            raise AssertionError("No unique registration channel found: {}".format(reg_key))
+            raise AssertionError(
+                "No unique registration channel found: {}".format(reg_key))
 
         # extract image from subset
         image_adata = adata_subset.uns[spatial_key][reg_key]['images'][resolution_key]
@@ -467,7 +479,8 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         image_dict = {}
         for key in image_keys:
             if key in image_dir_dict:
-                print("{}: Load image for key {}...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
+                print("{}: Load image for key {}...".format(
+                    f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
                 image_dict[key] = cv2.imread(image_dir_dict[key], 0)
 
         # extract and remove the registration image from the dict
@@ -475,21 +488,25 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
         if debug:
             # scale down the images
-            image_adata = imutils.resize(image_adata, width=int(image_adata.shape[1]*0.1))
-            image_to_register = imutils.resize(image_to_register, width=int(image_to_register.shape[1]*0.1))
+            image_adata = imutils.resize(
+                image_adata, width=int(image_adata.shape[1]*0.1))
+            image_to_register = imutils.resize(
+                image_to_register, width=int(image_to_register.shape[1]*0.1))
 
-        ### register images and extract homography matrix
-        print("{}: Register image {}...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
+        # register images and extract homography matrix
+        print("{}: Register image {}...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
         _, H = register_image(image_adata, image_to_register, do_registration=False,
-                                    keepFraction=keepFraction, method=method, debug=debug)
+                              keepFraction=keepFraction, method=method, debug=debug)
 
-        ### transform transcriptome coordinates using homography matrix
+        # transform transcriptome coordinates using homography matrix
         # extract coordinates from subset
         coords = adata_subset.obsm['spatial']
 
         # reshape and transform
-        print("{}: Transform coordinates...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        coords_reshaped = coords.reshape(-1,1,2)
+        print("{}: Transform coordinates...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        coords_reshaped = coords.reshape(-1, 1, 2)
         coords_trans = cv2.transform(coords_reshaped, H)
         coords_trans = coords_trans.reshape(-1, 3)[:, :2]
 
@@ -501,27 +518,35 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         adata.obs['pixel_col'] = adata.obsm['spatial'][:, 0]
 
         # recalculate scale `pixel_per_um` in each image of this group and get rotation angle and pivot point
-        print("{}: Recalculate scale...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        rot_angle, pivot_point = recalculate_scale(adata, groupby=groupby, group=group, return_angle_and_pivot=True)
+        print("{}: Recalculate scale...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        rot_angle, pivot_point = recalculate_scale(
+            adata, groupby=groupby, group=group, return_angle_and_pivot=True)
 
         # correct for rotational shifting of coordinates and image
         # image rotation
         rot_threshold = 0
         if np.absolute(rot_angle) > rot_threshold:
             for key in image_dict:
-                print("{}: Rotate image {} by {} degrees...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", key, rot_angle))
-                image_rotated = rotateImage(image_dict[key], angle=-rot_angle, pivot=pivot_point, PIL=True)
+                print("{}: Rotate image {} by {} degrees...".format(
+                    f"{datetime.now():%Y-%m-%d %H:%M:%S}", key, rot_angle))
+                image_rotated = rotateImage(
+                    image_dict[key], angle=-rot_angle, pivot=pivot_point, PIL=True)
                 image_dict[key] = image_rotated
 
             # coordinate rotation
-            print("{}: Rotate coordinates of group {} by {} degrees...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", group, rot_angle))
-            coords_transrot = np.array([rotatePoint(origin=pivot_point, point=elem, angle=-rot_angle) for elem in coords_trans])
+            print("{}: Rotate coordinates of group {} by {} degrees...".format(
+                f"{datetime.now():%Y-%m-%d %H:%M:%S}", group, rot_angle))
+            coords_transrot = np.array([rotatePoint(
+                origin=pivot_point, point=elem, angle=-rot_angle) for elem in coords_trans])
         else:
-            print("Rotation angle {} below threshold {}. Images and coordinates not rotated.".format(rot_angle, rot_threshold))
+            print("Rotation angle {} below threshold {}. Images and coordinates not rotated.".format(
+                rot_angle, rot_threshold))
             coords_transrot = coords_trans
-        
+
         # store new images in adata
-        print("{}: Store images and coordinates of group {} in anndata object...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", group))
+        print("{}: Store images and coordinates of group {} in anndata object...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}", group))
         for key in image_dict:
             adata.uns[spatial_key][key]['images'][resolution_key] = image_dict[key]
 
@@ -535,57 +560,75 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
     if not in_place:
         return adata
 
-def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi', 
-    fun=np.mean, fun_descriptor='mean', resolution_key='hires'):
 
+def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi',
+                              fun=np.mean, fun_descriptor='mean', lowres=False):
     '''
     Function to apply a function spotwise to an image in a ST dataset. 
     The dataset is expected to be in anndata format.
-    
+
     The image is expected in `adata.uns['spatial'][img_key]['images'][resolution_key]` where `img_key` consists
     of '{group}_{channel_pattern}'.
     In most cases the group is the well_name which is extracted from `adata.obs[groupby]` with groupby='well_name'.
-    
+
     Spot coordinates are expected to be stored in adata.obsm['spatial'] and should match the order of `adata.obs`.
 
     The function to be applied can be specified with `fun`. Default is `np.mean`.
 
     Changes to anndata object are made in-place.
-    
+
     '''
+
+    if lowres:
+        resolution_key = 'lowres'
+    else:
+        resolution_key = 'hires'
 
     results_list = []
     old_group = None
     for i, (index, row) in enumerate(adata.obs.iterrows()):
-        
+
         # extract group
         group = row[groupby]
-        spot = adata.obsm['spatial'][i]
-        
+
         if group != old_group:
             # search for correct img_key
-            img_key = [elem for elem in adata.uns['spatial'].keys() if (channel_pattern in elem) & (group in elem)]
-            
+            img_key = [elem for elem in adata.uns['spatial'].keys() if (
+                channel_pattern in elem) & (group in elem)]
+
             if len(img_key) == 1:
-                img = adata.uns['spatial'][img_key[0]]['images'][resolution_key]
-                px_dia = adata.uns['spatial'][img_key[0]]['scalefactors']['spot_diameter_real']
+                if lowres:
+                    scalef = adata.uns['spatial'][img_key[0]
+                                                  ]['scalefactors']['tissue_lowres_scalef']
+                else:
+                    scalef = adata.uns['spatial'][img_key[0]
+                                                  ]['scalefactors']['tissue_hires_scalef']
+
+                img = adata.uns['spatial'][img_key[0]
+                                           ]['images'][resolution_key]
+                px_dia = adata.uns['spatial'][img_key[0]
+                                              ]['scalefactors']['spot_diameter_real'] * scalef
+
             else:
-                print("No or no unique image key found for spot {}: {}".format(index, img_key))
+                print("No or no unique image key found for spot {}: {}".format(
+                    index, img_key))
                 img = None
-                
+
         if img is not None:
+            # extract spot
+            spot = adata.obsm['spatial'][i] * scalef
             # determine region of spot
-            region = img[int((spot[1] - px_dia / 2)) : int((spot[1] + px_dia / 2)), 
-                    int((spot[0] - px_dia / 2)) : int((spot[0] + px_dia / 2))]
-            
+            region = img[int((spot[1] - px_dia / 2)): int((spot[1] + px_dia / 2)),
+                         int((spot[0] - px_dia / 2)): int((spot[0] + px_dia / 2))]
+
             # apply function to region and record result
             results_list.append(fun(region))
-            
+
         else:
             # if no unique image was found record NaN
             results_list.append(np.nan)
-            
+
         # save group for next loop
         old_group = group
-        
+
     adata.obs[channel_pattern + '_' + fun_descriptor] = results_list
