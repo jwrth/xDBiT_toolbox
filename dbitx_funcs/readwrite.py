@@ -1,16 +1,17 @@
+from numpy.lib.arraysetops import unique
 import scanpy as sc
 import numpy as np
 import squidpy as sq
 import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
-from .images.image_processing import align_to_dict
+from .images.image_processing import align_to_dict, resize_images_in_adata, calc_image_param_per_spot
 from datetime import datetime
 
 
 def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, 
                         #dbitx=False, 
-                        frame=100, unique_id=None,
+                        frame=100, unique_id=None, extra_categories=None, resize_factor=0.2,
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
                         manual_pixel_offset_y=0, savepath=None):
     """
@@ -55,16 +56,22 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         # adata.obs['well'] = np.array(
         #     [str(elem.split(sep)[2]) for elem in adata.obs_names])
         adata.obs_names = np.array(["{e}_{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
+        adata.obs['id'] = unique_id
     else:
         adata.obs_names = np.array(["{e}{s}{uid}".format(e=elem, s=sep, uid=unique_id) for elem in adata.obs_names])
+        adata.obs['id'] = unique_id
 
     if images is not None:
         assert labels is not None, "No labels given."
         assert vertices is not None, "No vertices given."
+
+        # make labels unique
+        unique_labels = [unique_id + "_" + lab for lab in labels]
+
         # read images and create metadata
         print("Align and create image metadata...")
         image_and_metadata = align_to_dict(
-            images=images, labels=labels, vertices=vertices,
+            images=images, labels=unique_labels, vertices=vertices,
             resolution=resolution, n_channels=n_channels, frame=frame
         )
 
@@ -93,9 +100,25 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         # Add image and metadata to adata
         adata.uns[spatial_key] = image_and_metadata
 
+        # Resize images
+        print("Resize images by factor {}...".format(resize_factor), flush=True)
+        resize_images_in_adata(adata, scale_factor=resize_factor)
+
+        # calculate mean intensity per spot for each channel
+        print("Calculate channel mean per spot...", flush=True)
+        for l in labels:
+            calc_image_param_per_spot(adata, groupby='id', channel_pattern=l, 
+                fun=np.mean, fun_descriptor='mean', lowres=True)
+
     else:
         # Add pixel coordinates to adata
         adata.obsm["spatial"] = adata.obs[["um_col", "um_row"]].values
+
+    if extra_categories is not None:
+        # add extra categories to .obs
+        print("Add extra categories...", flush=True)
+        for cat in extra_categories.index:
+            adata.obs[cat] = extra_categories[cat]
 
     print("Adata object generated.")
 
