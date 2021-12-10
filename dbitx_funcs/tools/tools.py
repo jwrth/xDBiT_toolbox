@@ -160,6 +160,10 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     else:
         obs = adata
 
+    # # check if we want to filter `.uns`
+    # if uns_exclusion_pattern is not None:
+    #     extract_uns = True
+
     if groupby in obs.columns:
 
         # create filtering mask for groups
@@ -182,7 +186,7 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
             if len(groups_found) != len(groups):
                 print("Following groups were not found in column {}: {}".format(groupby, groups_notfound))
 
-            if extract_uns:
+            if extract_uns or uns_exclusion_pattern is not None:
                 new_uns = {key:value for (key,value) in adata.uns[uns_key].items() if np.any([group in key for group in groups])}
                 
                 if uns_exclusion_pattern is not None:
@@ -738,23 +742,24 @@ def standard_preprocessing(adata_in, batch_key_hvg=None, do_lognorm=True, regres
         print("Regress out {}...".format(regress_out))
         sc.pp.regress_out(adata, regress_out)
 
-    # dimensionality reduction
-    print("Dimensionality reduction...")
-
-    sc.pp.pca(adata)
-
     if batch_correction_key is None:
+        # dimensionality reduction
+        print("Dimensionality reduction...")
+        sc.pp.pca(adata)
         sc.pp.neighbors(adata)
         sc.tl.umap(adata)
         sc.tl.tsne(adata)
 
     else:
+        # PCA
+        sc.pp.pca(adata)
+
         neigh_uncorr_key = 'neighbors_uncorrected'
         sc.pp.neighbors(adata, key_added=neigh_uncorr_key)
 
         # dim reduction with uncorrected data
-        sc.tl.umap(adata, neighbors_key=neigh_uncorr_key)
-        sc.tl.tsne(adata)
+        #sc.tl.umap(adata, neighbors_key=neigh_uncorr_key)
+        #sc.tl.tsne(adata)
         # clustering
         sc.tl.leiden(adata, neighbors_key='neighbors_uncorrected', key_added='leiden_uncorrected')  
 

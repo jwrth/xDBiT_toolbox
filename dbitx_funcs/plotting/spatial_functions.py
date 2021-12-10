@@ -18,7 +18,7 @@ from tqdm import tqdm
 def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,
             header=None, headersize=18, header_names=None, raw=False, percent=False,
             dpi_save=300,
-            obsm_key = 'spatial',
+            obsm_key = 'spatial', plot_pixel=False,
             spot_size=50, spot_type='s',
             axis=None, fig=None, show=True,
             patch_style=None, patch_xy=(1000, 1000), patch_radius=1000, patch_color='r',
@@ -125,8 +125,10 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
             print("No key `spatial` in adata.uns. Therefore pixel_per_um scalefactor could not be found. Plotted pixel coordinates instead.") if verbose else None
 
     # extract x and y pixel coordinates and convert to micrometer
-    x_coord = adata.obsm[obsm_key][:, 0] / pixel_per_um
-    y_coord = adata.obsm[obsm_key][:, 1] / pixel_per_um
+    x_pixelcoord = adata.obsm[obsm_key][:, 0]
+    y_pixelcoord = adata.obsm[obsm_key][:, 1]
+    x_coord = x_pixelcoord / pixel_per_um
+    y_coord = y_pixelcoord / pixel_per_um
 
     # shift coordinates that they start at (0,0)
     x_offset = x_coord.min()
@@ -135,8 +137,12 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
     y_coord -= y_offset
 
     if xlim is None:
-        xmin = x_coord.min()
-        xmax = x_coord.max()
+        if plot_pixel:
+            xmin = x_pixelcoord.min()
+            xmax = x_pixelcoord.max()
+        else:
+            xmin = x_coord.min()
+            xmax = x_coord.max()
 
         xlim = (xmin - spot_size, xmax + spot_size)
     else:
@@ -144,8 +150,12 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         xlim[1] += spot_size
 
     if ylim is None:
-        ymin = y_coord.min()
-        ymax = y_coord.max()       
+        if plot_pixel:
+            ymin = y_pixelcoord.min()
+            ymax = y_pixelcoord.max()
+        else:
+            ymin = y_coord.min()
+            ymax = y_coord.max()    
 
         ylim = (ymin - spot_size, ymax + spot_size)
     else:
@@ -255,19 +265,26 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
             print("Nothing to plot.")
             return
         else:
-            if key is not None:
+            if plot_pixel:
                 # plot transcriptomic data
-                if not categorical:
-                    s = ax.scatter(x_coord, y_coord, c=color, marker=spot_type,
-                                   s=size, alpha=alpha, edgecolors=None)
-                else:
-                    sns.scatterplot(x='x_coord', y='y_coord', data=data,
-                                    hue=key, marker=spot_type, s=size*1.6, ax=ax, edgecolor="none", palette=color_dict, alpha=alpha)
-            if image is not None:
-                ax.imshow(image, extent=(
-                    -0.5 - x_offset, image.shape[1] / pixel_per_um / scale_factor - 0.5 - x_offset, 
-                    image.shape[0] / pixel_per_um / scale_factor - 0.5 - y_offset, -0.5 - y_offset
-                ), origin='upper', cmap='gray')
+                s = ax.scatter(x_pixelcoord, y_pixelcoord, c=color, marker=spot_type,
+                                s=size, alpha=alpha, edgecolors=None)
+                if image is not None:
+                    ax.imshow(image, origin='upper', cmap='gray')
+            else:
+                if key is not None:
+                    # plot transcriptomic data
+                    if not categorical:
+                        s = ax.scatter(x_coord, y_coord, c=color, marker=spot_type,
+                                    s=size, alpha=alpha, edgecolors=None)
+                    else:
+                        sns.scatterplot(x='x_coord', y='y_coord', data=data,
+                                        hue=key, marker=spot_type, s=size*1.6, ax=ax, edgecolor="none", palette=color_dict, alpha=alpha)
+                if image is not None:
+                    ax.imshow(image, extent=(
+                        -0.5 - x_offset, image.shape[1] / pixel_per_um / scale_factor - 0.5 - x_offset, 
+                        image.shape[0] / pixel_per_um / scale_factor - 0.5 - y_offset, -0.5 - y_offset
+                    ), origin='upper', cmap='gray')
 
         if patch_style is not None:
             pats = []
@@ -618,8 +635,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     range_min=-10, range_max=10, stepsize=0.01, show_progress=False,
     n_bins=20, use_raw=False,
     max_cols=4,
-    x_limit_labels=None, xlabel='PC1 of normalized AEH values', ylabel='Gene expression', values_into_title=None, title_suffix='',
+    x_limit_labels=None, 
+    xlabel=None,ylabel=None,
+    values_into_title=None, title_suffix='',
     #ax=None, 
+    legend_fontsize=24,
     savepath=None, save_only=False, show=True, 
     dpi_save=300, return_fig_axis=False, 
     loess=True, **kwargs):
@@ -772,8 +792,14 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     group_collection[group] = df
 
             if show:
+                if xlabel is None:
+                    xlabel = x_category
+                if ylabel is None:
+                    ylabel = "Gene expression"
+
+
                 axs[i].set_title(key)
-                axs[i].legend(fontsize=24)
+                axs[i].legend(fontsize=legend_fontsize)
                 axs[i].set_xlabel(xlabel, fontsize=28)
                 axs[i].set_ylabel(ylabel, fontsize=28)
                 axs[i].tick_params(axis='both', which='major', labelsize=24)
