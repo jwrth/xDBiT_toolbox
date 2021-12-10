@@ -210,7 +210,7 @@ dependencies:
     - numba==0.52.0
     - numcodecs==0.7.3
     - numexpr==2.7.2
-    - numpy==1.21.4+vanilla
+    - numpy==1.21.4
     - numpydoc==1.1.0
     - omnipath==1.0.4
     - opencv-python==4.5.1.48

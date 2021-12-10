@@ -1,4 +1,4 @@
-  #!/usr/bin/env python
+#!/usr/bin/env python
 
 '''
 Script to align matrices and images from DbitX pipeline.
@@ -52,15 +52,16 @@ settings = pd.read_csv(settings_file, header=None)
 parameters = pd.read_csv(settings_file, 
                        nrows=dir_start-1).dropna(how='all', axis=0).dropna(how='all', axis=1).set_index('category')
 
+# read directories
+n_headers_dir = len(lines[dir_start].split(",")) # get number of headers in directory line
+directories = pd.read_csv(settings_file, 
+                          skiprows=dir_start, usecols=range(1,n_headers_dir)).dropna(how='all', axis=0)
+
 ## Check if all necessary parameters are in the file
 param_cats = ["channel_names", "channel_labels", "n_channels"]
 dir_cats = ["experiment_id", "unique_id", "input_transcriptome", 
     "input_images", "output", "vertices_x", "vertices_y"]
 
-# read directories
-n_headers_dir = len(lines[dir_start].split(",")) # get number of headers in directory line
-directories = pd.read_csv(settings_file, 
-                          skiprows=dir_start, usecols=range(1,n_headers_dir)).dropna(how='all', axis=0)
 
 assert np.all([elem in parameters.index for elem in param_cats]), \
     "Not all required categories found in parameter section {}".format(param_cats)
@@ -87,16 +88,20 @@ if not (pd.isnull(parameters.loc["channel_names", "value"]) or pd.isnull(paramet
 vertx_id = directories.columns.tolist().index('vertices_x')
 verty_id = directories.columns.tolist().index('vertices_y')
 
-# check if all input images and matrix files exist
+# check if all input matrix files exist
 try:
     assert np.all([os.path.isfile(f) for f in directories["input_transcriptome"]]), \
-        "Not all input files exist."
+        "Not all input transcriptome files exist."
 except AssertionError as e:
     # check which files are missing
     missing_files = [f for f in directories["input_transcriptome"] if not os.path.isfile(f)]
-    print("{} Following files are missing: {}".format(e, missing_files))
+    print("{} Following transcriptome files are missing: {}".format(e, missing_files))
     #sys.exit()
     exit()
+
+# check if all input images are exist
+assert np.all([os.path.isfile(img) for img_d in directories['input_images'] for img in glob(img_d)]), \
+    "Not all input image files exist."
 
 # check if all output names are unique
 assert len(np.unique(directories["output"])) == len(directories["output"]), \
