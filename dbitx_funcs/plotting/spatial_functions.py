@@ -60,6 +60,8 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         xlim = [xlim] if isinstance(xlim, str) else list(xlim)
     if xlim is not None:
         ylim = [ylim] if isinstance(ylim, str) else list(ylim)
+    if header_names is not None:
+        header_names = [header_names] if isinstance(header_names, str) else list(header_names)
 
     # check if plotting raw data
     adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=raw)
@@ -168,6 +170,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
 
     else:
         n_plots = 1
+        show = False # otherwise plotting into given axes wouldn't work
 
     if max_cols is None:
         max_cols = n_plots
@@ -231,7 +234,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         ax.set_xlim(xlim[0], xlim[1])
         ax.set_ylim(ylim[0], ylim[1])
 
-        if image_metadata is None:
+        if image_metadata is None or plot_pixel:
             ax.set_xlabel('pixels')
             ax.set_ylabel('pixels')
         else:
@@ -252,7 +255,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         # calculate marker size
         pixels_per_unit = ax.transData.transform(
             [(0, 1), (1, 0)]) - ax.transData.transform((0, 0))
-        x_ppu = pixels_per_unit[1, 0]
+        #x_ppu = pixels_per_unit[1, 0]
         y_ppu = pixels_per_unit[0, 1]
         pxs = y_ppu * spot_size * oversize
         size = (72. / fig.dpi * pxs)**2

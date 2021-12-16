@@ -13,7 +13,7 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
                         #dbitx=False, 
                         frame=100, unique_id=None, extra_categories=None, resize_factor=0.2,
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
-                        manual_pixel_offset_y=0, savepath=None):
+                        manual_pixel_offset_y=0, savepath=None, return_adata=False):
     """
     Function to create adata object for squidpy from Dbit-seq data.
     Inputs are the path to the transcriptome matrix and the image. 
@@ -131,7 +131,10 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         adata.write(savepath)
         print("Adata object saved into " + savepath)
         print("Finished")
-        return
+        if return_adata:
+            return adata
+        else:
+            return
 
 def secure_save(adata, savepath, overwrite=False):
     '''

@@ -178,35 +178,15 @@ def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
 
     return image_sum
 
-
-def create_image_metadata(vertices, resolution, n_channels):
+def resize_image(img, scale_factor):
     '''
-    Function that calculates metadata for squidpy analysis of Dbit-seq samples.
-
+    Resize image by scale_factor
     '''
+    width = int(img.shape[1] * scale_factor)
+    height = int(img.shape[0] * scale_factor)
+    dim = (width, height)
 
-    # order vertices clockwise
-    vertices = order_points_clockwise(vertices)
-
-    # calculate the width of the alignment marker square
-    pxl_width = dist_points(vertices[0], vertices[1]).astype(int)
-
-    # calculate metadata
-    um_width = ((n_channels - 1) * resolution * 2)
-    pixel_per_um = pxl_width / um_width
-    spot_diameter = pixel_per_um * resolution
-
-    # summarize metadata in dictionary
-    image_metadata = {
-        # coordinates need to be converted to int
-        "upper_left_spot_coord": list(map(int, pts2[0])),
-        # this parameter is set to 60 since this is used by squidpy for plotting and gives best results.
-        "spot_diameter_fullres": 60,
-        "spot_diameter_real": spot_diameter,
-        "pixel_per_um": pixel_per_um
-    }
-
-    return image_metadata
+    return cv2.resize(img, dim)
 
 
 def resize_images_in_adata(adata, scale_factor):
@@ -219,12 +199,8 @@ def resize_images_in_adata(adata, scale_factor):
 
     for key in img_keys:
         img = adata.uns['spatial'][key]['images']['hires']
-        width = int(img.shape[1] * scale_factor)
-        height = int(img.shape[0] * scale_factor)
-        dim = (width, height)
 
-        adata.uns['spatial'][key]['images']['lowres'] = cv2.resize(
-            img, dim).copy()
+        adata.uns['spatial'][key]['images']['lowres'] = resize_image(img, scale_factor)
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
@@ -377,7 +353,8 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
     return registered, H
 
 
-def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle_and_pivot=False):
+def recalculate_scale(adata, groupby, group, spatial_key='spatial', 
+    save_scale=True, return_angle_and_pivot=False):
     '''
     Recalculates the scale `pixel_per_um` of all images of a given `group` in an anndata object.
     Expects the images in `adata.uns[spatial_key]`
@@ -411,21 +388,22 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle
             upper_spot_ar = spot1[['array_col', 'array_row']].values[0]
             lower_spot_ar = spot2[['array_col', 'array_row']].values[0]
 
-            # fetch images keys
-            keys = a.uns[spatial_key].keys()
+            if save_scale:
+                # fetch images keys
+                keys = a.uns[spatial_key].keys()
 
-            for key in keys:
-                # get resolution of current image
-                res = a.uns[spatial_key][key]['scalefactors']['resolution']
+                for key in keys:
+                    # get resolution of current image
+                    res = a.uns[spatial_key][key]['scalefactors']['resolution']
 
-                # calculate distances in pixel and um
-                d_px = dist_points(upper_spot_px, lower_spot_px)
-                d_ar = dist_points(upper_spot_ar, lower_spot_ar) * res * 2
+                    # calculate distances in pixel and um
+                    d_px = dist_points(upper_spot_px, lower_spot_px)
+                    d_um = dist_points(upper_spot_ar, lower_spot_ar) * res * 2
 
-                pixel_per_um = d_px / d_ar
-
-                adata.uns[spatial_key][key]['scalefactors']['pixel_per_um'] = pixel_per_um
-                adata.uns[spatial_key][key]['scalefactors']['spot_diameter_real'] = res * pixel_per_um
+                    pixel_per_um = d_px / d_um
+                    
+                    adata.uns[spatial_key][key]['scalefactors']['pixel_per_um'] = pixel_per_um
+                    adata.uns[spatial_key][key]['scalefactors']['spot_diameter_real'] = res * pixel_per_um
             break
         else:
             # if not both spots exists switch into next column
@@ -438,7 +416,9 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial', return_angle
 
 
 def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi',
-                                        spatial_key='spatial', resolution_key='hires',
+                                        spatial_key='spatial', 
+                                        hires_key='hires', lowres_key='lowres',
+                                        rot_threshold=0, do_registration=False, scale_factor=0.1,
                                         keepFraction=0.2, method='sift', debug=False, in_place=False):
     '''
     Function to add new images to an adata object and register the coordinates accordingly.
@@ -463,7 +443,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
             adata, groupby=groupby, groups=group, extract_uns=True, return_mask=True)
 
         # fetch name of registration channel
-        image_keys = adata_subset.uns[spatial_key].keys()
+        image_keys = list(adata_subset.uns[spatial_key].keys())
         reg_key = [k for k in image_keys if reg_channel in k]
         #other_keys = [k for k in image_keys if reg_channel not in k]
         if len(reg_key) == 1:
@@ -473,18 +453,26 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
                 "No unique registration channel found: {}".format(reg_key))
 
         # extract image from subset
-        image_adata = adata_subset.uns[spatial_key][reg_key]['images'][resolution_key]
+        image_adata = adata_subset.uns[spatial_key][reg_key]['images'][hires_key]
+        
+        # extract image metadata
+        image_metadata = adata_subset.uns[spatial_key][reg_key]['scalefactors']
+        pixel_per_um = image_metadata['pixel_per_um']
 
-        # load registration images
-        image_dict = {}
+        # load images and convert to grayscale if necessary
+        hq_image_dict = {}
         for key in image_keys:
             if key in image_dir_dict:
                 print("{}: Load image for key {}...".format(
                     f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
-                image_dict[key] = cv2.imread(image_dir_dict[key], 0)
+                hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
 
-        # extract and remove the registration image from the dict
-        image_to_register = image_dict[reg_key]
+                # convert to grayscale
+                if len(hq_image_dict[key].shape) == 3:
+                    hq_image_dict[key] = cv2.cvtColor(hq_image_dict[key], cv2.COLOR_BGR2GRAY)
+
+        # extract the registration image from the dict
+        image_to_register = hq_image_dict[reg_key]
 
         if debug:
             # scale down the images
@@ -496,43 +484,50 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # register images and extract homography matrix
         print("{}: Register image {}...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
-        _, H = register_image(image_adata, image_to_register, do_registration=False,
+        registered_img, H = register_image(image_adata, image_to_register, do_registration=do_registration,
                               keepFraction=keepFraction, method=method, debug=debug)
+
+        if do_registration:
+            # save registered image in adata
+            print("Save registered image in adata...")
+
+            # convert registered image to grayscale if necessary
+            if len(registered_img.shape) == 3:
+                    registered_img = cv2.cvtColor(registered_img, cv2.COLOR_BGR2GRAY)
+
+            if 'registered' in adata.uns.keys():
+                adata.uns['registered'][group] = registered_img
+            else:
+                adata.uns['registered'] = {}
+                adata.uns['registered'][group] = registered_img
 
         # transform transcriptome coordinates using homography matrix
         # extract coordinates from subset
         coords = adata_subset.obsm['spatial']
 
         # reshape and transform
-        print("{}: Transform coordinates...".format(
+        print("{}: Perspective transformation of coordinates...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+            
         coords_reshaped = coords.reshape(-1, 1, 2)
-        coords_trans = cv2.transform(coords_reshaped, H)
-        coords_trans = coords_trans.reshape(-1, 3)[:, :2]
-
-        # store transformed coordinates in adata
-        adata.obsm['spatial'][obs_mask] = coords_trans
-
-        # substitute the obs coordinates with the .obsm coordinates
-        adata.obs['pixel_row'] = adata.obsm['spatial'][:, 1]
-        adata.obs['pixel_col'] = adata.obsm['spatial'][:, 0]
+        coords_trans = cv2.perspectiveTransform(coords_reshaped, H)
+        coords_trans = coords_trans.reshape(-1, 2)
 
         # recalculate scale `pixel_per_um` in each image of this group and get rotation angle and pivot point
-        print("{}: Recalculate scale...".format(
+        print("{}: Calculate rotation angle...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         rot_angle, pivot_point = recalculate_scale(
-            adata, groupby=groupby, group=group, return_angle_and_pivot=True)
+            adata, groupby=groupby, group=group, save_scale=False, return_angle_and_pivot=True)
 
         # correct for rotational shifting of coordinates and image
         # image rotation
-        rot_threshold = 0
         if np.absolute(rot_angle) > rot_threshold:
-            for key in image_dict:
+            for key in hq_image_dict:
                 print("{}: Rotate image {} by {} degrees...".format(
                     f"{datetime.now():%Y-%m-%d %H:%M:%S}", key, rot_angle))
                 image_rotated = rotateImage(
-                    image_dict[key], angle=-rot_angle, pivot=pivot_point, PIL=True)
-                image_dict[key] = image_rotated
+                    hq_image_dict[key], angle=-rot_angle, pivot=pivot_point, PIL=True)
+                hq_image_dict[key] = image_rotated
 
             # coordinate rotation
             print("{}: Rotate coordinates of group {} by {} degrees...".format(
@@ -544,11 +539,31 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
                 rot_angle, rot_threshold))
             coords_transrot = coords_trans
 
-        # store new images in adata
+        # delete old images and store new images in adata
         print("{}: Store images and coordinates of group {} in anndata object...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", group))
-        for key in image_dict:
-            adata.uns[spatial_key][key]['images'][resolution_key] = image_dict[key]
+        
+        # get metadata from first key
+        metadata = adata.uns['spatial'][image_keys[0]]['scalefactors'].copy()
+
+        # delete old images
+        for key in image_keys:
+            adata.uns[spatial_key].pop(key, None) # remove key regardless of whether it is in the dict
+            #del adata.uns[spatial_key][key]
+            # res_keys = list(adata.uns[spatial_key][key]['images'].keys()).copy()
+            # for res_key in res_keys:
+            #     del adata.uns[spatial_key][key]['images'][res_key]
+        
+        # store new images in adata and add metadata
+        for key in hq_image_dict:
+            if key not in adata.uns[spatial_key]:
+                adata.uns[spatial_key][key] = {}
+                adata.uns[spatial_key][key]['images'] = {}
+            
+            # add image
+            adata.uns[spatial_key][key]['images'][hires_key] = hq_image_dict[key]
+            # add metadata
+            adata.uns[spatial_key][key]['scalefactors'] = metadata
 
         # store transformed and rotated coordinates in adata
         adata.obsm['spatial'][obs_mask] = coords_transrot
@@ -556,6 +571,17 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # substitute the obs coordinates with the .obsm coordinates
         adata.obs['pixel_row'] = adata.obsm['spatial'][:, 1]
         adata.obs['pixel_col'] = adata.obsm['spatial'][:, 0]
+    
+        # recalculate scale and save in `scalefactors`
+        print("{}: Recalculate scale...".format(
+                f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+        recalculate_scale(adata, groupby=groupby, group=group, 
+            save_scale=True, return_angle_and_pivot=False)
+
+    # resize images and store as `lowres` for plotting
+    print("{}: Resize all images and store as `lowres`...".format(
+            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+    resize_images_in_adata(adata, scale_factor=scale_factor)
 
     if not in_place:
         return adata
