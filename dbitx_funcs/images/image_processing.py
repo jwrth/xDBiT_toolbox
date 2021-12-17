@@ -456,8 +456,8 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         image_adata = adata_subset.uns[spatial_key][reg_key]['images'][hires_key]
         
         # extract image metadata
-        image_metadata = adata_subset.uns[spatial_key][reg_key]['scalefactors']
-        pixel_per_um = image_metadata['pixel_per_um']
+        lowres_metadata = adata_subset.uns[spatial_key][reg_key]['scalefactors']
+        pixel_per_um = lowres_metadata['pixel_per_um']
 
         # load images and convert to grayscale if necessary
         hq_image_dict = {}

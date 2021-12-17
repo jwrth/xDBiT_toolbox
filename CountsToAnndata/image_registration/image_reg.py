@@ -24,6 +24,38 @@ import cv2
 import napari
 import matplotlib.pyplot as plt
 
+# functions
+def registration_qc_plot(adata, adata_trans, output_dir, unique_id, reg_channel_label):
+    '''
+    Plot to check how well the registration worked.
+    '''
+    # create plot to check success of registration
+    plotpath = os.path.join(output_dir, unique_id + "_check_registration.png")
+
+    # parameters
+    idxs = adata.obs['id'].unique()
+    c_names = ["Low resolution image", "High-resolution image"]
+    gene = "Actb"
+
+    fig, axs = plt.subplots(len(idxs), 2, figsize=(8*2, 6*len(idxs)))
+
+    if len(idxs) > 1:
+        axs.ravel()
+
+    for r, idx in enumerate(idxs):
+        for c, ad in enumerate([adata, adata_trans]):
+            db.pl.spatial(ad, keys=gene, groupby='id', group=idx, image_key=reg_channel_label, 
+                        lowres=False,
+                        xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
+                        axis=axs[r+c], fig=fig)
+            if r == 0:
+                axs[r+c].set_title(c_names[c] + "\n" + gene, fontsize=12, fontweight='bold')
+                
+    fig.tight_layout()
+    plt.savefig(plotpath, dpi=200)
+            
+    plt.show()
+
 # read file location
 script_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -163,6 +195,8 @@ for i in range(0, n_datasets):
     matrix_file = dirs["input_transcriptome"]
     output_file = dirs["output"]
     output_dir = os.path.dirname(output_file)
+    output_filename = os.path.basename(output_file)
+    tmp_dir = os.path.join(output_dir, "tmp")
     unique_id = dirs["experiment_id"] + "_" + dirs["unique_id"]
 
     # check what images are given for this dataset
@@ -261,10 +295,22 @@ for i in range(0, n_datasets):
         images = None
         channel_labels = None
 
-    # generate squidpy formatted anndata object
+    ### Generation of squidpy formatted anndata object
     print("{} : Generate anndata object from matrix file and images...".format(
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
         flush=True)
+
+    if register_hq:
+        # create tmp directory
+        Path(tmp_dir).mkdir(parents=True, exist_ok=True)
+
+        # determine output file for lowres adata object
+        lowres_outfile = os.path.join(tmp_dir, output_filename.replace(".h5ad", "_lowres.h5ad"))
+        return_adata = True
+    else:
+        lowres_outfile = output_file
+        return_adata = False
+
 
     adata = db.dbitseq_to_squidpy(matrix_path=matrix_file, images=images,
         resolution=int(parameters.loc["spot_width"]), 
@@ -273,8 +319,9 @@ for i in range(0, n_datasets):
         frame=int(parameters.loc["frame"]),
         #dbitx=False, 
         labels=channel_labels, vertices=vertices_list[i], 
-        savepath=output_file, return_adata=True)
+        savepath=lowres_outfile, return_adata=return_adata)
 
+    ### Registration of hiqh-quality imaging data
     if register_hq:
         # create image_dir_dict
         image_dir_dict = {}
@@ -288,32 +335,9 @@ for i in range(0, n_datasets):
         
         adata_trans.write(output_file)
 
-        # create plot to check success of registration
-        plotpath = os.path.join(output_dir, unique_id + "_check_registration.png")
+        # plot registration QC plot
+        registration_qc_plot(adata, adata_trans, output_dir, unique_id, reg_channel_label)
 
-        idxs = adata.obs['id'].unique()
-        c_names = ["Low resolution image", "High-resolution image"]
-        gene = "Actb"
-
-        fig, axs = plt.subplots(len(idxs), 2, figsize=(8*2, 6*len(idxs)))
-
-        if len(idxs) > 1:
-            axs.ravel()
-
-        for r, idx in enumerate(idxs):
-            for c, ad in enumerate([adata, adata_trans]):
-                db.pl.spatial(ad, keys=gene, groupby='id', group=idx, image_key=reg_channel_label, 
-                            lowres=True,
-                            xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
-                            axis=axs[r+c], fig=fig)
-                if r == 0:
-                    axs[r+c].set_title(c_names[c] + "\n" + gene, fontsize=12, fontweight='bold')
-                    
-        fig.tight_layout()
-        plt.savefig(plotpath, dpi=200)
-                
-        plt.show()
-    
 print("{} : Finished all datasets. Vertices saved into {}".format(
     f"{datetime.now():%Y-%m-%d %H:%M:%S}", settings_new), 
     flush=True)
