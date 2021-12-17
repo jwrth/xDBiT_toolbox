@@ -461,15 +461,15 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
         # load images and convert to grayscale if necessary
         hq_image_dict = {}
-        for key in image_keys:
-            if key in image_dir_dict:
-                print("{}: Load image for key {}...".format(
-                    f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
-                hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
+        #for key in image_keys:
+        for key in image_dir_dict:
+            print("{}: Load image for key {}...".format(
+                f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
+            hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
 
-                # convert to grayscale
-                if len(hq_image_dict[key].shape) == 3:
-                    hq_image_dict[key] = cv2.cvtColor(hq_image_dict[key], cv2.COLOR_BGR2GRAY)
+            # convert to grayscale
+            if len(hq_image_dict[key].shape) == 3:
+                hq_image_dict[key] = cv2.cvtColor(hq_image_dict[key], cv2.COLOR_BGR2GRAY)
 
         # extract the registration image from the dict
         image_to_register = hq_image_dict[reg_key]
@@ -548,7 +548,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
         # delete old images
         for key in image_keys:
-            adata.uns[spatial_key].pop(key, None) # remove key regardless of whether it is in the dict
+            adata.uns[spatial_key].pop(key, None) # remove key regardless of whether it is in the dict or not
             #del adata.uns[spatial_key][key]
             # res_keys = list(adata.uns[spatial_key][key]['images'].keys()).copy()
             # for res_key in res_keys:
