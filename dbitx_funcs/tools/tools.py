@@ -8,11 +8,10 @@ from scipy import ndimage
 import seaborn as sns
 import math
 from typing import Optional, Tuple
-from gprofiler import GProfiler
-import gseapy
 import anndata
 from PIL import Image
 import scanpy as sc
+from .. import utils
 
 #from ..plotting import volcano_plot
 
@@ -374,121 +373,6 @@ dist_thrs : Optional[float] = None,):
     #return (xs,ys,ys_hat,stderr)
     return df
 
-def go(adata=None, key=None, target_genes=None, key_added=None, organism='mmusculus', enrichr_libraries='GO_Biological_Process_2018', groups=None, 
-    mode='gprofiler', outdir=None, no_plot=True, uns_key_added='enrichment', return_df=True, sortby='pvals_adj', ascending=True, topN=300,
-    **kwargs):
-
-    if target_genes is None:
-        assert adata is not None and key is not None, "`target_genes`, `adata` and `key` are all None."
-        if key_added is None:
-            key_added = key
-    else:
-        if adata is None:
-            print("No adata given to save values. Results dataframe is returned.")
-            return_df = True
-        else:
-            assert key_added is not None, "Results cannot be added to adata since no `key_added` was given."
-    
-    if not return_df:
-        if uns_key_added in adata.uns:
-            assert isinstance(adata.uns[uns_key_added], dict), 'adata.uns["{}"] exists but is no dictionary.'.format(uns_key_added)
-
-    # get information for up and down regulation from key
-    if key is not None:
-        _, _, _, deg, _ = collect_deg_data(adata, keys=key)
-        deg = pd.concat(deg[key])
-        deg = deg.sort_values(sortby, ascending=ascending)
-
-        if deg.reference.unique()[0] != 'rest':
-            # extract group and reference
-            group = deg.group.unique().tolist()
-            reference = deg.reference.unique().tolist()
-
-            # make sure there is only one reference or group
-            assert len(group) == len(reference) == 1, "More than one group or reference"
-            group = group[0]
-            reference = reference[0]
-
-            # give the reference `rest` a name
-            up = deg.xs('up', level=1)
-            down = deg.xs('down', level=1).rename(index={group: reference})
-
-            group = down.group.copy()
-            ref = down.reference.copy()
-            down["reference"] = group
-            down["group"] = ref
-
-            down['scores'] = down['scores'] * -1
-            down['logfoldchanges'] = down['logfoldchanges'] * -1
-            down['combined'] = down['combined'] * -1
-
-            deg = pd.concat([up, down])
-            deg.drop('updown', axis=1, inplace=True)
-        else:
-            deg = deg.xs('up', level=1).copy()
-
-        # get groups from key
-        groups = deg['group'].unique()
-    else:
-        groups = [key_added]
-
-    if mode == 'gprofiler':
-        enrichment_dict = {}
-        for i, group in enumerate(groups):
-            #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
-            if key is not None:
-                target_genes = deg.xs(group).names.tolist()
-            
-            if topN is not None:
-                target_genes = target_genes[:topN]
-
-            gp = GProfiler(return_dataframe=True)
-            e = gp.profile(organism=organism, query=target_genes, no_evidences=False)
-            
-            # calc -log(p_value)
-            e['Enrichment score'] = [-np.log10(elem) for elem in e.p_value]
-            
-            # sort by p_value
-            e.sort_values('p_value', inplace=True)
-            
-            # collect data
-            enrichment_dict[group] = e
-
-        enrichment = pd.concat(enrichment_dict)
-        
-    elif mode == 'enrichr':
-        enrichment_dict = {}
-        for i, group in enumerate(groups):
-            target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
-
-            e = gseapy.enrichr(gene_list=target_genes, gene_sets=enrichr_libraries, organism=organism, outdir=outdir, no_plot=no_plot, **kwargs).results
-            
-            # calc -log(p_value)
-            e['Enrichment score'] = [-np.log10(elem) for elem in e['Adjusted P-value']]
-            
-            # sort by p_value
-            e.sort_values('Adjusted P-value', inplace=True)
-            
-            # collect data
-            enrichment_dict[group] = e
-
-        enrichment = pd.concat(enrichment_dict)
-
-        enrichment.rename(columns={'Term': 'name'}, inplace=True)
-        enrichment.rename(columns={'Gene_set': 'source'}, inplace=True)
-    
-    # rename column headers
-    enrichment.rename(columns={'recall': 'Gene ratio'}, inplace=True)
-
-    if return_df:
-        return enrichment
-    else:
-        if uns_key_added in adata.uns:
-            adata.uns[uns_key_added][key_added] = enrichment
-        else:
-            adata.uns[uns_key_added] = {}
-            adata.uns[uns_key_added][key_added] = enrichment
-
 
 def nth_repl_all(s, sub, repl, nth):
 
@@ -704,7 +588,39 @@ def otsu_threshold(counts, bins_num = 256, is_normalized=False):
     threshold = bin_mids[:-1][index_of_max_val]
     return int(round(threshold))
 
-def standard_preprocessing(adata_in, batch_key_hvg=None, do_lognorm=True, regress_out=None, filter_hvg=False, batch_correction_key=None):
+def scanorama(adata, batch, hvg=False, hvg_key='highly_variable', **kwargs):
+
+    '''
+    Function to perform Scanorama batch correction (https://github.com/brianhie/scanorama/).
+    Code partially from: https://github.com/theislab/scib.
+    '''
+
+    import scanorama        
+
+    utils.check_sanity(adata, batch, hvg, hvg_key)
+
+    hvg_genes = list(adata.var.index[adata.var[hvg_key]])
+
+    split, categories = utils.split_batches(adata.copy(), batch, hvg=hvg_genes, return_categories=True)
+    corrected = scanorama.correct_scanpy(split, return_dimred=True, **kwargs)
+    corrected = anndata.AnnData.concatenate(
+        *corrected, batch_key=batch, batch_categories=categories, index_unique=None
+    )
+    corrected.obsm['X_emb'] = corrected.obsm['X_scanorama']
+    # corrected.uns['emb']=True
+
+    # add scanorama results to original adata - make sure to have correct order of obs
+    X_scan = corrected.obsm['X_scanorama']
+    orig_obs_names = list(adata.obs_names)
+    cor_obs_names = list(corrected.obs_names)
+    adata.obsm['X_scanorama'] = np.array([X_scan[orig_obs_names.index(o)] for o in cor_obs_names])
+    adata.obsm['X_emb'] = adata.obsm['X_scanorama']
+
+    #return corrected
+    return adata
+
+def standard_preprocessing(adata_in, batch_key_hvg=None, do_lognorm=True, regress_out=None, 
+    filter_hvg=False, batch_correction_key=None, dim_reduction=True):
 
     '''
     Function to perform standard preprocessing on ST data. Adapted from Squidpy Napari Tutorial.
@@ -742,39 +658,40 @@ def standard_preprocessing(adata_in, batch_key_hvg=None, do_lognorm=True, regres
         print("Regress out {}...".format(regress_out))
         sc.pp.regress_out(adata, regress_out)
 
-    if batch_correction_key is None:
-        # dimensionality reduction
-        print("Dimensionality reduction...")
-        sc.pp.pca(adata)
-        sc.pp.neighbors(adata)
-        sc.tl.umap(adata)
-        sc.tl.tsne(adata)
+    if dim_reduction:
+        if batch_correction_key is None:
+            # dimensionality reduction
+            print("Dimensionality reduction...")
+            sc.pp.pca(adata)
+            sc.pp.neighbors(adata)
+            sc.tl.umap(adata)
+            sc.tl.tsne(adata)
 
-    else:
-        # PCA
-        sc.pp.pca(adata)
+        else:
+            # PCA
+            sc.pp.pca(adata)
 
-        neigh_uncorr_key = 'neighbors_uncorrected'
-        sc.pp.neighbors(adata, key_added=neigh_uncorr_key)
+            neigh_uncorr_key = 'neighbors_uncorrected'
+            sc.pp.neighbors(adata, key_added=neigh_uncorr_key)
 
-        # dim reduction with uncorrected data
-        #sc.tl.umap(adata, neighbors_key=neigh_uncorr_key)
-        #sc.tl.tsne(adata)
+            # dim reduction with uncorrected data
+            #sc.tl.umap(adata, neighbors_key=neigh_uncorr_key)
+            #sc.tl.tsne(adata)
+            # clustering
+            sc.tl.leiden(adata, neighbors_key=neigh_uncorr_key, key_added='leiden_uncorrected')  
+
+            # batch correction
+            print("Batch correction for {}...".format(batch_correction_key))
+            bbknn.bbknn(adata, batch_key=batch_correction_key, metric='euclidean') # is used as alternative to sc.pp.neighbors
+
+            # dim reduction with corrected data
+            print("Dimensionality reduction with batch corrected data...")
+            sc.tl.umap(adata)
+            sc.tl.tsne(adata)
+
         # clustering
-        sc.tl.leiden(adata, neighbors_key='neighbors_uncorrected', key_added='leiden_uncorrected')  
-
-        # batch correction
-        print("Batch correction for {}...".format(batch_correction_key))
-        bbknn.bbknn(adata, batch_key=batch_correction_key, metric='euclidean') # is used as alternative to sc.pp.neighbors
-
-        # dim reduction with corrected data
-        print("Dimensionality reduction with batch corrected data...")
-        sc.tl.umap(adata)
-        sc.tl.tsne(adata)
-
-    # clustering
-    print("Leiden clustering...")
-    sc.tl.leiden(adata)
+        print("Leiden clustering...")
+        sc.tl.leiden(adata)
 
     # if not in_place:
     #     return adata
