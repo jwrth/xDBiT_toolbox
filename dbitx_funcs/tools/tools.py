@@ -12,21 +12,22 @@ import anndata
 from PIL import Image
 import scanpy as sc
 from .. import utils
+from ..exceptions import ModuleNotFoundOnWindows
 
 #from ..plotting import volcano_plot
 
 # Some modules make problems on Windows. Therefore I imported them conditionally
-try:
-    from skmisc.loess import loess
-except ImportError:
-    print("Import issue with loess function detected. Probably due to Windows. Error ignored.")
-    pass
+# try:
+#     from skmisc.loess import loess
+# except ImportError:
+#     print("Import issue with loess function detected. Probably due to Windows. Error ignored.")
+#     pass
 
-try:
-    import bbknn
-except ModuleNotFoundError:
-    print("Package 'bbknn' not installed here. Error ignored.")
-    pass
+# try:
+#     import bbknn
+# except ModuleNotFoundError:
+#     print("Package 'bbknn' not installed here. Error ignored.")
+#     pass
 
 
 
@@ -331,6 +332,11 @@ dist_thrs : Optional[float] = None,):
     From: https://github.com/almaan/ST-mLiver
     """
 
+    try:
+        from skmisc.loess import loess
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundOnWindows(e)
+
     srt = np.argsort(xs)
     xs = xs[srt]
     ys = ys[srt]
@@ -625,6 +631,11 @@ def standard_preprocessing(adata_in, batch_key_hvg=None, do_lognorm=True, regres
     '''
     Function to perform standard preprocessing on ST data. Adapted from Squidpy Napari Tutorial.
     '''
+
+    try:
+        import bbknn
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundOnWindows(e)
 
     adata = adata_in.copy()
 

@@ -78,3 +78,20 @@ def todense(adata):
     import scipy
     if isinstance(adata.X, scipy.sparse.csr_matrix):
         adata.X = adata.X.todense()
+
+class SpeciesToID:
+    def __init__(self):
+        self.species_dict = {
+            'mmusculus': 10090,
+            'hsapiens': 9606,
+            'dmelanogaster': 7227
+        }
+    def check_species(self, species):
+        if species not in self.species_dict:
+            raise ValueError(
+                "`species` must be one of following values: {}".format(list(self.species_dict.keys()))
+            )
+    def convert(self, species):
+        self.check_species(species)
+        return self.species_dict[species]
+
