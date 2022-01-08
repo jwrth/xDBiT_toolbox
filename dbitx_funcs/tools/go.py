@@ -16,25 +16,13 @@ class GOEnrichment():
         self.result = {}
     
     def prepare_enrichment(self, adata: AnnData = None, key: str = None, key_added: str = None, 
-            uns_key_added: str = 'enrichment', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True):
+            #uns_key_added: str = 'enrichment', return_df: bool = True, 
+            sortby: str = 'pvals_adj', ascending: bool = True):
 
         if adata is None and key is None:
             raise ValueError("`adata` and `key` are all None.")
         if key_added is None:
             key_added = key
-        
-        else:
-            if adata is None:
-                print("No adata given to save values. Results dataframe is returned.")
-                return_df = True
-            else:
-                if key_added is None:
-                    raise ValueError("Results cannot be added to adata since no `key_added` was given.")
-        
-        if not return_df:
-            if uns_key_added in adata.uns:
-                if not isinstance(adata.uns[uns_key_added], dict):
-                    raise ValueError('adata.uns["{}"] exists but is no dictionary.'.format(uns_key_added))
 
         # get information for up and down regulation from key
         if key is not None:
@@ -82,7 +70,7 @@ class GOEnrichment():
         **kwargs: Any):
 
         deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        uns_key_added=uns_key_added, return_df=return_df, sortby=sortby, ascending=ascending)
+                        sortby=sortby, ascending=ascending)
         
         if organism is None:
             raise ValueError("`organism` not specified. Needs to gprofiler naming conventions, e.g. `mmusculus`")
@@ -132,8 +120,8 @@ class GOEnrichment():
         uns_key_added: str = 'stringdb_enrichment', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
         **kwargs: Any):
 
-        deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        uns_key_added=uns_key_added, return_df=return_df, sortby=sortby, ascending=ascending)
+        deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added,
+                        sortby=sortby, ascending=ascending)
 
         if organism is None:
             raise ValueError("`organism` not specified. Needs to gprofiler naming conventions, e.g. `mmusculus`")
@@ -195,7 +183,7 @@ class GOEnrichment():
         **kwargs):
 
         deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        uns_key_added=uns_key_added, return_df=return_df, sortby=sortby, ascending=ascending)
+                        sortby=sortby, ascending=ascending)
 
         if organism is None:
             raise ValueError("`organism` not specified. Needs to have one of the following values: `mmusculus`, `hsapiens` or `dmelanogaster`")
@@ -279,7 +267,7 @@ class StringDB:
       
 
     def call_stringdb_network(self, genes, species, output_format="image", prefix="", 
-        output_dir="stringdb_networks", network_flavor="evidence", save=True, **kwargs):
+        output_dir="stringdb_networks", network_flavor="confidence", save=True, **kwargs):
         '''
         Generate and save networks from https://string-db.org/.
         '''
@@ -332,11 +320,11 @@ class StringDB:
             return self.result
 
     def stringdb_network_from_adata(self, adata: AnnData = None, key: str = None, top_n: int = 300, organism: str = None, output_format: str = "image",
-        key_added: str = None, uns_key_added: str = 'stringdb_enrichment', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
+        key_added: str = None, sortby: str = 'pvals_adj', ascending: bool = True,
         **kwargs: Any):
 
         deg, groups, key_added = GOEnrichment().prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        uns_key_added=uns_key_added, return_df=return_df, sortby=sortby, ascending=ascending)
+                        sortby=sortby, ascending=ascending)
 
         for i, group in enumerate(groups):
             #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()

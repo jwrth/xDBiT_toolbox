@@ -136,7 +136,8 @@ def rotatePoint(origin, point, angle, radians=False):
     qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
     return [qx, qy]
 
-def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial', uns_exclusion_pattern=None, return_mask=False):
+def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial', uns_exclusion_pattern=None, 
+    return_mask=False, strip=False):
 
     '''
     Function to extract a group from a dataframe or anndata object. 
@@ -192,6 +193,13 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
                 if uns_exclusion_pattern is not None:
                     new_uns = {key:value for (key,value) in new_uns.items() if uns_exclusion_pattern not in key}
                 adata.uns[uns_key] = new_uns
+
+            if strip:
+                # remove all annotations but .var, .obs and .obsm
+                del adata.uns
+                del adata.varm
+                del adata.layers
+                del adata.obsp
             
             if return_mask:
                 return adata, mask
