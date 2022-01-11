@@ -65,14 +65,11 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
 
     # get path of dbitx module and import functions
-    module_path = os.path.abspath(os.path.join(script_dir, "../.."))
+    module_path = os.path.abspath(os.path.join(script_dir, ".."))
     if module_path not in sys.path:
         sys.path.append(module_path)
 
     import dbitx_funcs as db
-
-    ## Set basic parameters
-    register_hq = False
 
     ## Read parameters
     print("Starting Alignment script...", flush=True)
@@ -80,7 +77,8 @@ if __name__ == "__main__":
     # read parameters file
     #settings_file = sys.argv[1]
     #settings_file = "/home/jwirth/projects/experiments/37_43/CountsToAnndata/37_43_CtoA_params+hq_withvertices.csv"
-    settings_file = "C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params+hq_wovertices_ho.csv"
+    #settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_wohq_wovertices_ho_20220111_withvertices.csv"
+    settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_woimages_wovertices_ho_20220111_withvertices.csv"
 
     print("Reading batch parameters from {}".format(settings_file))
     lines = open(settings_file).readlines()
@@ -110,15 +108,15 @@ if __name__ == "__main__":
     param_cats = ["n_channels", "spot_width", "frame", 
         "align_images:align_channel", "align_images:dapi_channel", "hq_images:channel_names", "hq_images:channel_labels"]
     dir_cats = ["experiment_id", "unique_id", "main_dir", 
-        "input_transcriptome", "align_images", "hq_images", "output", 
+        "input_transcriptome", "align_images", "hq_images", "output_dir", 
         "vertices_x", "vertices_y"]
 
     assert np.all([elem in parameters.index for elem in param_cats]), \
         "Not all required categories found in parameter section {}".format(param_cats)
     assert np.all([elem in directories.columns for elem in dir_cats]), \
         "Not all required column headers found in directory section {}".format(dir_cats)
-    assert ~np.any([pd.isnull(parameters.loc[cat, "value"]) for cat in param_cats]), \
-        "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats)
+    assert ~np.any([pd.isnull(parameters.loc[cat, "value"]) for cat in param_cats[:3]]), \
+        "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats[:3])
 
     # determine extra categories which are added later to adata.obs
     extra_cats_headers = [elem for elem in directories.columns if elem not in dir_cats]
@@ -129,6 +127,15 @@ if __name__ == "__main__":
     image_cats = ["align_images:align_channel", "align_images:dapi_channel", 
         "hq_images:channel_names", "hq_images:channel_labels"]
 
+    # get ids of vertices_x and vertices_y
+    vertx_id = directories.columns.tolist().index('vertices_x')
+    verty_id = directories.columns.tolist().index('vertices_y')
+
+    # create full directories from main_dir and the relative paths of matrix and output
+    for cat in ["input_transcriptome", "output_dir"]:
+        directories[cat] = [os.path.join(m, p) if isinstance(p, str) else p for m, p in zip(directories["main_dir"], directories[cat])]
+
+
     if not np.any([pd.isnull(parameters.loc[elem, "value"]) for elem in image_cats]):
         alignment_channel = parameters.loc["align_images:align_channel", "value"]
         dapi_channel = parameters.loc["align_images:dapi_channel", "value"]
@@ -137,33 +144,26 @@ if __name__ == "__main__":
         hq_ch_names = str(parameters.loc["hq_images:channel_names", "value"]).split(" ")
         hq_ch_labels = str(parameters.loc["hq_images:channel_labels", "value"]).split(" ")
 
-        # determine channel on which registration is done most probably the dapi
+        # determine channel on which registration is done - most probably the dapi
         reg_id = [i for i, elem in enumerate(hq_ch_names) if "*" in elem][0]
-        #reg_channel_name = hq_ch_names[reg_id]
         reg_channel_label = hq_ch_labels[reg_id]
-        #reg_channel_name = [elem for elem in hq_ch_names if "*" in elem][0]
-
 
         # check if channel names and labels have same length
         assert len(hq_ch_names) == len(hq_ch_labels), \
-            "Number of channel_names ({}) and channel_labels ({}) differ.".format(len(hq_ch_names), len(hq_ch_labels))
+            "Number of channel_names ({}) and channel_labels ({}) differ.".format(len(hq_ch_names), len(hq_ch_labels))    
 
-    # get ids of vertices_x and vertices_y
-    vertx_id = directories.columns.tolist().index('vertices_x')
-    verty_id = directories.columns.tolist().index('vertices_y')
-
-    # create full directories from main_dir and the relative paths
-    for cat in ["input_transcriptome", "align_images", "hq_images"]:
-        directories[cat] = [os.path.join(m, p) for m, p in zip(directories["main_dir", cat])]
+        # create full directories from main_dir and the relative paths of the images
+        for cat in ["align_images", "hq_images"]:
+            directories[cat] = [os.path.join(m, p) if isinstance(p, str) else p for m, p in zip(directories["main_dir"], directories[cat])]
     
     # create output file names from output_dir
-    directories["output"] = [os.path.join(m, p, 
-        "{}_{}_adata_raw_with_images.h5ad".format(e, u)) for e, u, m, p in zip(
-            directories["experiment_id"],
-            directories["unique_id"],
-            directories["main_dir"],
-            directories["output_dir"]
-            )]
+    # directories["output"] = [os.path.join(m, p, 
+    #     "{}_{}_adata_raw_with_images.h5ad".format(e, u)) for e, u, m, p in zip(
+    #         directories["experiment_id"],
+    #         directories["unique_id"],
+    #         directories["main_dir"],
+    #         directories["output_dir"]
+    #         )]
 
     # check if all input matrix files exist
     try:
@@ -176,16 +176,22 @@ if __name__ == "__main__":
         #sys.exit()
         exit()
 
-    # check if all input images exist
-    assert np.all([os.path.isfile(img) for img_d in directories['align_images'] for img in glob(img_d)]), \
-        "Not all alignment image input files exist."
+    # # check if all input images exist
+    # assert np.all([os.path.isfile(img) for img_d in directories['align_images'] for img in glob(img_d)]), \
+    #     "Not all alignment image input files exist."
 
-    assert np.all([os.path.isfile(img) for img_d in directories['hq_images'] for img in glob(img_d)]), \
-        "Not all hq image input files exist."
+    # assert np.all([os.path.isfile(img) for img_d in directories['hq_images'] for img in glob(img_d)]), \
+    #     "Not all hq image input files exist."
 
     # check if all output names are unique
-    assert len(np.unique(directories["output"])) == len(directories["output"]), \
-        "Output files are not unique. This would cause that one file is overwritten by another: {}".format(directories["output"])
+    # assert len(np.unique(directories["output"])) == len(directories["output"]), \
+    #     "Output files are not unique. This would cause that one file is overwritten by another: {}".format(directories["output"])
+
+    # check if unique_ids are really unique
+    unique_ids = ["{}_{}".format(a,b) for a,b in zip(directories["experiment_id"], directories["unique_id"])]
+    assert len(np.unique(unique_ids)) == len(unique_ids), \
+        "`experiment_id` and `unique_id` together do not give a unique set of ids. \n" \
+            "This would cause that one file is overwritten by another"
 
     # assert that for each dataset there are either both hq_image and align_image or None of both
     assert np.all([pd.notnull(a) == pd.notnull(b) for a, b in zip(directories["align_images"], directories["hq_images"])]), \
@@ -218,19 +224,26 @@ if __name__ == "__main__":
         # get parameters for this dataset
         matrix_file = dirs["input_transcriptome"]
         output_dir = dirs["output_dir"]
-        output_file = dirs["output"]
+        #output_file = dirs["output"]
         #output_dir = os.path.dirname(output_file)
-        output_filename = os.path.basename(output_file)
+        #output_filename = os.path.basename(output_file)
         tmp_dir = os.path.join(output_dir, "tmp")
         unique_id = dirs["experiment_id"] + "_" + dirs["unique_id"]
 
         # check what images are given for this dataset
         images_given = pd.notnull(dirs["align_images"]) and pd.notnull(dirs["hq_images"])
+        images_exist = os.path.isfile(str(dirs["align_images"])) and os.path.isfile(str(dirs["hq_images"]))
+        process_images = images_given and images_exist
 
         # create output directory
         Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-        if images_given:
+        register_hq = False
+        if process_images:
+            # create name of output files
+            output_filename = "{}_hqimages.h5ad".format(unique_id)
+            align_filename = "{}_alignimages.h5ad".format(unique_id)
+
             # check if the vertices are given in the settings file
             vertices_not_given = pd.isnull(dirs["vertices_x"]) or pd.isnull(dirs["vertices_y"])
 
@@ -319,21 +332,24 @@ if __name__ == "__main__":
         else:
             images = None
             channel_labels = None
+            align_filename = "{}_noimages.h5ad".format(unique_id)
 
         ### Generation of squidpy formatted anndata object
         print("{} : Generate anndata object from matrix file and images...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
             flush=True)
 
+
         if register_hq:
             # create tmp directory
             Path(tmp_dir).mkdir(parents=True, exist_ok=True)
 
-            # determine output file for lowres adata object
-            lowres_outfile = os.path.join(tmp_dir, output_filename.replace(".h5ad", "_lowres.h5ad"))
+            # generate path to output files for adata objects
+            align_outfile = os.path.join(tmp_dir, align_filename)
+            output_file = os.path.join(output_dir, output_filename)
             return_adata = True
         else:
-            lowres_outfile = output_file
+            align_outfile = os.path.join(output_dir, align_filename)
             return_adata = False
 
 
@@ -344,7 +360,7 @@ if __name__ == "__main__":
             frame=int(parameters.loc["frame"]),
             #dbitx=False, 
             labels=channel_labels, vertices=vertices_list[i], 
-            savepath=lowres_outfile, return_adata=return_adata)
+            savepath=align_outfile, return_adata=return_adata)
 
         ### Registration of hiqh-quality imaging data
         if register_hq:
