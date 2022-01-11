@@ -78,7 +78,8 @@ if __name__ == "__main__":
     #settings_file = sys.argv[1]
     #settings_file = "/home/jwirth/projects/experiments/37_43/CountsToAnndata/37_43_CtoA_params+hq_withvertices.csv"
     #settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_wohq_wovertices_ho_20220111_withvertices.csv"
-    settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_woimages_wovertices_ho_20220111_withvertices.csv"
+    #settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_woimages_wovertices_ho_20220111_withvertices.csv"
+    settings_file = "/home/jwirth/projects/experiments/37_38/CountsToAnndata/37_38_CtoA_params_+hq_wovertices_ho_20220111_withvertices.csv"
 
     print("Reading batch parameters from {}".format(settings_file))
     lines = open(settings_file).readlines()
@@ -232,8 +233,15 @@ if __name__ == "__main__":
 
         # check what images are given for this dataset
         images_given = pd.notnull(dirs["align_images"]) and pd.notnull(dirs["hq_images"])
-        images_exist = os.path.isfile(str(dirs["align_images"])) and os.path.isfile(str(dirs["hq_images"]))
-        process_images = images_given and images_exist
+
+        # check if both alignment and hq_images exist
+        if images_given:
+            align_images_exist = np.all(os.path.isfile(img) for img in glob(dirs["align_images"]))
+            hq_images_exist = np.all(os.path.isfile(img) for img in glob(dirs["hq_images"]))
+            process_images = align_images_exist and hq_images_exist
+        else:
+            process_images = False
+
 
         # create output directory
         Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -258,6 +266,7 @@ if __name__ == "__main__":
 
             # check whether paths to alignment images and hq images are identical
             if not len(set(align_images) & set(hq_images)) == len(align_images):
+                print("Alignment images and hq are not identical. HQ images will be registered.")
                 register_hq = True
             
             # detect alignment marker image
