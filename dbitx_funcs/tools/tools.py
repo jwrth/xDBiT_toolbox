@@ -1,4 +1,4 @@
-from matplotlib.pyplot import install_repl_displayhook
+from matplotlib.pyplot import install_repl_displayhook, xticks
 import NaiveDE
 import SpatialDE
 import pandas as pd
@@ -7,7 +7,7 @@ import numpy as np
 from scipy import ndimage
 import seaborn as sns
 import math
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union, List, Dict, Any
 import anndata
 from PIL import Image
 import scanpy as sc
@@ -315,8 +315,14 @@ def set_dict_difference(set_dict, set_key):
         s = s.difference(set_dict[key])
     return s
     
-def smooth_fit(xs : np.ndarray, ys : np.ndarray, x_to_fit_on=None,
-dist_thrs : Optional[float] = None,):
+def smooth_fit(xs: np.ndarray, ys: np.ndarray, 
+    #x_to_fit_on: Optional[List] = None,
+    #dist_thrs: Optional[float] = None, 
+    min: Optional[float] = None, 
+    max: Optional[float] = None,
+    #stepsize: Optional[float] = None,
+    nsteps: Optional[float] = 100
+    ):
 
     """Smooth curve using loess
 
@@ -345,29 +351,32 @@ dist_thrs : Optional[float] = None,):
     except ModuleNotFoundError as e:
         raise ModuleNotFoundOnWindows(e)
 
+    # sort x values
     srt = np.argsort(xs)
     xs = xs[srt]
     ys = ys[srt]
 
-    if dist_thrs is None:
-        dist_thrs = np.inf
+    # determine min and max x values and select x inside this range
+    if min is None:
+        min = xs.min()
+    if max is None:
+        max = xs.max()
 
-    keep = np.abs(xs) < dist_thrs
+    keep = (xs >= min) & (xs <= max)
     xs = xs[keep]
     ys = ys[keep]
 
     # generate loess class object
-    ls = loess(xs,
-               ys,
-              )
+    ls = loess(xs, ys)
+
     # fit loess class to data
     ls.fit()
 
-    # check if there are specific x values to fit the data on
-    if x_to_fit_on is not None:
-        # make sure that all values to fit on lie inside the give x values
-        x_to_fit_on = x_to_fit_on[(x_to_fit_on > xs.min()) & (x_to_fit_on < xs.max())]
-        xs = np.asarray(x_to_fit_on)
+    # if stepsize is given determine xs to fit the data on
+    stepsize = (max - min) / nsteps
+    if stepsize is not None:
+        xs = np.asarray(np.arange(min, max+stepsize, stepsize))
+        xs = xs[(xs <= max) & (xs >= min)]
 
     # predict on data
     pred =  ls.predict(xs,
