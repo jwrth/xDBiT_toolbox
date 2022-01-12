@@ -635,7 +635,10 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
         return ax
 
 def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None,
-    range_min=-10, range_max=10, stepsize=0.01, show_progress=False,
+    range_min=None, range_max=None, 
+    #stepsize=0.01, 
+    nsteps=100,
+    show_progress=False,
     n_bins=20, use_raw=False,
     max_cols=4,
     x_limit_labels=None, 
@@ -674,40 +677,6 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
     data_collection = {}
     for i, key in (enumerate(tqdm(keys)) if show_progress else enumerate(keys)):
-        # data = {}
-        # for part in sorted(adata.obs[splitby].unique()):
-        #     partial = extract_groups(adata, groupby=splitby, groups=part)
-
-        #     # check if plotting raw data
-        #     X, var, var_names = check_raw(partial, use_raw=use_raw)
-
-        #     # extract groups to groupby
-        #     group = partial.obs[groupby]
-
-        #     idx = var.index.get_loc(key)
-        #     y = X[:, idx].copy()
-        #     x = partial.obs[x_category]
-
-        #     # bin x and calculate mean for bins
-        #     lower = x.min()
-        #     upper = x.max()
-
-        #     bins = np.linspace(lower, upper, n_bins)
-        #     digitized = np.digitize(x, bins, right=True)
-
-        #     partial_data = pd.DataFrame({
-        #         groupby: group,
-        #         'x': x,
-        #         'bin': digitized,
-        #         'expression': y
-        #     })
-            
-        #     data[part] = partial_data
-
-        # data = pd.concat(data)
-        # #return data
-        # data.index.names = [splitby, 'id']
-
         ## Plotting
         if loess:
             groups = adata.obs[groupby].unique()
@@ -726,51 +695,34 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
                 if splitby is None:
                     # select x value
-                    #x = partial.obs.loc[:, x_category].values
                     x = adata.obs.loc[group_mask, x_category].values
 
                     # extract expression values as y
                     idx = var.index.get_loc(key)
                     #y = X[:, idx].copy()
                     y = group_X[:, idx].copy()
-
-                    # x = data.query('{} == "{}"'.format(groupby, group)).x.values
-                    # y = data.query('{} == "{}"'.format(groupby, group)).expression.values
                     
-                    # determine the x-values to fit on
-                    #x_to_fit_on = np.arange(x.min(), x.max() + stepsize/10, stepsize)
-                    x_to_fit_on = np.arange(range_min, range_max, stepsize)
+                    # do smooth fitting
+                    df = smooth_fit(x, y, 
+                                min=range_min, max=range_max,
+                                nsteps=nsteps)
 
-                    # fit curve
-                    df = smooth_fit(x, y, x_to_fit_on=x_to_fit_on)
                 else:
-                    #splits = partial.obs[splitby].unique()
-                    #splits = adata.obs.loc[group_mask, splitby].unique()
                     splits = group_obs[splitby].unique()
                     df_collection = {}
                     for split in splits:
-                        # extract x values
-                        #obs_mask = partial.obs[splitby] == split
-                        #x = partial.obs.loc[obs_mask, x_category].values
-                                            
-                        #split_mask = group_mask & (adata.obs.loc[group_mask, splitby] == split)
+                        # extract x values                                            
                         split_mask = group_obs[splitby] == split
                         x = group_obs.loc[split_mask, x_category].values
-                        #print(np.sum(split_mask))
 
                         # extract expression values as y
                         idx = var.index.get_loc(key)
-                        #y = X[obs_mask, idx].copy()
-                        #print(split_mask.shape)
-                        #print(X.shape)
                         y = group_X[split_mask, idx].copy()
 
-                        # determine the x-values to fit on
-                        #x_to_fit_on = np.arange(x.min(), x.max() + stepsize/10, stepsize)
-                        x_to_fit_on = np.arange(-10, 10, stepsize)
-
-                        # fit curve
-                        df_split = smooth_fit(x, y, x_to_fit_on=x_to_fit_on)
+                        # do smooth fitting
+                        df_split = smooth_fit(x, y, 
+                                min=range_min, max=range_max,
+                                nsteps=nsteps)
 
                         # collect data
                         df_collection[split] = df_split
@@ -781,7 +733,6 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     df = df_collection[['x', 'y_pred']].groupby('x').mean()
                     df['std'] = df_collection[['x', 'y_pred']].groupby('x').std()
                     df.reset_index(inplace=True)
-                    #return df_collection
 
                 if show:
                     axs[i].fill_between(df['x'], 
