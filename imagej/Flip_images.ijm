@@ -1,3 +1,5 @@
+setBatchMode(true); // run all processes in background
+
 macro  Generic_BatchProcess_Macro
 {
 	DirName = getDirectory("Choose Directory with files");
@@ -9,7 +11,7 @@ macro  Generic_BatchProcess_Macro
 		FileName = FileList[Cpt];
 		RootName = GetRootName(FileName,".");
 		
-		SaveDir = "Processed\\";
+		SaveDir = "Flipped\\";
 		SaveDir = DirName + SaveDir;
 		if(!File.exists(SaveDir)){
 			File.makeDirectory(SaveDir);
@@ -32,10 +34,12 @@ function TreatSingleFile(FilePath,SavePath)
 	OrigID = getImageID();
 
 	//Flip image
+	print("Processing " + FilePath); 
 	run("Flip Vertically");
-
+	
 	saveAs("Tiff", SavePath);
-
+	print("Saved to " + SavePath);
+	close();
 }
 
 function GetRootName(FileName,Seperator)
