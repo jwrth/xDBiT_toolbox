@@ -304,7 +304,7 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self):
+    def ProcessDatasets(self, scale_factor_before_reg):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -425,7 +425,8 @@ class CountsToAnndata():
                                                                 image_dir_dict=image_dir_dict, 
                                                                 reg_channel=self.reg_channel_label, 
                                                                 in_place=False, debug=False, 
-                                                                do_registration=True
+                                                                do_registration=True,
+                                                                scale_factor_before_reg=scale_factor_before_reg
                                                                 )
                 
                 adata_trans.write(output_file)
@@ -442,7 +443,7 @@ class CountsToAnndata():
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", output_dir), 
             flush=True)
 
-    def registration_qc_plot(self, adata, adata_trans, output_dir, unique_id, reg_channel_label):
+    def registration_qc_plot(self, adata, adata_trans, output_dir, unique_id, reg_channel_label, save_only=True):
         '''
         Plot to check how well the registration worked.
         '''
@@ -470,9 +471,12 @@ class CountsToAnndata():
                     
         fig.tight_layout()
         plt.savefig(plotpath, dpi=200)
-                
-        plt.show()
 
+        if save_only:
+            plt.close(fig)
+        else:
+            plt.show()
+                
 #######
 ## Protocol start
 #######
@@ -522,7 +526,7 @@ if __name__ == "__main__":
     coa = CountsToAnndata()
     coa.ReadAndCheckSettings(settings_file=settings_file)
     coa.AddVertices(settings_file=settings_file)
-    coa.ProcessDatasets()
+    coa.ProcessDatasets(scale_factor_before_reg=0.2)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 

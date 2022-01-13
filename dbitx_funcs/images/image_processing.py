@@ -204,16 +204,24 @@ def resize_images_in_adata(adata, scale_factor):
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
-def register_image(image, template, maxFeatures=500, keepFraction=0.2,
+def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_factor=None,
                    debug=False, method="sift", ratio_test=True, flann=True, do_registration=True):
 
-    if len(image.shape) == 3:
-        print("Convert image to grayscale...")
-        imageGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    if scale_factor is not None:
+        print("Scale images before registration")
+        image_scaled = resize_image(img=image, scale_factor=scale_factor)
+        template_scaled = resize_image(img=template, scale_factor=scale_factor)
+    else:
+        image_scaled = image
+        template_scaled = template
 
-    if len(template.shape) == 3:
+    if len(image_scaled.shape) == 3:
+        print("Convert image to grayscale...")
+        image_scaled = cv2.cvtColor(image_scaled, cv2.COLOR_BGR2GRAY)
+
+    if len(template_scaled.shape) == 3:
         print("Convert template to grayscale...")
-        templateGray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+        template_scaled = cv2.cvtColor(template_scaled, cv2.COLOR_BGR2GRAY)
 
     print("{}: Get features...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     # Get features
@@ -222,15 +230,15 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
         # sift
         sift = cv2.SIFT_create()
 
-        (kpsA, descsA) = sift.detectAndCompute(image, None)
-        (kpsB, descsB) = sift.detectAndCompute(template, None)
+        (kpsA, descsA) = sift.detectAndCompute(image_scaled, None)
+        (kpsB, descsB) = sift.detectAndCompute(template_scaled, None)
 
     elif method == "surf":
         print("     Method: SURF...")
         surf = cv2.xfeatures2d.SURF_create(400)
 
-        (kpsA, descsA) = surf.detectAndCompute(image, None)
-        (kpsB, descsB) = surf.detectAndCompute(template, None)
+        (kpsA, descsA) = surf.detectAndCompute(image_scaled, None)
+        (kpsB, descsB) = surf.detectAndCompute(template_scaled, None)
 
     else:
         print("Unknown method. Aborted.")
@@ -297,7 +305,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
     # check to see if we should visualize the matched keypoints
     if debug:
         print("{}: Debugging mode - Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        matchedVis = cv2.drawMatches(image, kpsA, template, kpsB,
+        matchedVis = cv2.drawMatches(image_scaled, kpsA, template_scaled, kpsB,
                                      good_matches, None)
         matchedVis = imutils.resize(matchedVis, width=1000)
         plt.imshow(matchedVis)
@@ -324,11 +332,11 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         # plot keypoints for image
         fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-        axs[0].imshow(image)
+        axs[0].imshow(image_scaled)
         axs[0].scatter(x=ptsA[:, 0], y=ptsA[:, 1])
         axs[0].set_title('Image')
 
-        axs[1].imshow(template)
+        axs[1].imshow(template_scaled)
         axs[1].scatter(x=ptsB[:, 0], y=ptsB[:, 1])
         axs[1].set_title('Template')
 
@@ -340,7 +348,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2,
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
     # use the homography matrix to register the images
-    (h, w) = template.shape[:2]
+    (h, w) = template_scaled.shape[:2]
 
     if do_registration:
         print("{}: Register image...".format(
@@ -417,7 +425,7 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial',
 
 def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi',
                                         spatial_key='spatial', 
-                                        hires_key='hires', lowres_key='lowres',
+                                        hires_key='hires', lowres_key='lowres', scale_factor_before_reg=None,
                                         rot_threshold=0, do_registration=False, scale_factor=0.1,
                                         keepFraction=0.2, method='sift', debug=False, in_place=False):
     '''
@@ -484,7 +492,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # register images and extract homography matrix
         print("{}: Register image {}...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
-        registered_img, H = register_image(image_adata, image_to_register, do_registration=do_registration,
+        registered_img, H = register_image(image_adata, image_to_register, do_registration=do_registration, scale_factor=scale_factor_before_reg,
                               keepFraction=keepFraction, method=method, debug=debug)
 
         if do_registration:
