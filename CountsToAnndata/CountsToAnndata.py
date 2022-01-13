@@ -76,10 +76,7 @@ if __name__ == "__main__":
 
     # read parameters file
     #settings_file = sys.argv[1]
-    #settings_file = "/home/jwirth/projects/experiments/37_43/CountsToAnndata/37_43_CtoA_params+hq_withvertices.csv"
-    #settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_wohq_wovertices_ho_20220111_withvertices.csv"
-    #settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_woimages_wovertices_ho_20220111_withvertices.csv"
-    settings_file = "/home/jwirth/projects/experiments/37_38/CountsToAnndata/37_38_CtoA_params_+hq_wovertices_ho_20220111_withvertices.csv"
+    settings_file = r"C:\Users\Johannes\Documents\homeoffice\37_38\CountsToAnndata\37_38_CtoA_params_wohq_wovertices_ho.csv"
 
     print("Reading batch parameters from {}".format(settings_file))
     lines = open(settings_file).readlines()
