@@ -10,6 +10,7 @@
 #@ String (label="Input file format: ", choices={".tif", ".png", ".jpg"}, style="listBox") file_ending
 #@ String (label="Channels to process (comma-separated; e.g. 'C00,C01')") channels
 #@ String (label="Pattern in target directories (Optional): ", value="") pattern_dir
+#@ String (label="Flip? ", choices={"Vertically", "Horizontally", "Do not flip"}, style="listBox") flip
 #@ Boolean (label="Compute overlap? ") compute
 #@ Boolean (label="Overwrite output file if it exists? ") overwrite
 
@@ -120,8 +121,15 @@ function StitchImages(FolderPath, SavePath, FileName, ConfigFile)
 
 	}
 
-
-
+	if (flip != "Do not flip"){
+		run("Flip " + flip);
+		print("Image flipped");
+		RootName = GetRootName(SavePath,".");
+		SavePath = RootName + "_flipped" + file_ending;
+	}
+	else{
+		print("Image not flipped.");
+	}
 
 	if ( overwrite ){
 		File.delete(SavePath);
