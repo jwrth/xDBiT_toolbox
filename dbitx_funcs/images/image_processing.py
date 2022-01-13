@@ -348,7 +348,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
     # use the homography matrix to register the images
-    (h, w) = template_scaled.shape[:2]
+    (h, w) = template.shape[:2]
 
     if do_registration:
         print("{}: Register image...".format(
