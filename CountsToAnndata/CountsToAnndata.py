@@ -145,7 +145,7 @@ class CountsToAnndata():
 
         # create full directories from main_dir and the relative paths of matrix and output
         for cat in ["input_transcriptome", "output_dir"]:
-            self.directories[cat] = [os.path.join(m, p) if isinstance(p, str) else p 
+            self.directories[cat] = [os.path.join(m, p.strip(os.sep)) if isinstance(p, str) else p 
                                         for m, p in 
                                         zip(self.directories["main_dir"], self.directories[cat])
                                         ]
@@ -168,7 +168,7 @@ class CountsToAnndata():
 
             # create full directories from main_dir and the relative paths of the images
             for cat in ["align_images", "hq_images"]:
-                self.directories[cat] = [os.path.join(m, p) if isinstance(p, str) else p 
+                self.directories[cat] = [os.path.join(m, p.strip(os.sep)) if isinstance(p, str) else p 
                                             for m, p in 
                                             zip(self.directories["main_dir"], self.directories[cat])
                                             ]
