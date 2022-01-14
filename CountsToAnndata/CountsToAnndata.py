@@ -24,7 +24,7 @@ class SelectionWindow:
 
         self.root = Tk()
         self.root.title('CountsToAnndata')
-        self.root.geometry("280x70")
+        self.root.geometry("280x105")
         self.root.option_add("*font", "Calibri 10")
 
         self.home = os.path.expanduser("~") # get home directory
@@ -37,13 +37,23 @@ class SelectionWindow:
         self.selectFile = Button(self.root, text="Select settings file", command=self.browsefunc)
         self.selectFile.grid(row=0,column=0)
 
+        # set windows for scale factor selection
+        self.labelText = StringVar()
+        self.labelText.set("Scale factor:")
+        self.labelDir = Label(self.root, textvariable=self.labelText)
+        self.labelDir.grid(row=1, column=0)
+
+        self.sf_default = StringVar(self.root, value="0.2")
+        self.scale_entry = Entry(self.root, textvariable=self.sf_default, width=4, justify=CENTER)
+        self.scale_entry.grid(row=1, column=1)
+
         # set cancel button to exit script
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
-        self.cancel.grid(row=1,column=1)
+        self.cancel.grid(row=2,column=1)
 
         # set okay button to continue script
         self.okay = Button(self.root, text="Okay", command=self.closewindow)
-        self.okay.grid(row=1,column=0)
+        self.okay.grid(row=2,column=0)
 
         # key bindings
         self.root.bind("<Return>", func=self.closewindow)
@@ -58,6 +68,7 @@ class SelectionWindow:
     # Functions
     def closewindow(self, event=None): # event only needed for .bind which passes event object to function
         self.settings_file = self.entry.get()
+        self.scale_factor = self.scale_entry.get()
         self.root.destroy()
 
     def browsefunc(self):
@@ -495,11 +506,11 @@ if __name__ == "__main__":
 
         # read input of selection window
         settings_file = selection.settings_file
+        scale_factor_before_reg = float(selection.scale_factor)
+
     except tkinter.TclError:
         settings_file = input("Enter path to parameters .csv file: ")
-    
-    #scale_factor_before_reg = int(input("Enter scale factor: "))
-    scale_factor_before_reg = 0.2
+        scale_factor_before_reg = float(input("Enter scale factor: "))
 
     #####
     # Process datasets
