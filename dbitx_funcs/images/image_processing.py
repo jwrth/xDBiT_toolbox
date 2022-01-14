@@ -110,7 +110,7 @@ def multi_grayscale_to_rgb(r=None, g=None, b=None, bit_type="8bit", lowers=[None
     return rgb
 
 
-def align_image(image, vertices, frame: int = 100):
+def align_image(image, vertices, frame: int = 100, return_grayscale=True):
     '''
     Function to align image based on four vertices using perspective transformation.
     '''
@@ -132,6 +132,11 @@ def align_image(image, vertices, frame: int = 100):
     # align image
     aligned = cv2.warpPerspective(
         image, M, (int(pxl_width + 2 * frame), int(pxl_width + 2 * frame)))
+
+    if return_grayscale:
+        if len(aligned.shape) == 3:
+            print("Convert image to grayscale...")
+            aligned = cv2.cvtColor(aligned, cv2.COLOR_BGR2GRAY)
 
     return aligned
 
@@ -204,24 +209,25 @@ def resize_images_in_adata(adata, scale_factor):
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
-def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_factor=None,
-                   debug=False, method="sift", ratio_test=True, flann=True, do_registration=True):
+def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_factor=1,
+                   debug=False, method="sift", ratio_test=True, flann=True, do_registration=True,
+                   return_grayscale=True):
 
-    if scale_factor is not None:
+    if len(image.shape) == 3:
+        print("Convert image to grayscale...")
+        image_scaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    if len(template.shape) == 3:
+        print("Convert template to grayscale...")
+        template_scaled = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+
+    if scale_factor < 1:
         print("Scale images before registration")
         image_scaled = resize_image(img=image, scale_factor=scale_factor)
         template_scaled = resize_image(img=template, scale_factor=scale_factor)
     else:
         image_scaled = image
         template_scaled = template
-
-    if len(image_scaled.shape) == 3:
-        print("Convert image to grayscale...")
-        image_scaled = cv2.cvtColor(image_scaled, cv2.COLOR_BGR2GRAY)
-
-    if len(template_scaled.shape) == 3:
-        print("Convert template to grayscale...")
-        template_scaled = cv2.cvtColor(template_scaled, cv2.COLOR_BGR2GRAY)
 
     print("{}: Get features...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     # Get features
@@ -346,14 +352,25 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
     # points
     print("{}: Compute homography matrix...".format(
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+
+    # apply scale_factor to points
+    ptsA /= scale_factor
+    ptsB /= scale_factor
+
+    # determine homography matrix
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
+
     # use the homography matrix to register the images
     (h, w) = template.shape[:2]
-
     if do_registration:
         print("{}: Register image...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         registered = cv2.warpPerspective(image, H, (w, h))
+
+        if return_grayscale:
+            if len(registered.shape) == 3:
+                print("Convert registered image to grayscale...")
+                registered = cv2.cvtColor(registered, cv2.COLOR_BGR2GRAY)
     else:
         registered = None
 

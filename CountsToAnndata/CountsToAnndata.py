@@ -15,6 +15,7 @@ import sys
 import os
 from tkinter import *
 from tkinter import filedialog
+import tkinter
 
 class SelectionWindow:
 
@@ -488,11 +489,17 @@ if __name__ == "__main__":
     #####
 
     # open selection window
-    selection = SelectionWindow()
-    selection.root.mainloop()
+    try:
+        selection = SelectionWindow()
+        selection.root.mainloop()
 
-    # read input of selection window
-    settings_file = selection.settings_file
+        # read input of selection window
+        settings_file = selection.settings_file
+    except tkinter.TclError:
+        settings_file = input("Enter path to parameters .csv file: ")
+    
+    #scale_factor_before_reg = int(input("Enter scale factor: "))
+    scale_factor_before_reg = 0.2
 
     #####
     # Process datasets
@@ -526,7 +533,7 @@ if __name__ == "__main__":
     coa = CountsToAnndata()
     coa.ReadAndCheckSettings(settings_file=settings_file)
     coa.AddVertices(settings_file=settings_file)
-    coa.ProcessDatasets(scale_factor_before_reg=0.2)
+    coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
