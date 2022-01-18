@@ -1,4 +1,6 @@
-# DbitX toolbox
+# DbitX_toolbox
+
+This repository contains all code that is necessary to reproduce results shown in the publication ...
 
 This toolbox includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or DbitX experiments.
 It is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
