@@ -1,8 +1,9 @@
 import numpy as np
+import pandas as pd
 from math import sqrt
-from scipy import ndimage
 from scipy.spatial import distance as dist
-import cv2
+from ..exceptions import ModuleNotFoundOnWindows
+from typing import Optional, Tuple, Union, List, Dict, Any
 
 
 def minDistance(A, B, E) :
@@ -154,3 +155,85 @@ def order_points_clockwise(pts, mode='yx'):
     # return the coordinates in top-left, top-right,
     # bottom-right, and bottom-left order
     return np.array([tl, tr, br, bl], dtype="float32")
+
+
+def smooth_fit(xs: np.ndarray, ys: np.ndarray, 
+    #x_to_fit_on: Optional[List] = None,
+    #dist_thrs: Optional[float] = None, 
+    min: Optional[float] = None, 
+    max: Optional[float] = None,
+    #stepsize: Optional[float] = None,
+    nsteps: Optional[float] = 100
+    ):
+
+    """Smooth curve using loess
+
+    will perform curve fitting using skmisc.loess,
+    points above 'dist_thrs' will be excluded.
+    Parameters:
+    ----------
+    xs : np.ndarray
+        x values
+    ys : np.ndarray
+        y values
+    dist_thrs : float
+        exclude (x,y) tuples where x > dist_thrs
+    Returns:
+    -------
+    A tuple with included x and y-values (xs',ys'), as well
+    as fitted y-values (ys_hat) together with associated
+    standard errors. The tuple is on the form
+    (xs',ys',y_hat,std_err)
+
+    From: https://github.com/almaan/ST-mLiver
+    """
+
+    try:
+        from skmisc.loess import loess
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundOnWindows(e)
+
+    # sort x values
+    srt = np.argsort(xs)
+    xs = xs[srt]
+    ys = ys[srt]
+
+    # determine min and max x values and select x inside this range
+    if min is None:
+        min = xs.min()
+    if max is None:
+        max = xs.max()
+
+    keep = (xs >= min) & (xs <= max)
+    xs = xs[keep]
+    ys = ys[keep]
+
+    # generate loess class object
+    ls = loess(xs, ys)
+
+    # fit loess class to data
+    ls.fit()
+
+    # if stepsize is given determine xs to fit the data on
+    stepsize = (max - min) / nsteps
+    if stepsize is not None:
+        xs = np.asarray(np.arange(min, max+stepsize, stepsize))
+        xs = xs[(xs <= max) & (xs >= min)]
+
+    # predict on data
+    pred =  ls.predict(xs,
+                       stderror=True)
+    # get predicted values
+    ys_hat = pred.values
+    # get standard error
+    stderr = pred.stderr
+
+    df = pd.DataFrame({
+        'x': xs,
+        #'y': ys,
+        'y_pred': ys_hat,
+        'std': stderr
+    })
+
+    #return (xs,ys,ys_hat,stderr)
+    return df

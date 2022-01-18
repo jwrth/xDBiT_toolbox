@@ -4,9 +4,40 @@ from ..calculations._calc import order_points_clockwise, dist_points
 import imutils
 import matplotlib.pyplot as plt
 from datetime import datetime
-from ..tools import extract_groups, rotateImage, rotatePoint
+from ..tools import extract_groups, rotatePoint
 from ..calculations import dist_points, rotation_angle
-#import anndata
+import numpy as np
+from scipy import ndimage
+from typing import Optional, Tuple, Union, List, Dict, Any
+from PIL import Image
+
+def rotateImage(img, angle, pivot, imagetype="grayscale", PIL=True, order=3):
+    """
+    Rotate counterclockwise by given angle in degrees around pivot point (format [x,y]).
+    """
+
+    if PIL:
+        # use Python Image Processing Library
+        img = Image.fromarray(img)
+        imgR = np.array(img.rotate(angle, center=tuple(pivot)))
+
+    else:
+        # use scipy function
+        padX = [int(img.shape[0] - pivot[0]), int(pivot[0])]
+        padY = [int(img.shape[1] - pivot[1]), int(pivot[1])]
+
+        if imagetype == "grayscale":
+            imgP = np.pad(img, [padY, padX], 'constant')
+        elif imagetype == "rgb":
+            imgP = np.pad(img, [padY, padX, [0, 0]], 'constant')
+        else:
+            print("Unknown image type.")
+            return
+        
+        imgR = ndimage.rotate(imgP, angle, reshape=False, order=order)
+        imgR = imgR[padY[0]: -padY[1], padX[0]: -padX[1]]
+
+    return imgR
 
 
 def set_histogram(data, lower=0, upper=None, bit_type=np.uint8, clip=True):

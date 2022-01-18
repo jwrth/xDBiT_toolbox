@@ -9,7 +9,8 @@ import numpy as np
 import warnings
 from ..calculations._calc import dist_points, minDistance
 from sklearn.preprocessing import MinMaxScaler
-from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, smooth_fit, get_crange
+from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
+from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
 from ..images import set_histogram
 from tqdm import tqdm
@@ -70,7 +71,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
     if header_names is not None:
         assert len(header_names) == len(keys)
 
-    # get image data
+    # get image data and or metadata
     if image_key is not None:
         # check if image_key gives unique match
         image_key_list = adata.uns['spatial'].keys()
@@ -113,8 +114,14 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         image_metadata = None
         # search for pixel_per_um scalefactor
         if 'spatial' in adata.uns.keys():
-            # get first entry of dictionary as image_metadata
-            first_entry = next(iter(adata.uns['spatial'].values()))
+            image_key_list = adata.uns['spatial'].keys()
+            if group is not None:
+                # make sure that group name is also in image_key and select first option
+                image_key = [k for k in image_key_list if group in k][0]
+                first_entry = adata.uns['spatial'][image_key]
+            else:
+                # get first entry of dictionary as image_metadata
+                first_entry = next(iter(adata.uns['spatial'].values()))
             
             # extract image metadata if possible
             if 'scalefactors' in first_entry:
@@ -131,6 +138,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
     y_pixelcoord = adata.obsm[obsm_key][:, 1]
     x_coord = x_pixelcoord / pixel_per_um
     y_coord = y_pixelcoord / pixel_per_um
+
 
     # shift coordinates that they start at (0,0)
     x_offset = x_coord.min()
@@ -356,7 +364,8 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
 
 def spatial_grouped(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
-    savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], dpi_display=80, header_names=None,
+    savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
+    dpi_display=80, header_names=None,
     xlim=None, ylim=None,
     **kwargs):
     
@@ -412,18 +421,13 @@ def spatial_grouped(adata, keys, groupby='well_name', groups=None, raw=False, ma
                 else:
                     header_name = None
 
-                # determine x and y limits
-                if xlim is None:    
-                    xlim = [adata.obs["um_col"].min(), adata.obs["um_col"].max()]
-                if ylim is None:
-                    ylim = [adata.obs["um_row"].min(), adata.obs["um_row"].max()]
-
                 # create color dictionary if key is categorical
                 color_dict = create_color_dict(adata, key, palette)
 
                 spatial(adata, key, raw=raw, groupby=groupby,
                         group=group, fig=fig, axis=axs[row, col], show=False,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_per_key_dict[key], 
+                        xlim=xlim, ylim=ylim, 
+                        spot_size=spot_size, crange=crange_per_key_dict[key], 
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
 
         for ax, row in zip(axs[:, 0], groups):

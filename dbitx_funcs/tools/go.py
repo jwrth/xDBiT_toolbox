@@ -8,7 +8,7 @@ import numpy as np
 from gprofiler import GProfiler
 import gseapy
 from pathlib import Path
-from .tools import collect_deg_data
+from .adata import collect_deg_data
 from ..utils import SpeciesToID
 
 class GOEnrichment():
