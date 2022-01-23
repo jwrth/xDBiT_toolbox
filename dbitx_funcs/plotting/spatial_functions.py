@@ -28,7 +28,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
             image_key=None, lowres=True, histogram_setting=None,
             alpha=1, palette="tab10", color_dict=None,
             header_x=0.5, header_y=0.98, header_fontsize=12,
-            save_only=False, savepath=None, save_background=None, crange=None,
+            save_only=False, savepath=None, save_background=None, crange=None, colorbar=True,
             verbose=True):
 
     if isinstance(pd_dataframe, pd.DataFrame):
@@ -328,13 +328,14 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
             else:
                 divider = make_axes_locatable(ax)
                 #cax = divider.append_axes("right", size="0%", pad=1)
-                clb = fig.colorbar(s, ax=ax, shrink=0.8)
-                #clb = plt.colorbar(s, ax=cax, shrink=1)
-                #cax.axis('off')
-                if crange is not None:
-                    clb.mappable.set_clim(crange[0], crange[1])
-                if percent:
-                    clb.ax.set_title('%')
+                if colorbar:
+                    clb = fig.colorbar(s, ax=ax, shrink=0.8)
+                    #clb = plt.colorbar(s, ax=cax, shrink=1)
+                    #cax.axis('off')
+                    if crange is not None:
+                        clb.mappable.set_clim(crange[0], crange[1])
+                    if percent:
+                        clb.ax.set_title('%')
 
         
     if n_plots > 1:
