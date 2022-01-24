@@ -16,6 +16,10 @@ import os
 from tkinter import *
 from tkinter import filedialog
 import tkinter
+import numpy as np
+import pandas as pd
+from glob import glob
+from datetime import datetime
 
 class SelectionWindow:
 
@@ -94,7 +98,7 @@ class CountsToAnndata():
         Checks if settings file is correct.
         '''
 
-        print("Reading batch parameters from {}".format(settings_file))
+        print("Reading parameters from {}".format(settings_file))
         lines = open(settings_file).readlines()
         param_start = [i for i, line in enumerate(lines) if line.startswith(">parameters")][0]
         self.dir_start = [i for i, line in enumerate(lines) if line.startswith(">directories")][0]
@@ -121,7 +125,7 @@ class CountsToAnndata():
         ## Check if all necessary parameters are in the file
         param_cats = ["n_channels", "spot_width", "frame", 
             "align_images:align_channel", "align_images:dapi_channel", "hq_images:channel_names", "hq_images:channel_labels"]
-        dir_cats = ["experiment_id", "unique_id", "main_dir", 
+        dir_cats = ["experiment_id", "unique_id", "main_dir", "organism",
             "input_transcriptome", "align_images", "hq_images", "output_dir", 
             "vertices_x", "vertices_y"]
 
@@ -134,14 +138,13 @@ class CountsToAnndata():
 
         # determine extra categories which are added later to adata.obs
         self.extra_cats_headers = [elem for elem in self.directories.columns if elem not in dir_cats]
-        self.extra_cats_headers = ["experiment_id"] + self.extra_cats_headers
+        self.extra_cats_headers = ["experiment_id", "organism"] + self.extra_cats_headers
 
         ## extract image parameters
         # determine alignment channel
         image_cats = ["align_images:align_channel", "align_images:dapi_channel", 
             "hq_images:channel_names", "hq_images:channel_labels"]
 
-        
 
         # create full directories from main_dir and the relative paths of matrix and output
         for cat in ["input_transcriptome", "output_dir"]:
@@ -159,8 +162,16 @@ class CountsToAnndata():
             self.hq_ch_labels = str(self.parameters.loc["hq_images:channel_labels", "value"]).split(" ")
 
             # determine channel on which registration is done - most probably the dapi
-            reg_id = [i for i, elem in enumerate(self.hq_ch_names) if "*" in elem][0]
-            self.reg_channel_label = self.hq_ch_labels[reg_id]
+            reg_id = [i for i, elem in enumerate(self.hq_ch_names) if "*" in elem]
+            if len(reg_id) == 1:
+                self.reg_channel_label = self.hq_ch_labels[reg_id[0]]
+            elif len(reg_id) > 1:
+                print("More than one `hq_images:channel_names` labelled with `*` found: {}".format(reg_id))
+                sys.exit()
+            else:
+                input("No channel in hq_images:channel_names labelled with `*`. No hq image will be added if available. Press enter to continue anyway...")
+                self.reg_channel_label = None
+
 
             # check if channel names and labels have same length
             assert len(self.hq_ch_names) == len(self.hq_ch_labels), \
@@ -252,8 +263,15 @@ class CountsToAnndata():
 
                 # check whether paths to alignment images and hq images are identical
                 if not len(set(align_images) & set(hq_images)) == len(align_images):
-                    print("Alignment images and hq are not identical. HQ images will be registered.")
-                    self.register_hq[i] = True
+                    if self.reg_channel_label is not None:
+                        print("Alignment images and hq are not identical. HQ images will be registered.")
+                        self.register_hq[i] = True
+                    else:
+                        print("Alignment images and hq are not identical and could be registered " \
+                            "but no channel in `hq_images:channel_names` was labelled with `*`." \
+                                "Therefore, the hq images are not added.")
+                else:
+                    print("Alignment images and hq are identical. HQ images will not be registered.")
                 
                 # detect alignment marker image
                 align_img = [elem for elem in align_images if self.alignment_channel in elem][0]
@@ -340,6 +358,7 @@ class CountsToAnndata():
             matrix_file = dirs["input_transcriptome"]
             output_dir = dirs["output_dir"]
             unique_id = dirs["experiment_id"] + "_" + dirs["unique_id"]
+            organism = None if pd.isnull(dirs["organism"]) else dirs["organism"]
 
             # create output directory
             Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -414,6 +433,7 @@ class CountsToAnndata():
                 images=images,
                 resolution=int(self.parameters.loc["spot_width"]), 
                 unique_id=unique_id, 
+                organism=organism,
                 extra_categories=extra_cats,
                 n_channels=int(self.parameters.loc["n_channels"]), 
                 frame=int(self.parameters.loc["frame"]),
@@ -512,6 +532,12 @@ if __name__ == "__main__":
         settings_file = input("Enter path to parameters .csv file: ")
         scale_factor_before_reg = float(input("Enter scale factor: "))
 
+    settings_file = settings_file.strip('"')
+    
+    # read and check input file
+    coa = CountsToAnndata()
+    coa.ReadAndCheckSettings(settings_file=settings_file)
+
     #####
     # Process datasets
     #####
@@ -528,10 +554,7 @@ if __name__ == "__main__":
 
     import dbitx_funcs as db
     import matplotlib.pyplot as plt
-    import pandas as pd
-    import numpy as np
-    from glob import glob
-    from datetime import datetime
+    
     from pathlib import Path
     import cv2
     import napari
@@ -541,8 +564,7 @@ if __name__ == "__main__":
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
             flush=True)
 
-    coa = CountsToAnndata()
-    coa.ReadAndCheckSettings(settings_file=settings_file)
+    
     coa.AddVertices(settings_file=settings_file)
     coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg)
 

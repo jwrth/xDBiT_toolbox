@@ -7,11 +7,12 @@ import os
 from .calculations._calc import coord_to_um, coord_to_pixel
 from .images.image_processing import align_to_dict, resize_images_in_adata, calc_image_param_per_spot
 from datetime import datetime
+from gprofiler import GProfiler
 
 
-def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, 
+def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, convert_genes=True,
                         #dbitx=False, 
-                        frame=100, unique_id=None, extra_categories=None, resize_factor=0.2,
+                        frame=100, unique_id=None, extra_categories=None, resize_factor=0.2, organism='mmusculus',
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
                         manual_pixel_offset_y=0, savepath=None, return_adata=False):
     """
@@ -119,6 +120,22 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         print("Add extra categories...", flush=True)
         for cat in extra_categories.index:
             adata.obs[cat] = extra_categories[cat]
+
+    if convert_genes and organism is not None:
+        print("Convert gene names...")
+        genes = adata.var_names.tolist()
+
+        # query gprofiler
+        gp = GProfiler(return_dataframe=True)
+        conversion = gp.convert(query=genes, organism=organism)
+        conversion = conversion.replace("nan", np.nan)
+
+        # sometimes it finds more than one match. Here I select always the first match.
+        first_match = conversion.sort_values("n_incoming").groupby("n_incoming").head(1)
+
+        # add genes names
+        adata.var["ensembl_id"] = first_match["converted"].values
+        adata.var_names_make_unique()
 
     print("Adata object generated.")
 
