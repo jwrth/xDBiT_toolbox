@@ -16,7 +16,7 @@ from ..images import set_histogram
 from tqdm import tqdm
 
 
-def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,
+def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,
             header=None, headersize=18, header_names=None, raw=False, percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
@@ -363,7 +363,7 @@ def spatial(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None
         return fig, ax
 
 
-def spatial_grouped(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4, 
+def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
     dpi_display=80, header_names=None,
@@ -425,7 +425,7 @@ def spatial_grouped(adata, keys, groupby='well_name', groups=None, raw=False, ma
                 # create color dictionary if key is categorical
                 color_dict = create_color_dict(adata, key, palette)
 
-                spatial(adata, key, raw=raw, groupby=groupby,
+                spatial_single(adata, key, raw=raw, groupby=groupby,
                         group=group, fig=fig, axis=axs[row, col], show=False,
                         xlim=xlim, ylim=ylim, 
                         spot_size=spot_size, crange=crange_per_key_dict[key], 
@@ -470,7 +470,7 @@ def spatial_grouped(adata, keys, groupby='well_name', groups=None, raw=False, ma
             # create color dictionary if key is categorical
             color_dict = create_color_dict(adata, key, palette)
 
-            spatial(adata, key, raw=raw, groupby=groupby,
+            spatial_single(adata, key, raw=raw, groupby=groupby,
                     group=group, fig=fig, axis=axs[i], show=False,
                     xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_per_key_dict[key],
                     palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
@@ -722,6 +722,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 else:
                     splits = group_obs[splitby].unique()
                     df_collection = {}
+
+                    # get min and max values for x values
+                    x = group_obs[x_category].values
+                    range_min = x.min()
+                    range_max = x.max()
                     for split in splits:
                         # extract x values                                            
                         split_mask = group_obs[splitby] == split
@@ -744,12 +749,16 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     # calculate mean and std
                     df = df_collection[['x', 'y_pred']].groupby('x').mean()
                     df['std'] = df_collection[['x', 'y_pred']].groupby('x').std()
+                    df['conf_lower'] = [a-b for a,b in zip(df['y_pred'], df['std'])]
+                    df['conf_upper'] = [a+b for a,b in zip(df['y_pred'], df['std'])]
                     df.reset_index(inplace=True)
 
                 #if show:
                 axs[i].fill_between(df['x'], 
-                                df['y_pred'] - df['std'],
-                                df['y_pred'] + df['std'],
+                                #df['y_pred'] - df['std'],
+                                #df['y_pred'] + df['std'],
+                                df['conf_lower'],
+                                df['conf_upper'],
                                 alpha = 0.2,
                                 color = 'grey')
                 axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)

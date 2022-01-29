@@ -334,7 +334,7 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, scale_factor_before_reg):
+    def ProcessDatasets(self, scale_factor_before_reg, grayscale=True):
         '''
         Process images:
             - Align coordinates to alignment images

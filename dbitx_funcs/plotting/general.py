@@ -240,37 +240,36 @@ def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', p
     #         axs = axs[0]
     #     return fig, axs
 
-def correlate_significance_two_groups(adata, deg_key, spatialde_key,
-groups='all', threshold = 0.05, increment = 10e-16, offset = 1.02, vmin = -3, vmax = 3, 
+def correlate_significance_two_groups(adata, deg_key, spatialde_key, groupby, 
+deg_splits='all', threshold = 0.05, increment = 10e-16, offset = 1.02, vmin = -3, vmax = 3, 
 linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, save_only=False, show=True, dpi_save=300):
 
     # extract the groups that were used in the DEG analysis
-    groupby = adata.uns[deg_key]['params']['groupby']
+    splitby = adata.uns[deg_key]['params']['groupby']
 
     # check whether to use all possible groups or only a subset of it
-    if groups == 'all':
-        groups = list(adata.obs[groupby].unique())
+    if deg_splits == 'all':
+        deg_splits = list(adata.obs[splitby].unique())
     else:
-        groups = [elem for elem in groups if elem in adata.obs[groupby].unique()]
-    if len(groups) > 2:
-        print("Too many groups ({} instead of 2)".format(len(groups)))
+        deg_splits = [elem for elem in deg_splits if elem in adata.obs[splitby].unique()]
+    if len(deg_splits) > 2:
+        print("Too many groups ({} instead of 2)".format(len(deg_splits)))
         return
-    elif len(groups) < 2:
-        print("Found only {} of the give groups in `adata.obs[{}]`.".format(str(len(groups)), groupby))
+    elif len(deg_splits) < 2:
+        print("Found only {} of the give groups in `adata.obs[{}]`.".format(str(len(deg_splits)), splitby))
 
-    deg_df = {group: create_deg_df(adata, keys=deg_key, groups=group) for group in groups}
+    deg_df = {deg_split: create_deg_df(adata, keys=deg_key, groups=deg_split) for deg_split in deg_splits}
 
-    exp_conditions = {elem[0]: elem[1] for elem in list(set([tuple((well, g)) for well, g in zip(adata.obs["well_name"], adata.obs[groupby])]))}
-
+    exp_conditions = {elem[0]: elem[1] for elem in list(set([tuple((well, g)) for well, g in zip(adata.obs[groupby], adata.obs[splitby])]))}
     # create results dataframe from spatialde results
     results_df = {}
     for well in adata.uns[spatialde_key].keys():
         results_df[well] = adata.uns[spatialde_key][well]["results"]
-        results_df[well]["well_name"] = well
-        results_df[well][groupby] = exp_conditions[well]
+        results_df[well][groupby] = well
+        results_df[well][splitby] = exp_conditions[well]
 
     results_df = pd.concat(results_df, ignore_index=True)
-    results_df = results_df[[groupby, 'well_name', 'g', 'l', 'qval']]
+    results_df = results_df[[splitby, groupby, 'g', 'l', 'qval']]
 
     # find patterned genes
     patterned_genes = results_df.query('qval < 0.05')['g'].unique()
@@ -280,21 +279,21 @@ linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, 
     results_df = results_df[mask]
 
     # group the results dataframe
-    grouped_df = results_df.groupby([groupby, "g"]).mean()
-    grouped_df["std"] = results_df.groupby([groupby, "g"]).std()["qval"].values
-    grouped_df["count"] = results_df.groupby([groupby, "g"]).count()["qval"].values
+    grouped_df = results_df.groupby([splitby, "g"]).mean()
+    grouped_df["std"] = results_df.groupby([splitby, "g"]).std()["qval"].values
+    grouped_df["count"] = results_df.groupby([splitby, "g"]).count()["qval"].values
     grouped_df = grouped_df.dropna()
 
     # filter for patterned genes that are in group1
-    mask = [gene in patterned_genes for gene in deg_df[groups[0]].names]
-    deg_group1 = deg_df[groups[0]][mask]
+    mask = [gene in patterned_genes for gene in deg_df[deg_splits[0]].names]
+    deg_group1 = deg_df[deg_splits[0]][mask]
     deg_group1 = deg_group1.sort_values('names', ascending=True)
 
     # sort grouped df by index
     grouped_df = grouped_df.sort_index(ascending=True)
 
     # make sure that the genes are in both groups. Filter unique genes out.
-    in_both = grouped_df.xs(groups[0]).index[grouped_df.xs(groups[0]).index.get_level_values('g').isin(grouped_df.xs(groups[1]).index.get_level_values('g'))]
+    in_both = grouped_df.xs(deg_splits[0]).index[grouped_df.xs(deg_splits[0]).index.get_level_values('g').isin(grouped_df.xs(deg_splits[1]).index.get_level_values('g'))]
     grouped_df = grouped_df.loc[(slice(None), in_both), :]
 
     deg_group1 = deg_group1[deg_group1.names.isin(in_both)]
@@ -302,11 +301,11 @@ linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, 
     #return deg_group1
 
     # extract q-values for both groups
-    qval_group1 = grouped_df.loc[(groups[0])].qval.values
-    qval_group2 = grouped_df.loc[(groups[1])].qval.values
+    qval_group1 = grouped_df.loc[(deg_splits[0])].qval.values
+    qval_group2 = grouped_df.loc[(deg_splits[1])].qval.values
 
     # extract gene names
-    gene_names = grouped_df.loc[(groups[0])].index.values
+    gene_names = grouped_df.loc[(deg_splits[0])].index.values
 
     # extract logfoldchange
     logfold_group1 = deg_group1['logfoldchanges']
@@ -386,13 +385,13 @@ linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, 
         ax[i].axvline(-np.log10(threshold), ls='dashed', color='k')
 
     for i in range(len(ax)):
-        ax[i].set_xlabel("-log10(qval) {}".format(groups[0]))
-        ax[i].set_ylabel("-log10(qval) {}".format(groups[1]))
+        ax[i].set_xlabel("-log10(qval) {}".format(deg_splits[0]))
+        ax[i].set_ylabel("-log10(qval) {}".format(deg_splits[1]))
         
     fig.subplots_adjust(bottom=0.25)
     cbar_ax = fig.add_axes([0.1, 0.15, 0.8, 0.02])
     clb = plt.colorbar(s, cax=cbar_ax, orientation='horizontal')
-    clb.set_label('log2(Fold change) {} vs. {}'.format(groups[0], groups[1]))
+    clb.set_label('log2(Fold change) {} vs. {}'.format(deg_splits[0], deg_splits[1]))
 
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
 
