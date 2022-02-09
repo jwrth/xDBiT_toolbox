@@ -8,10 +8,12 @@ from .calculations._calc import coord_to_um, coord_to_pixel
 from .images.image_processing import align_to_dict, resize_images_in_adata, calc_image_param_per_spot
 from datetime import datetime
 from gprofiler import GProfiler
+import cv2
 
 
 def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, convert_genes=True,
                         #dbitx=False, 
+                        grayscale=True,
                         frame=100, unique_id=None, extra_categories=None, resize_factor=0.2, organism='mmusculus',
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
                         manual_pixel_offset_y=0, savepath=None, return_adata=False):
@@ -136,6 +138,15 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         # add genes names
         adata.var["ensembl_id"] = first_match["converted"].values
         adata.var_names_make_unique()
+
+    if grayscale:
+        # convert to grayscale
+        print("Convert adata images to grayscale...")
+        for key in adata.uns[spatial_key]:
+            for res_key in adata.uns[spatial_key][key]['images'].keys():
+                img = adata.uns[spatial_key][key]['images'][res_key]
+                if len(img.shape) == 3:
+                    adata.uns[spatial_key][key]['images'][res_key] = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     print("Adata object generated.")
 
