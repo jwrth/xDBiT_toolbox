@@ -403,6 +403,7 @@ class CountsToAnndata():
                     channel_labels = self.hq_ch_labels
                 
                 images = [cv2.imread(d, -1) for d in image_paths]
+                
             else:
                 images = None
                 channel_labels = None
@@ -428,6 +429,7 @@ class CountsToAnndata():
                 return_adata = False
 
             # align transcriptomic data to alignment images using the selected vertices
+
             adata = db.dbitseq_to_squidpy(
                 matrix_path=matrix_file, 
                 images=images,
