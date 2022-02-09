@@ -3,16 +3,17 @@ import numpy as np
 from ..calculations.contours import circularity, centroid
 import pandas as pd
 import math
+from tqdm import tqdm
 
-def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=3, min_diameter=None,
-    min_circularity=None, scale=None, return_raw=False):
+def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=20, min_diameter=0,
+    min_circularity=0.2, scale=None, return_raw=False):
     '''
     Segment vessels or other structures that are defined by no or background signal.
     '''
 
     # check if data should be filtered
     do_filtering = False
-    if min_diameter is not None or min_circularity is not None:
+    if (min_diameter > 0) or (min_circularity > 0):
         do_filtering=True
 
     # thresholding of background
@@ -27,9 +28,14 @@ def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=3, 
     # if exclude_edge:
     #     contours = filter_edge_contours(contours, img)
 
+    if len(img.shape) == 3:
+        print("Convert image to grayscale...")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
     # segment section
-    signal = img >= t
-    signal = signal.astype(np.uint8) * 255
+    #signal = img >= t
+    #signal = signal.astype(np.uint8) * 255
+    signal = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY_INV,11,2)
     signal = cv2.medianBlur(signal, 19, 0)
     signal = cv2.morphologyEx(signal, cv2.MORPH_CLOSE, np.ones((9,9),np.uint8))
     sections, _ = cv2.findContours(signal, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -41,9 +47,10 @@ def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=3, 
         sections = [s for s, a in zip(sections, section_areas) if a > area_threshold]
 
     # segment background structures
-    structures = img <= t
-    structures = structures.astype(np.uint8) * 255
-    structures = cv2.medianBlur(structures, 9, 0)
+    #structures = img <= t
+    #structures = structures.astype(np.uint8) * 255
+    structures = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
+    structures = cv2.medianBlur(structures, 19, 0)
     structures, _ = cv2.findContours(structures, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     # check which of the segmented structures are actually inside the sections and therefore potential vessels
@@ -81,20 +88,18 @@ def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=3, 
         # save unfiltered version
         df_raw = df.copy()
 
-        if min_diameter is not None:
-            if scale is not None:
-                # convert pixel into µm
-                min_diameter *= scale
-            
-            # calculate area from diameter
-            #min_area = math.pi * (min_diameter / 2)**2
-
-            # filter dataframe by area
-            #df.query('area >= {}'.format(min_area), inplace=True)
-            df.query('avg_dia >= {}'.format(min_diameter), inplace=True)
+        if scale is not None:
+            # convert pixel into µm
+            min_diameter *= scale
         
-        if min_circularity is not None:
-            df.query('circularity >= {}'.format(min_circularity), inplace=True)
+        # calculate area from diameter
+        #min_area = math.pi * (min_diameter / 2)**2
+
+        # filter dataframe by area
+        #df.query('area >= {}'.format(min_area), inplace=True)
+        df.query('avg_dia >= {}'.format(min_diameter), inplace=True)
+        
+        df.query('circularity >= {}'.format(min_circularity), inplace=True)
     else:
         df_raw = None
     
@@ -110,8 +115,8 @@ def segment_vessels(img, threshold_ratio=0.01, exclude_edge=True, min_points=3, 
 
 
 def segment_vessels_from_adata(adata, key_added='vessels', img_key_pattern='dapi', uns_key='spatial', 
-    lowres=False, threshold_ratio=0.01, exclude_edge=True, min_diameter=None, use_scale=True,
-    min_circularity=None):
+    lowres=False, threshold_ratio=0.01, exclude_edge=True, min_diameter=0, use_scale=True,
+    min_circularity=0.2):
     '''
     Segment vessels from adata object.
     '''
@@ -128,7 +133,7 @@ def segment_vessels_from_adata(adata, key_added='vessels', img_key_pattern='dapi
     df_raws = {}
     imgs = {}
     metadata = {}
-    for img_key in img_keys:
+    for img_key in tqdm(img_keys):
         img = adata.uns[uns_key][img_key]['images'][res_key].copy()
 
         if use_scale == True:

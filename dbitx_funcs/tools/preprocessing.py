@@ -62,7 +62,8 @@ def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spat
 def standard_preprocessing(adata_in, 
     hvg_batch_key=None, hvg_flavor='seurat', hvg_n_top_genes=None,
     do_lognorm=True, regress_out=None, filter_hvg=False, dim_reduction=True, 
-    batch_correction_key=None,  batch_correction_method="scanorama", 
+    batch_correction_key=None,  batch_correction_method="scanorama", verbose=False,
+    tsne_lr=1000, tsne_jobs=8,
     **kwargs):
     '''
     Function to perform standard preprocessing on ST data. Adapted from Squidpy Napari Tutorial.
@@ -135,7 +136,7 @@ def standard_preprocessing(adata_in,
             sc.pp.pca(adata)
             sc.pp.neighbors(adata)
             sc.tl.umap(adata)
-            sc.tl.tsne(adata)
+            sc.tl.tsne(adata, n_jobs=tsne_jobs, learning_rate=tsne_lr)
 
         else:
             # PCA
@@ -162,7 +163,7 @@ def standard_preprocessing(adata_in,
             elif batch_correction_method == "scanorama":
                 print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key))
                 hvgs = list(adata.var_names[adata.var['highly_variable']])
-                adata = scanorama(adata, batch=batch_correction_key, hvg=hvgs, **kwargs)
+                adata = scanorama(adata, batch=batch_correction_key, hvg=hvgs, verbose=verbose, **kwargs)
 
                 # find neighbors
                 sc.pp.neighbors(adata, use_rep="X_scanorama")
