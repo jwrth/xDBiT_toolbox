@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 from ..calculations._calc import order_points_clockwise, dist_points
-import imutils
+#import imutils
 import matplotlib.pyplot as plt
 from datetime import datetime
 from ..tools import extract_groups, rotatePoint
@@ -344,10 +344,11 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         print("{}: Debugging mode - Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         matchedVis = cv2.drawMatches(image_scaled, kpsA, template_scaled, kpsB,
                                      good_matches, None)
-        matchedVis = imutils.resize(matchedVis, width=1000)
+        #matchedVis = imutils.resize(matchedVis, width=1000)
+        matchedVis = resize_image(matchedVis, scale_factor=0.1)
         plt.imshow(matchedVis)
         plt.show()
-
+    
     # Compute homography matrix
 
     print("{}: Fetch keypoints...".format(
@@ -532,10 +533,14 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
         if debug:
             # scale down the images
-            image_adata = imutils.resize(
-                image_adata, width=int(image_adata.shape[1]*0.1))
-            image_to_register = imutils.resize(
-                image_to_register, width=int(image_to_register.shape[1]*0.1))
+            image_adata = resize_image(image_adata, scale_factor=0.1)
+            image_to_register = resize_image(image_to_register, scale_factor=0.1)
+
+            # image_adata = imutils.resize(
+            #     image_adata, width=int(image_adata.shape[1]*0.1))
+            # image_to_register = imutils.resize(
+            #     image_to_register, width=int(image_to_register.shape[1]*0.1))
+
 
         # register images and extract homography matrix
         print("{}: Register image {}...".format(

@@ -27,7 +27,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             #image=None, image_metadata=None, 
             image_key=None, lowres=True, histogram_setting=None,
             alpha=1, palette="tab10", color_dict=None,
-            header_x=0.5, header_y=0.98, header_fontsize=12,
+            header_x=0.5, header_y=0.98, header_fontsize=20,
             save_only=False, savepath=None, save_background=None, crange=None, colorbar=True,
             verbose=True):
 
@@ -243,11 +243,11 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         ax.set_ylim(ylim[0], ylim[1])
 
         if image_metadata is None or plot_pixel:
-            ax.set_xlabel('pixels')
-            ax.set_ylabel('pixels')
+            ax.set_xlabel('pixels', fontsize=14)
+            ax.set_ylabel('pixels', fontsize=14)
         else:
-            ax.set_xlabel('µm')
-            ax.set_ylabel('µm')
+            ax.set_xlabel('µm', fontsize=14)
+            ax.set_ylabel('µm', fontsize=14)
 
         if header_names is None:
             ax.set_title(key, fontsize=header_fontsize, fontweight='bold')
@@ -259,6 +259,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         ax.grid(False)
         ax.set_aspect(1)
         ax.set_facecolor('k')
+        ax.tick_params(labelsize=12)
 
         # calculate marker size
         pixels_per_unit = ax.transData.transform(
@@ -329,7 +330,10 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                 divider = make_axes_locatable(ax)
                 #cax = divider.append_axes("right", size="0%", pad=1)
                 if colorbar:
-                    clb = fig.colorbar(s, ax=ax, shrink=0.8)
+                    clb = fig.colorbar(s, ax=ax, shrink=1, 
+                        #pad=-0.17, 
+                        aspect=40)
+                    clb.ax.tick_params(labelsize=14)
                     #clb = plt.colorbar(s, ax=cax, shrink=1)
                     #cax.axis('off')
                     if crange is not None:

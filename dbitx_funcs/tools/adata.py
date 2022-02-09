@@ -317,22 +317,22 @@ def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd
 def remove_images(adata, uns_key='spatial', reg_key='registered', 
     hires_only=False, hires_key='hires'):
     '''
-    Remove all images from adata.
+    Remove all images from adata and return the adata without images.
     Images are expected to be in `adata.uns[uns_key]`
     '''
-    image_keys = adata.uns[uns_key].keys()
-    adata_wo_images = adata.copy()
+    image_keys = list(adata.uns[uns_key].keys())
+    #adata = adata.copy()
     for key in image_keys:
-        res_keys = list(adata_wo_images.uns[uns_key][key]['images'].keys())
+        res_keys = list(adata.uns[uns_key][key]['images'].keys())
 
         if hires_only:
-            del adata_wo_images.uns[uns_key][key]['images'][hires_key]
+            del adata.uns[uns_key][key]['images'][hires_key]
         else:
             for res_key in res_keys:
-                del adata_wo_images.uns[uns_key][key]['images'][res_key]
+                del adata.uns[uns_key][key]['images'][res_key]
 
     # remove registered images if available
-    if reg_key in adata_wo_images.uns:
-        del adata_wo_images.uns[reg_key]
+    if reg_key in adata.uns:
+        del adata.uns[reg_key]
 
-    return adata_wo_images
+    #return adata

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from math import sqrt
 from scipy.spatial import distance as dist
-from sympy import lowergamma
+#from sympy import lowergamma
 from ..exceptions import ModuleNotFoundOnWindows
 from typing import Optional, Tuple, Union, List, Dict, Any
 
