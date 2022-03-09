@@ -39,7 +39,7 @@ def rna_metrics_pie(metrics, max_cols=4,
                 textprops={'fontsize': label_fontsize})
         axs[i].set_title(r"$\bf{" + name + "}$", fontsize=title_fontsize)
 
-    plt.suptitle("RNA alignment metrics", size=16, fontsize=suptitle_fontsize, y=1.005)
+    plt.suptitle("RNA alignment metrics", fontsize=suptitle_fontsize, y=1.005)
 
     fig.tight_layout()
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
