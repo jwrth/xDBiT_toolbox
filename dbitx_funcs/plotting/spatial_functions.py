@@ -674,22 +674,22 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     keys = [keys] if isinstance(keys, str) else list(keys)
 
     #if show:
-    if axis is None:
-        n_plots, n_rows, max_cols = get_nrows_maxcols(keys, max_cols)
-        fig, axs = plt.subplots(n_rows,max_cols, figsize=(8*max_cols, 6*n_rows))
+    if not return_data:
+        # prepare plotting
+        if axis is None:
+            n_plots, n_rows, max_cols = get_nrows_maxcols(keys, max_cols)
+            fig, axs = plt.subplots(n_rows,max_cols, figsize=(8*max_cols, 6*n_rows))
 
-    else:            
-        axs = axis
-        #fig = None
-        n_plots = 1
-        show = False # otherwise plotting into given axes wouldn't work
-        
-    if n_plots > 1:
-        axs = axs.ravel()
-    else:
-        axs = [axs]
-    #else:
-    #    n_plots = 1
+        else:            
+            axs = axis
+            #fig = None
+            n_plots = 1
+            show = False # otherwise plotting into given axes wouldn't work
+            
+        if n_plots > 1:
+            axs = axs.ravel()
+        else:
+            axs = [axs]
 
     data_collection = {}
     for i, key in (enumerate(tqdm(keys)) if show_progress else enumerate(keys)):
@@ -756,38 +756,38 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     df['conf_lower'] = [a-b for a,b in zip(df['y_pred'], df['std'])]
                     df['conf_upper'] = [a+b for a,b in zip(df['y_pred'], df['std'])]
                     df.reset_index(inplace=True)
-
-                #if show:
-                axs[i].fill_between(df['x'], 
-                                #df['y_pred'] - df['std'],
-                                #df['y_pred'] + df['std'],
-                                df['conf_lower'],
-                                df['conf_upper'],
-                                alpha = 0.2,
-                                color = 'grey')
-                axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)
-
                 if return_data:
                     group_collection[group] = df
+                else:
+                    axs[i].fill_between(df['x'], 
+                                    #df['y_pred'] - df['std'],
+                                    #df['y_pred'] + df['std'],
+                                    df['conf_lower'],
+                                    df['conf_upper'],
+                                    alpha = 0.2,
+                                    color = 'grey')
+                    axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)
 
-            #if show:
-            if xlabel is None:
-                xlabel = x_category
-            if ylabel is None:
-                ylabel = "Gene expression"
 
 
-            axs[i].set_title(key, fontsize=title_fontsize)
-            axs[i].legend(fontsize=legend_fontsize)
-            axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
-            axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
-            axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+            if not return_data:
+                if xlabel is None:
+                    xlabel = x_category
+                if ylabel is None:
+                    ylabel = "Gene expression"
 
-            if values_into_title is None:
-                axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
-            else:
-                assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
-                axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
+
+                axs[i].set_title(key, fontsize=title_fontsize)
+                axs[i].legend(fontsize=legend_fontsize)
+                axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
+                axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
+                axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+
+                if values_into_title is None:
+                    axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
+                else:
+                    assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
+                    axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
         else:
             # plot binned values
             # sort out expression values of 0 since they disturbed the result in case of well C2 (bin 7 and 8 showed expression of 0)
@@ -824,24 +824,30 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             group_collection = pd.concat(group_collection)
             data_collection[key] = group_collection
 
-    if n_plots > 1:
 
-        # check if there are empty plots remaining
-        while i < n_rows * max_cols - 1:
-            i+=1
-            # remove empty plots
-            axs[i].set_axis_off()
     
     if return_data:
+        # close plot
+        plt.close()
+
+        # return data
         data_collection = pd.concat(data_collection)
         data_collection.index.names = ['key', groupby, 'id']
         return data_collection
 
-    if show:
-        fig.tight_layout()
-        save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
-    else:
-        return fig, axs
+    else: 
+        if n_plots > 1:
+
+            # check if there are empty plots remaining
+            while i < n_rows * max_cols - 1:
+                i+=1
+                # remove empty plots
+                axs[i].set_axis_off()
+        if show:
+            fig.tight_layout()
+            save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+        else:
+            return fig, axs
 
 
 def linear_expression_grouped(adata, splitby=None, keys=None, x_category=None, groupby=None, max_cols=4, n_bins=20, use_raw=False,

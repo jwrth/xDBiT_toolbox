@@ -242,3 +242,17 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     #return (xs,ys,ys_hat,stderr)
     return df
+
+def center_of_mass(values, weights):
+    '''
+    Calculate center of mass of an array of values with a corresponding array of weights.
+    Can be also used to calculate the center of expression by using:
+        - `values`: position along an axis
+        - `weights`: expression value
+    '''
+
+    if np.sum(weights) > 0:
+        com = np.average(values, weights=weights)
+    else:
+        com = np.nan
+    return com

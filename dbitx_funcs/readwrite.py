@@ -190,5 +190,7 @@ def save_and_show_figure(savepath, save_only=False, dpi_save=300):
         print("Saved.")
         if save_only:
             plt.close()
+        else:
+            plt.show()
     else:
         return plt.show()

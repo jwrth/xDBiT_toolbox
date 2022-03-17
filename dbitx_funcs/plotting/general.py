@@ -7,6 +7,7 @@ from ..readwrite import save_and_show_figure
 import seaborn as sns
 import networkx as nx
 from ..readwrite import save_and_show_figure
+import textwrap
 
 
 # https://stackoverflow.com/questions/50569419/where-to-put-the-doc-string-for-a-decorator
@@ -484,7 +485,9 @@ savepath=None, save_only=False, show=True, dpi_save=300):
 
 def go_dotplot(enrichment, color_key=None, groups=None, 
 max_to_plot=25, max_cols=4, cmap='viridis', cmin=None, cmax=None, normalize_cmap=True,
-ax_label_size=16, markersize=240, figsize=(8,6), tick_label_size=16, clb_label_size=16, title_size=16,
+ax_label_size=16, markersize=240, figsize=(8,6), xtick_label_size=16, ytick_label_size=16,
+clb_label_size=16, clb_tick_label_size=16, clb_pos=None, clb_norm=False,
+title_size=16, max_line_length=25,
 value_to_plot='Enrichment score', sortby=None, name_key='name', libraries=None, ascending=False,
 savepath=None, save_only=False, show=True, dpi_save=300):
 
@@ -542,10 +545,10 @@ savepath=None, save_only=False, show=True, dpi_save=300):
     fig, axs = plt.subplots(n_rows, n_cols, figsize=(figsize[0]*n_cols, figsize[1]*n_rows))
     axs = axs.ravel() if n_plots > 1 else [axs]
 
-    for i, group in enumerate(groups):
+    for i, group in enumerate(sorted(groups)):
         if group in enrichment.index.unique(level=0):
             # select data
-            df = enrichment.xs(group)
+            df = enrichment.xs(group).copy()
 
             # if max_to_plot is not None and len(df) > max_to_plot:
             #         df = df[:max_to_plot]
@@ -553,12 +556,18 @@ savepath=None, save_only=False, show=True, dpi_save=300):
                 color = df[color_key]
             else:
                 color = 'k'
+            
+            # introduce line breaks if the names are too long
+            df[name_key] = [textwrap.fill(elem, width=max_line_length, break_long_words=True) for elem in df[name_key]]
+
+            # plotting
             s = axs[i].scatter(df[value_to_plot], df[name_key], c=color, cmap=cmap, s=markersize, edgecolors='k')
             
             axs[i].invert_yaxis()
             axs[i].set_title("{}\n{}".format(group, libraries), fontsize=title_size)
             axs[i].set_xlabel(value_to_plot, fontsize=ax_label_size)
-            axs[i].tick_params(axis='both', which='major', labelsize=tick_label_size)
+            axs[i].tick_params(axis='x', which='major', labelsize=xtick_label_size)
+            axs[i].tick_params(axis='y', which='major', labelsize=ytick_label_size)
 
             axs[i].grid(axis='y')
 
@@ -567,9 +576,20 @@ savepath=None, save_only=False, show=True, dpi_save=300):
             # clb.set_label('Fraction of patterned genes', loc='center')
 
             if color_key is not None:
-                clb = fig.colorbar(s, ax=axs[i])
-                clb.set_label(color_key, loc='center', fontsize=clb_label_size)
-                clb.mappable.set_clim(cmin, cmax)
+                if clb_pos is None:
+                    clb = fig.colorbar(s, ax=axs[i])
+                    clb.set_label(color_key, loc='center', fontsize=clb_label_size)
+                    clb.ax.tick_params(labelsize=clb_tick_label_size)
+                    if clb_norm:
+                        clb.mappable.set_clim(cmin, cmax)
+                else:
+                    if i == clb_pos:
+                        clb = fig.colorbar(s, ax=axs[clb_pos])
+                        clb.set_label(color_key, loc='center', fontsize=clb_label_size)
+                        clb.ax.tick_params(labelsize=clb_tick_label_size)
+                        if clb_norm:
+                            clb.mappable.set_clim(cmin, cmax)
+
 
         else:
             #print('No significant results for selected libraries {} in group {}'.format(libraries, group))
