@@ -1,0 +1,20 @@
+>parameters,category,value,,,,,,,,,,,,
+,n_channels,38,,,,,,,,,,,,
+,spot_width,50,,,,,,,,,,,,
+,frame,100,,,,,,,,,,,,
+,align_images:align_channel,c2,,,,,,,,,,,,
+,align_images:dapi_channel,c1,,,,,,,,,,,,
+,hq_images:channel_names,c1* c2 c3 c4ffc,,,,,,,,,,,,
+,hq_images:channel_labels,dapi phalloidin CD31 bf,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+>directories,experiment_id,unique_id,main_dir,input_transcriptome,align_images,hq_images,output_dir,vertices_x,vertices_y,age,organ,age_months,mouse_id,exp_date
+,37_46,A1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000005/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-07*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-07*.tif,anndata,,,young,Spleen,3,TS27,12/9/2021
+,37_46,A2,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000006/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-08*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-08*.tif,anndata,,,young,Spleen,3,TS27,12/9/2021
+,37_46,A3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000007/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-09*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-09*.tif,anndata,,,young,Heart,3,TS27,12/9/2021
+,37_46,B1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000008/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-04*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-04*.tif,anndata,,,young,Heart,3,TS27,12/9/2021
+,37_46,B2,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000009/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-05*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-05*.tif,anndata,,,young,Liver,3,TS27,12/9/2021
+,37_46,B3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000010/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-06*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-06*.tif,anndata,,,young,Kidney,3,TS27,12/9/2021
+,37_46,C1,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000011/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-01*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-01*.tif,anndata,,,young,Kidney,3,TS27,12/9/2021
+,37_46,C2,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000012/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-02*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-02*.tif,anndata,,,young,Brain,3,NaCai,12/9/2021
+,37_46,C3,N:\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_46,CountsToAnndata/Sample_22L000013/out/DGE_matrix_with_introns_min100.txt.gz,imaging\02_secondimaging\splitscenes\Stitched\*Scene-03*.tif,imaging\01_firstimaging\splitscenes\Stitched\*Scene-03*.tif,anndata,,,young,Brain,3,NaCai,12/9/2021
