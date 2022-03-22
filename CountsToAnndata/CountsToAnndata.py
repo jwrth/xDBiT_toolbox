@@ -278,6 +278,7 @@ class CountsToAnndata():
                 #dapi_img = [elem for elem in align_images if self.dapi_channel in elem][0]
 
                 if vertices_not_given:
+                    import napari
                     # read alignment image
                     alignment_image = cv2.imread(align_img)
 
@@ -334,7 +335,7 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, scale_factor_before_reg, grayscale=True):
+    def ProcessDatasets(self, scale_factor_before_reg, grayscale=True, debug='False'):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -458,7 +459,7 @@ class CountsToAnndata():
                                                                 groupby='id', 
                                                                 image_dir_dict=image_dir_dict, 
                                                                 reg_channel=self.reg_channel_label, 
-                                                                in_place=False, debug=False, 
+                                                                in_place=False, debug=debug, 
                                                                 do_registration=True,
                                                                 scale_factor_before_reg=scale_factor_before_reg
                                                                 )
@@ -496,7 +497,7 @@ class CountsToAnndata():
 
         for r, idx in enumerate(idxs):
             for c, ad in enumerate([adata, adata_trans]):
-                db.pl.spatial(ad, keys=gene, groupby='id', group=idx, image_key=reg_channel_label, 
+                db.pl.spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
                             lowres=False,
                             xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
                             axis=axs[r+c], fig=fig)
@@ -559,7 +560,6 @@ if __name__ == "__main__":
     
     from pathlib import Path
     import cv2
-    import napari
 
     print("Starting processing...", flush=True)
     print("{} : Starting script...".format(
@@ -568,7 +568,7 @@ if __name__ == "__main__":
 
     
     coa.AddVertices(settings_file=settings_file)
-    coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg)
+    coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg, debug=False)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
