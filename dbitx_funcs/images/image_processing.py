@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from ..tools import extract_groups, rotatePoint
 from ..calculations import dist_points, rotation_angle
+from sklearn.preprocessing import minmax_scale
 import numpy as np
 from scipy import ndimage
 from typing import Optional, Tuple, Union, List, Dict, Any
@@ -649,7 +650,9 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
 
 def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi',
-                              fun=np.mean, fun_descriptor='mean', lowres=False):
+                              fun=np.mean, fun_descriptor='mean', lowres=False,
+                              normalize=True
+                              ):
     '''
     Function to apply a function spotwise to an image in a ST dataset. 
     The dataset is expected to be in anndata format.
@@ -716,6 +719,10 @@ def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi'
             results_list.append(np.nan)
 
         # save group for next loop
-        old_group = group
+        old_group = group    
 
-    adata.obs[channel_pattern + '_' + fun_descriptor] = results_list
+    obshead = channel_pattern + '_' + fun_descriptor
+    adata.obs[obshead] = results_list
+
+    if normalize:
+        adata.obs[obshead + '_norm'] = adata.obs[[groupby, obshead]].groupby(groupby).transform(minmax_scale)

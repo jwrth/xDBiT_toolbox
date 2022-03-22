@@ -106,7 +106,15 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
 
         if histogram_setting is not None:
             bit_type = np.uint8 if image.max() < 256 else np.uint16
-            image = set_histogram(image, lower=histogram_setting[0], upper=histogram_setting[1], bit_type=bit_type)
+            if histogram_setting == 'minmax':
+                print('bin hier')
+                image = set_histogram(image, lower=image.min(), upper=image.max(), bit_type=bit_type, )
+            elif (histogram_setting > 0) & (histogram_setting < 1):
+                image = set_histogram(image, lower=image.min(), upper=int(image.max() * histogram_setting), bit_type=bit_type)
+            elif len(histogram_setting) == 2:
+                image = set_histogram(image, lower=histogram_setting[0], upper=histogram_setting[1], bit_type=bit_type)
+            else:
+                print('Unknown format of `histogram_setting`. Must be either "minmax" or (minval, maxval) or value between 0 and 1', flush=True)
     else:
         image = None
         scale_factor = 1
@@ -233,6 +241,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                         categorical = False
                 else:
                     print("Key '{}' not found.".format(key))
+                    ax.set_axis_off()
                     return
 
             if percent:
@@ -382,6 +391,7 @@ def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4
     # check keys and groups
     keys = [keys] if isinstance(keys, str) else list(keys)
     multikeys = False
+    multigroups = False
     if len(keys) > 1:
         multikeys = True
 
@@ -389,6 +399,8 @@ def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4
         groups = list(adata.obs[groupby].unique())
     else:
         groups = [groups] if isinstance(groups, str) else list(groups)
+    if len(groups) > 1:
+        multigroups = True
 
     if header_names is not None:
         assert len(header_names) == len(keys)
@@ -408,100 +420,106 @@ def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
                 use_raw=raw, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe) if key not in normalize_crange_not_for else None for key in keys}
-    
-    if multikeys:
-        n_rows = len(groups)
-        max_cols = len(keys)
-        n_plots = n_rows * max_cols
-        fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
+    if multigroups:
+        if multikeys:
+            n_rows = len(groups)
+            max_cols = len(keys)
+            n_plots = n_rows * max_cols
+            fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
 
-        i = 0
-        for row, group in enumerate(groups):
-            for col, key in enumerate(keys):
-                # counter
-                i+=1
-                
-                if header_names is not None:
-                    header_name = [header_names[col]]
-                else:
-                    header_name = None
+            i = 0
+            for row, group in enumerate(groups):
+                for col, key in enumerate(keys):
+                    # counter
+                    i+=1
+                    
+                    if header_names is not None:
+                        header_name = [header_names[col]]
+                    else:
+                        header_name = None
+
+                    # create color dictionary if key is categorical
+                    color_dict = create_color_dict(adata, key, palette)
+
+                    spatial_single(adata, key, raw=raw, groupby=groupby,
+                            group=group, fig=fig, axis=axs[row, col], show=False,
+                            xlim=xlim, ylim=ylim, 
+                            spot_size=spot_size, crange=crange_per_key_dict[key], 
+                            palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
+
+            for ax, row in zip(axs[:, 0], groups):
+                ax.annotate(prefix_groups + row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
+                            xycoords=ax.yaxis.label, textcoords='offset points',
+                            size=groupheader_fontsize, ha='right', va='center', weight='bold')
+
+        else:
+            n_plots = len(groups)
+            if n_plots > max_cols:
+                n_rows = math.ceil(n_plots / max_cols)
+            else:
+                n_rows = 1
+                max_cols = n_plots
+
+            fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
+
+            if n_plots > 1:
+                axs = axs.ravel()
+            else:
+                axs = [axs]
+
+            # for k in range(len(axs)):
+            #     print(axs[k].transData.transform([(0, 1), (1, 0)]) - axs[k].transData.transform((0, 0)))
+            # print(axs[1].transData.transform([(0, 1), (1, 0)]) - axs[1].transData.transform((0, 0)))
+            # print(axs[2].transData.transform([(0, 1), (1, 0)]) - axs[2].transData.transform((0, 0)))
+            # print(axs[3].transData.transform([(0, 1), (1, 0)]) - axs[3].transData.transform((0, 0)))
+
+            
+            for i, group in enumerate(groups):
+                key = keys[0]
+
+                # determine x and y limits
+                if xlim is None:    
+                    xlim = [adata.obs["um_col"].min(), adata.obs["um_col"].max()]
+                if ylim is None:
+                    ylim = [adata.obs["um_row"].min(), adata.obs["um_row"].max()]
 
                 # create color dictionary if key is categorical
                 color_dict = create_color_dict(adata, key, palette)
 
                 spatial_single(adata, key, raw=raw, groupby=groupby,
-                        group=group, fig=fig, axis=axs[row, col], show=False,
-                        xlim=xlim, ylim=ylim, 
-                        spot_size=spot_size, crange=crange_per_key_dict[key], 
-                        palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
+                        group=group, fig=fig, axis=axs[i], show=False,
+                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_per_key_dict[key],
+                        palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
 
-        for ax, row in zip(axs[:, 0], groups):
-            ax.annotate(prefix_groups + row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
-                        xycoords=ax.yaxis.label, textcoords='offset points',
-                        size=groupheader_fontsize, ha='right', va='center', weight='bold')
-
-    else:
-        n_plots = len(groups)
-        if n_plots > max_cols:
-            n_rows = math.ceil(n_plots / max_cols)
-        else:
-            n_rows = 1
-            max_cols = n_plots
-
-        fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
+                axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
+                
 
         if n_plots > 1:
-            axs = axs.ravel()
+            # check if there are empty plots remaining
+            while i < n_rows * max_cols - 1:
+                i+=1
+                # remove empty plots
+                axs[i].set_axis_off()
+
+        fig.tight_layout()
+        if savepath is not None:
+            print("Saving figure to file " + savepath)
+            plt.savefig(savepath, dpi=dpi_save, bbox_inches='tight')
+            print("Saved.")
+        if save_only:
+            plt.close(fig)
+        elif show:
+            return plt.show()
         else:
-            axs = [axs]
-
-        # for k in range(len(axs)):
-        #     print(axs[k].transData.transform([(0, 1), (1, 0)]) - axs[k].transData.transform((0, 0)))
-        # print(axs[1].transData.transform([(0, 1), (1, 0)]) - axs[1].transData.transform((0, 0)))
-        # print(axs[2].transData.transform([(0, 1), (1, 0)]) - axs[2].transData.transform((0, 0)))
-        # print(axs[3].transData.transform([(0, 1), (1, 0)]) - axs[3].transData.transform((0, 0)))
-
-        
-        for i, group in enumerate(groups):
-            key = keys[0]
-
-            # determine x and y limits
-            if xlim is None:    
-                xlim = [adata.obs["um_col"].min(), adata.obs["um_col"].max()]
-            if ylim is None:
-                ylim = [adata.obs["um_row"].min(), adata.obs["um_row"].max()]
-
-            # create color dictionary if key is categorical
-            color_dict = create_color_dict(adata, key, palette)
-
-            spatial_single(adata, key, raw=raw, groupby=groupby,
-                    group=group, fig=fig, axis=axs[i], show=False,
-                    xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_per_key_dict[key],
-                    palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
-
-            axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
-            
-
-    if n_plots > 1:
-        # check if there are empty plots remaining
-        while i < n_rows * max_cols - 1:
-            i+=1
-            # remove empty plots
-            axs[i].set_axis_off()
-    
-    fig.tight_layout()
-    if savepath is not None:
-        print("Saving figure to file " + savepath)
-        plt.savefig(savepath, dpi=dpi_save, bbox_inches='tight')
-        print("Saved.")
-    if save_only:
-        plt.close(fig)
-    elif show:
-        return plt.show()
+            return fig, ax
     else:
-        return fig, ax
-
-
+        # if there is only one group use `spatial_single` function
+        spatial_single(adata, keys, raw=raw, groupby=groupby, group=groups[0], show=True,
+                        xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols,
+                        palette=palette, pd_dataframe=pd_dataframe, 
+                        savepath=savepath, save_only=save_only,
+                        **kwargs
+                        )
 
 
 def radial_expression(adata, coordinates, radius, min_dist=50, keys=None, mode='genes', raw=False, log_transform=False, show=True, axis=None, fig=None,
