@@ -93,8 +93,8 @@ function StitchImages(FolderPath, SavePath, FileName, ConfigFile)
 		"tile_overlap=" + overlap + " " + 
 		"first_file_index_i=" + index_start + " " + 
 		"directory=[" + FolderPath + "] " + 
-		"file_names=" + FileName + " " + 
-		"output_textfile_name=" + ConfigFile + " " + 
+		"file_names=[" + FileName + "] " + 
+		"output_textfile_name=[" + ConfigFile + "] " + 
 		"fusion_method=[Linear Blending] " + 
 		"regression_threshold=0.30 " + 
 		"max/avg_displacement_threshold=2.50 " + 
@@ -111,14 +111,13 @@ function StitchImages(FolderPath, SavePath, FileName, ConfigFile)
 		"tile_overlap=" + overlap + " " + 
 		"first_file_index_i=" + index_start + " " + 
 		"directory=[" + FolderPath + "] " + 
-		"file_names=" + FileName + " " + 
-		"output_textfile_name=" + ConfigFile + " " + 
+		"file_names=[" + FileName + "] " + 
+		"output_textfile_name=[" + ConfigFile + "] " + 
 		"fusion_method=[Linear Blending] " + 
 		"regression_threshold=0.30 " + 
 		"max/avg_displacement_threshold=2.50 " + 
 		"absolute_displacement_threshold=3.50 " + 
 		"image_output=[Fuse and display]");
-
 	}
 
 	if (flip != "Do not flip"){

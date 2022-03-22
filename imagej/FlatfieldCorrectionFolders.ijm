@@ -113,10 +113,12 @@ function FlatfieldCorrection()
 			}
 			print("Files deleted.");
 		}
-	
+		
+		print(SaveName);
 		print("Save image sequence...");
-		run("Image Sequence... ", "format=TIFF start=" + index_start + " digits=" + index_length + " name=" + SaveName + " save=[" + SaveDir + "]");
-		
+		// run("Image Sequence... ", "format=TIFF start=" + index_start + " digits=" + index_length + " name=" + SaveName + " save=[" + SaveDir + "]"); // olde ImageJ version
+		run("Image Sequence... ", "format=TIFF start=" + index_start + " digits=" + index_length + " name=[" + SaveName + "] dir=[" + SaveDir + "]");
+
 		close();
 	}
 
