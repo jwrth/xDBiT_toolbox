@@ -141,6 +141,14 @@ def multi_grayscale_to_rgb(r=None, g=None, b=None, bit_type="8bit", lowers=[None
 
     return rgb
 
+def convert_to_8bit(img):
+    '''
+    Convert numpy array image to 8bit.
+    '''
+    img = (img / img.max()) * 255
+    img = np.uint8(img)
+    return (img)
+
 
 def align_image(image, vertices, frame: int = 100, return_grayscale=True):
     '''
@@ -398,6 +406,11 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
     if do_registration:
         print("{}: Register image...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+
+        # convert to 8-bit and scale
+        image = convert_to_8bit(image)
+
+        # warping
         registered = cv2.warpPerspective(image, H, (w, h))
 
         if return_grayscale:
