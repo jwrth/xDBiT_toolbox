@@ -408,7 +408,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
 
         # convert to 8-bit and scale
-        image = convert_to_8bit(image)
+        #image = convert_to_8bit(image)
 
         # warping
         registered = cv2.warpPerspective(image, H, (w, h))
