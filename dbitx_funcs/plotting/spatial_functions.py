@@ -411,12 +411,6 @@ def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4
     else:
         data_in_dataframe=False
 
-    # determine x and y limits
-    if xlim is None:
-        xlim = [adata.obs["um_col"].min(), adata.obs["um_col"].max()]
-    if ylim is None:
-        ylim = [adata.obs["um_row"].min(), adata.obs["um_row"].max()]
-
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
                 use_raw=raw, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe) if key not in normalize_crange_not_for else None for key in keys}
@@ -466,22 +460,9 @@ def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4
                 axs = axs.ravel()
             else:
                 axs = [axs]
-
-            # for k in range(len(axs)):
-            #     print(axs[k].transData.transform([(0, 1), (1, 0)]) - axs[k].transData.transform((0, 0)))
-            # print(axs[1].transData.transform([(0, 1), (1, 0)]) - axs[1].transData.transform((0, 0)))
-            # print(axs[2].transData.transform([(0, 1), (1, 0)]) - axs[2].transData.transform((0, 0)))
-            # print(axs[3].transData.transform([(0, 1), (1, 0)]) - axs[3].transData.transform((0, 0)))
-
             
             for i, group in enumerate(groups):
                 key = keys[0]
-
-                # determine x and y limits
-                if xlim is None:    
-                    xlim = [adata.obs["um_col"].min(), adata.obs["um_col"].max()]
-                if ylim is None:
-                    ylim = [adata.obs["um_row"].min(), adata.obs["um_row"].max()]
 
                 # create color dictionary if key is categorical
                 color_dict = create_color_dict(adata, key, palette)
