@@ -807,3 +807,29 @@ def corr_heatmap(adata, keys, groupby, groups=None,
 
     plt.tight_layout()
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+
+def violinplot(data, x, y, ax, hue=None,
+            order=None, ylabel="# of {} per spot", jitter=0.4, hue_order=None, scale='area',
+            show=True, **kwargs):
+    # plotting
+    sns.violinplot(x=x, y=y, data=data, ax=ax, hue=hue, 
+        inner=None, dodge=False, order=order, hue_order=hue_order, scale=scale, **kwargs)
+    sns.stripplot(x=x, y=y, data=data, ax=ax, hue=None, size=1, color='black', dodge=True, jitter=jitter, order=order)
+    
+    # settings
+    ax.set_ylim(0, None)
+    ax.tick_params(axis='x', which='major', labelsize=16, rotation=45)
+    ax.tick_params(axis='y', which='major', labelsize=16, rotation=0)
+    ax.set_ylabel(ylabel.format(y), fontsize=16)
+    
+    if hue is not None:
+        # set legend
+        legend = ax.legend(title="Method",
+                        #loc="upper left",
+                        #bbox_to_anchor=(1, 1.03),
+                        fontsize=16)
+        plt.setp(legend.get_title(),fontsize=16)
+    
+    if show:
+        plt.tight_layout()
+        return plt.show()
