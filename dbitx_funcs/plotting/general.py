@@ -484,7 +484,7 @@ savepath=None, save_only=False, show=True, dpi_save=300):
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
 
 def go_dotplot(enrichment, color_key=None, groups=None, 
-max_to_plot=25, max_cols=4, cmap='viridis', cmin=None, cmax=None, normalize_cmap=True,
+max_to_plot=25, max_cols=4, cmap='viridis', cmin=None, cmax=None,
 ax_label_size=16, markersize=240, figsize=(8,6), xtick_label_size=16, ytick_label_size=16,
 clb_label_size=16, clb_tick_label_size=16, clb_pos=None, clb_norm=False,
 title_size=16, max_line_length=25,
@@ -532,7 +532,7 @@ savepath=None, save_only=False, show=True, dpi_save=300):
 
     # get min and max for the colorbar
     if color_key is not None:
-        if normalize_cmap:
+        if clb_norm:
             cmax = enrichment[color_key].max() if cmax is None else cmax
             cmin = enrichment[color_key].min() if cmin is None else cmin
         else:

@@ -340,7 +340,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                 #cax = divider.append_axes("right", size="0%", pad=1)
                 if colorbar:
                     clb = fig.colorbar(s, ax=ax, shrink=1, 
-                        #pad=-0.17, 
+                        pad=-0.05, 
                         aspect=40)
                     clb.ax.tick_params(labelsize=14)
                     #clb = plt.colorbar(s, ax=cax, shrink=1)
