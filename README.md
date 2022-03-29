@@ -57,6 +57,13 @@ python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
 ```
 
 ### Samtools
+
+#### Option 1: Conda 
+```
+conda install -c bioconda samtools 
+```
+
+#### Option 2: Instructions
 Download and instructions from: https://www.htslib.org/download/
 
 ```
