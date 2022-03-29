@@ -20,7 +20,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             header=None, headersize=18, header_names=None, raw=False, percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
-            spot_size=50, spot_type='s',
+            spot_size=50, spot_type='s', clb_pad=-0.05,
             axis=None, fig=None, show=True,
             patch_style=None, patch_xy=(1000, 1000), patch_radius=1000, patch_color='r',
             xlim=None, ylim=None, oversize=1, dpi_display=80, figsize=(8.2,6),
@@ -340,7 +340,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                 #cax = divider.append_axes("right", size="0%", pad=1)
                 if colorbar:
                     clb = fig.colorbar(s, ax=ax, shrink=1, 
-                        pad=-0.05, 
+                        pad=clb_pad, 
                         aspect=40)
                     clb.ax.tick_params(labelsize=14)
                     #clb = plt.colorbar(s, ax=cax, shrink=1)
