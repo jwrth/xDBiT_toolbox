@@ -102,7 +102,12 @@ python3 -m pip install --user --upgrade cutadapt
 
 Manual on: https://github.com/alexdobin/STAR
 
-#### Installation
+#### Installation Option 1: Conda
+```
+conda install -c bioconda star 
+```
+
+#### Installation Option 2: from source
 ```
 # Get latest STAR source from releases
 wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
