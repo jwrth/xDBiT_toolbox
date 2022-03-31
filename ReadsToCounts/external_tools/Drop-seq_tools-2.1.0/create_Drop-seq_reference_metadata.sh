@@ -144,7 +144,7 @@ invoke_dropseq CreateIntervalsFiles SEQUENCE_DICTIONARY=$sequence_dictionary RED
            OUTPUT=$outdir
 $ECHO mkdir -p $outdir/STAR
 check_invoke $star_executable --runMode genomeGenerate --genomeDir $outdir/STAR --genomeFastaFiles $output_fasta \
-           --sjdbGTFfile $output_gtf --sjdbOverhang 100 --limitGenomeGenerateRAM 250000000000 --runThreadN 20
+           --sjdbGTFfile $output_gtf --sjdbOverhang 100 #--limitGenomeGenerateRAM 250000000000 --runThreadN 20
 check_invoke $bgzip_executable $output_fasta
 check_invoke $samtools_executable faidx $output_fasta.gz
 
