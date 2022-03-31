@@ -73,7 +73,7 @@ class GOEnrichment():
                         sortby=sortby, ascending=ascending)
         
         if organism is None:
-            raise ValueError("`organism` not specified. Needs to gprofiler naming conventions, e.g. `mmusculus`")
+            raise ValueError("`organism` not specified. Needs gprofiler naming conventions, e.g. `mmusculus`")
 
         enrichment_dict = {}
         for i, group in enumerate(groups):

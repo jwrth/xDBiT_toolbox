@@ -129,12 +129,26 @@ class CountsToAnndata():
             "input_transcriptome", "align_images", "hq_images", "output_dir", 
             "vertices_x", "vertices_y"]
 
-        assert np.all([elem in self.parameters.index for elem in param_cats]), \
-            "Not all required categories found in parameter section {}".format(param_cats)
-        assert np.all([elem in self.directories.columns for elem in dir_cats]), \
-            "Not all required column headers found in directory section {}".format(dir_cats)
-        assert ~np.any([pd.isnull(self.parameters.loc[cat, "value"]) for cat in param_cats[:3]]), \
-            "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats[:3])
+        # check for missing values in parameters and directories
+        missing_params = [elem for elem in param_cats if elem not in self.parameters.index]
+        missing_paramvals = [cat for cat in param_cats if pd.isnull(self.parameters.loc[cat, "value"])]
+        missing_dirs = [elem for elem in dir_cats if elem not in self.directories.columns]
+
+        halt=False
+        missnames = ["parameters", "parameter values", "directories"]
+        for i, miss in enumerate([missing_params, missing_paramvals, missing_dirs]):
+            if len(miss) > 0:
+                print("MissingValueError: Following values are missing in {}: {}".format(missnames[i], miss))
+                halt=True
+        if halt:
+            sys.exit()
+
+        # assert np.all([elem in self.parameters.index for elem in param_cats]), \
+        #     "Not all required categories found in parameter section {}".format(param_cats)
+        # assert np.all([elem in self.directories.columns for elem in dir_cats]), \
+        #     "Not all required column headers found in directory section {}".format(dir_cats)
+        # assert ~np.any([pd.isnull(self.parameters.loc[cat, "value"]) for cat in param_cats[:3]]), \
+        #     "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats[:3])
 
         # determine extra categories which are added later to adata.obs
         self.extra_cats_headers = [elem for elem in self.directories.columns if elem not in dir_cats]
@@ -434,12 +448,12 @@ class CountsToAnndata():
             adata = db.dbitseq_to_squidpy(
                 matrix_path=matrix_file, 
                 images=images,
-                resolution=int(self.parameters.loc["spot_width"]), 
+                resolution=int(self.parameters.loc["spot_width", "value"]), 
                 unique_id=unique_id, 
                 organism=organism,
                 extra_categories=extra_cats,
-                n_channels=int(self.parameters.loc["n_channels"]), 
-                frame=int(self.parameters.loc["frame"]),
+                n_channels=int(self.parameters.loc["n_channels", "value"]), 
+                frame=int(self.parameters.loc["frame", "value"]),
                 labels=channel_labels, 
                 vertices=self.vertices_list[i], 
                 savepath=align_outfile, 
