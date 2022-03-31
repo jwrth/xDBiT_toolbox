@@ -105,7 +105,7 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
 
         # Resize images
         print("Resize images by factor {}...".format(resize_factor), flush=True)
-        resize_images_in_adata(adata, scale_factor=resize_factor)
+        resize_images_in_adata(adata, scale_factor=resize_factor) # add lowres image
 
         # calculate mean intensity per spot for each channel
         print("Calculate channel mean per spot...", flush=True)

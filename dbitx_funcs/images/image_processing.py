@@ -262,7 +262,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         template_scaled = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
     if scale_factor < 1:
-        print("Scale images before registration")
+        print("Scale images before registration by factor {}".format(scale_factor))
         image_scaled = resize_image(img=image, scale_factor=scale_factor)
         template_scaled = resize_image(img=template, scale_factor=scale_factor)
     else:
