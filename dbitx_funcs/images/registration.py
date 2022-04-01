@@ -1,3 +1,4 @@
+from cv2 import resize
 import numpy as np
 import cv2
 from ..calculations._calc import order_points_clockwise, dist_points
@@ -6,7 +7,7 @@ from datetime import datetime
 from ..tools import extract_groups, rotatePoint
 from ..calculations import dist_points
 import numpy as np
-from .image_processing import resize_image, recalculate_scale, rotateImage, resize_images_in_adata, single_grayscale_to_rgb
+from .image_processing import resize_image, recalculate_scale, rotateImage, resize_images_in_adata, convert_to_8bit
 
 def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_factor=1,
                    debug=False, method="sift", ratio_test=True, flann=True, do_registration=True,
@@ -20,13 +21,23 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         print("Convert template to grayscale...")
         template_scaled = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
 
-    if scale_factor < 1:
-        print("Scale images before registration by factor {}".format(scale_factor))
-        image_scaled = resize_image(img=image, scale_factor=scale_factor)
-        template_scaled = resize_image(img=template, scale_factor=scale_factor)
-    else:
-        image_scaled = image
-        template_scaled = template
+    # if scale_factor < 1:
+    #     print("Scale images before registration by factor {}".format(scale_factor))
+    #     image_scaled = resize_image(img=image, scale_factor=scale_factor)
+    #     template_scaled = resize_image(img=template, scale_factor=scale_factor)
+    # else:
+    #     image_scaled = image
+    #     template_scaled = template
+
+    dim = (1000,1000)
+    print("Rescale images to following dimensions: {}".format(dim))
+    image_scaled = resize_image(img=image, dim=dim)
+    template_scaled = resize_image(img=template, dim=dim)
+    print("Dim of image: {}".format(image_scaled.shape))
+    print("Dim of template: {}".format(template_scaled.shape))
+    print("Convert scaled images to 8 bit")
+    image_scaled = convert_to_8bit(image_scaled)
+    template_scaled = convert_to_8bit(template_scaled)
 
     print("{}: Get features...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     # Get features
@@ -88,25 +99,6 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
 
         print("Number of matches used: {}".format(len(good_matches)))
 
-    # elif method=="orb":
-    #     # use ORB to detect keypoints and extract (binary) local
-    #     # invariant features
-    #     orb = cv2.ORB_create(maxFeatures)
-    #     (kpsA, descsA) = orb.detectAndCompute(image, None)
-    #     (kpsB, descsB) = orb.detectAndCompute(template, None)
-
-    #     # match the features
-    #     method = cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING
-    #     matcher = cv2.DescriptorMatcher_create(method)
-    #     matches = matcher.match(descsA, descsB, None)
-
-    #     # sort the matches by their distance (the smaller the distance,
-    #     # the "more similar" the features are)
-    #     matches = sorted(matches, key=lambda x:x.distance)
-    #     # keep only the top matches
-    #     keep = int(len(matches) * keepFraction)
-    #     good_matches = matches[:keep]
-
     # check to see if we should visualize the matched keypoints
     if debug:
         print("{}: Debugging mode - Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
@@ -118,7 +110,6 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         plt.show()
     
     # Compute homography matrix
-
     print("{}: Fetch keypoints...".format(
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
     # allocate memory for the keypoints (x, y)-coordinates from the
@@ -153,9 +144,23 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
     print("{}: Compute homography matrix...".format(
         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
 
+    # calculate scale factors for x and y dimension for image and template
+    x_sf_image = dim[0] / image.shape[0]
+    y_sf_image = dim[1] / image.shape[1]
+    x_sf_template = dim[0] / template.shape[0]
+    y_sf_template = dim[1] / template.shape[1]
+
+    # apply scale factors to points - separately for each dimension
+    ptsA[:, 0] = ptsA[:, 0] / x_sf_image
+    ptsA[:, 1] = ptsA[:, 1] / y_sf_image
+    ptsB[:, 0] = ptsB[:, 0] / x_sf_template
+    ptsB[:, 1] = ptsB[:, 1] / y_sf_template
+
+
+
     # apply scale_factor to points
-    ptsA /= scale_factor
-    ptsB /= scale_factor
+    # ptsA /= scale_factor
+    # ptsB /= scale_factor
 
     # determine homography matrix
     (H, mask) = cv2.findHomography(ptsA, ptsB, method=cv2.RANSAC)
@@ -232,7 +237,8 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         for key in image_dir_dict:
             print("{}: Load image for key {}...".format(
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}", key))
-            hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
+            #hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
+            hq_image_dict[key] = cv2.imread(image_dir_dict[key], -1) # load unchanged
 
             # convert to grayscale
             if len(hq_image_dict[key].shape) == 3:
@@ -396,8 +402,8 @@ def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
     aligned = [align_image(img, vertices, frame) for img in images]
 
     # Transform to RGB
-    aligned = [single_grayscale_to_rgb(
-        img, bit_type=bit_type) for img in aligned]
+    #aligned = [single_grayscale_to_rgb(
+    #    img, bit_type=bit_type) for img in aligned]
 
     # Part 2: Create metadata
     print("     Create metadata...")

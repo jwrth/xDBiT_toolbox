@@ -294,7 +294,7 @@ class CountsToAnndata():
                 if vertices_not_given:
                     import napari
                     # read alignment image
-                    alignment_image = cv2.imread(align_img)
+                    alignment_image = cv2.imread(align_img, -1)
 
                     ### Select corner spots in alignment image using napari viewer
                     # with napari.gui_qt():

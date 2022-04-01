@@ -147,15 +147,17 @@ def convert_to_8bit(img):
     return (img)
 
 
-def resize_image(img, scale_factor):
+def resize_image(img, dim=None, scale_factor=None):
     '''
     Resize image by scale_factor
     '''
-    width = int(img.shape[1] * scale_factor)
-    height = int(img.shape[0] * scale_factor)
-    dim = (width, height)
+    if scale_factor is not None:
+        width = int(img.shape[1] * scale_factor)
+        height = int(img.shape[0] * scale_factor)
+        dim = (width, height)
 
     return cv2.resize(img, dim)
+        
 
 
 def resize_images_in_adata(adata, scale_factor):
@@ -169,7 +171,7 @@ def resize_images_in_adata(adata, scale_factor):
     for key in img_keys:
         img = adata.uns['spatial'][key]['images']['hires']
 
-        adata.uns['spatial'][key]['images']['lowres'] = resize_image(img, scale_factor)
+        adata.uns['spatial'][key]['images']['lowres'] = resize_image(img, scale_factor=scale_factor)
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
