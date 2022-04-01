@@ -5,7 +5,8 @@ import squidpy as sq
 import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
-from .images.image_processing import align_to_dict, resize_images_in_adata, calc_image_param_per_spot
+from .images.image_processing import resize_images_in_adata, calc_image_param_per_spot
+from .images.registration import align_to_dict
 from datetime import datetime
 from gprofiler import GProfiler
 import cv2
