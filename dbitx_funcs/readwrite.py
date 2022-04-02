@@ -5,7 +5,7 @@ import squidpy as sq
 import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
-from .images.image_processing import resize_images_in_adata, calc_image_param_per_spot
+from .images.image_processing import convert_to_8bit, resize_images_in_adata, calc_image_param_per_spot
 from .images.registration import align_to_dict
 from datetime import datetime
 from gprofiler import GProfiler
@@ -14,8 +14,9 @@ import cv2
 
 def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, convert_genes=True,
                         #dbitx=False, 
-                        grayscale=True,
-                        frame=100, unique_id=None, extra_categories=None, resize_factor=0.2, organism='mmusculus',
+                        grayscale=True, to_8bit=True,
+                        frame=100, unique_id=None, extra_categories=None, lowres_factor=0.2, 
+                        organism='mmusculus',
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
                         manual_pixel_offset_y=0, savepath=None, return_adata=False):
     """
@@ -69,8 +70,13 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         assert labels is not None, "No labels given."
         assert vertices is not None, "No vertices given."
 
+        if to_8bit:
+            # convert images to 8bit images
+            images = [convert_to_8bit(i) for i in images]
+
         # make labels unique
         unique_labels = [unique_id + "_" + lab for lab in labels]
+
 
         # read images and create metadata
         print("Align and create image metadata...")
@@ -105,8 +111,8 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         adata.uns[spatial_key] = image_and_metadata
 
         # Resize images
-        print("Resize images by factor {} and save as lowres...".format(resize_factor), flush=True)
-        resize_images_in_adata(adata, scale_factor=resize_factor) # add lowres image
+        print("Resize images by factor {} and save as lowres...".format(lowres_factor), flush=True)
+        resize_images_in_adata(adata, scale_factor=lowres_factor) # add lowres image
 
         # calculate mean intensity per spot for each channel
         print("Calculate channel mean per spot...", flush=True)

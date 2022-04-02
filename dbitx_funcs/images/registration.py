@@ -29,7 +29,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
     #     image_scaled = image
     #     template_scaled = template
 
-    dim = (1000,1000)
+    dim = (4000,4000)
     print("Rescale images to following dimensions: {}".format(dim))
     image_scaled = resize_image(img=image, dim=dim)
     template_scaled = resize_image(img=template, dim=dim)
@@ -105,9 +105,11 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         matchedVis = cv2.drawMatches(image_scaled, kpsA, template_scaled, kpsB,
                                      good_matches, None)
         #matchedVis = imutils.resize(matchedVis, width=1000)
-        matchedVis = resize_image(matchedVis, scale_factor=0.1)
-        plt.imshow(matchedVis)
-        plt.show()
+        #matchedVis = resize_image(matchedVis, scale_factor=0.1)
+        #plt.imshow(matchedVis)
+        #plt.show()
+    else:
+        matchedVis = None
     
     # Compute homography matrix
     print("{}: Fetch keypoints...".format(
@@ -124,20 +126,20 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         ptsA[i] = kpsA[m.queryIdx].pt
         ptsB[i] = kpsB[m.trainIdx].pt
 
-    if debug:
-        print("{}: Debugging mode - Display image and template with keypoints...".format(
-            f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        # plot keypoints for image
-        fig, axs = plt.subplots(1, 2, figsize=(12, 6))
-        axs[0].imshow(image_scaled)
-        axs[0].scatter(x=ptsA[:, 0], y=ptsA[:, 1])
-        axs[0].set_title('Image')
+    # if debug:
+    #     print("{}: Debugging mode - Display image and template with keypoints...".format(
+    #         f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+    #     # plot keypoints for image
+    #     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+    #     axs[0].imshow(image_scaled)
+    #     axs[0].scatter(x=ptsA[:, 0], y=ptsA[:, 1])
+    #     axs[0].set_title('Image')
 
-        axs[1].imshow(template_scaled)
-        axs[1].scatter(x=ptsB[:, 0], y=ptsB[:, 1])
-        axs[1].set_title('Template')
+    #     axs[1].imshow(template_scaled)
+    #     axs[1].scatter(x=ptsB[:, 0], y=ptsB[:, 1])
+    #     axs[1].set_title('Template')
 
-        plt.show()
+    #     plt.show()
 
     # compute the homography matrix between the two sets of matched
     # points
@@ -155,8 +157,6 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
     ptsA[:, 1] = ptsA[:, 1] / y_sf_image
     ptsB[:, 0] = ptsB[:, 0] / x_sf_template
     ptsB[:, 1] = ptsB[:, 1] / y_sf_template
-
-
 
     # apply scale_factor to points
     # ptsA /= scale_factor
@@ -185,12 +185,12 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, scale_fac
         registered = None
 
     # return the registered image
-    return registered, H
+    return registered, H, matchedVis
 
 def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi',
-                                        spatial_key='spatial', 
-                                        hires_key='hires', lowres_key='lowres', scale_factor_before_reg=None,
-                                        rot_threshold=0, do_registration=False, scale_factor=0.1,
+                                        spatial_key='spatial', to_8bit=True,
+                                        hires_key='hires', lowres_key='lowres', #scale_factor_before_reg=1,
+                                        rot_threshold=0, do_registration=False, lowres_factor=0.2,
                                         keepFraction=0.2, method='sift', debug=False, in_place=False):
     '''
     Function to add new images to an adata object and register the coordinates accordingly.
@@ -240,6 +240,9 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
             #hq_image_dict[key] = cv2.imread(image_dir_dict[key], 0)
             hq_image_dict[key] = cv2.imread(image_dir_dict[key], -1) # load unchanged
 
+            if to_8bit:
+                hq_image_dict[key] = convert_to_8bit(hq_image_dict[key])
+
             # convert to grayscale
             if len(hq_image_dict[key].shape) == 3:
                 hq_image_dict[key] = cv2.cvtColor(hq_image_dict[key], cv2.COLOR_BGR2GRAY)
@@ -247,10 +250,10 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # extract the registration image from the dict
         image_to_register = hq_image_dict[reg_key]
 
-        if debug:
-            # scale down the images
-            image_adata = resize_image(image_adata, scale_factor=0.1)
-            image_to_register = resize_image(image_to_register, scale_factor=0.1)
+        # if debug:
+        #     # scale down the images
+        #     image_adata = resize_image(image_adata, scale_factor=0.1)
+        #     image_to_register = resize_image(image_to_register, scale_factor=0.1)
 
             # image_adata = imutils.resize(
             #     image_adata, width=int(image_adata.shape[1]*0.1))
@@ -261,8 +264,16 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # register images and extract homography matrix
         print("{}: Register image {}...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
-        registered_img, H = register_image(image_adata, image_to_register, do_registration=do_registration, scale_factor=scale_factor_before_reg,
-                              keepFraction=keepFraction, method=method, debug=debug)
+        registered_img, H, matchedVis = register_image(image_adata, image_to_register, do_registration=do_registration, 
+                                #scale_factor=scale_factor_before_reg,
+                                keepFraction=keepFraction, method=method, debug=debug)
+
+        if matchedVis is not None:
+            if 'matchedVis' in adata.uns.keys():
+                adata.uns['matchedVis'][group] = matchedVis
+            else:
+                adata.uns['matchedVis'] = {}
+                adata.uns['matchedVis'][group] = matchedVis
 
         if do_registration:
             # save registered image in adata
@@ -341,6 +352,8 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
             adata.uns[spatial_key][key]['images'][hires_key] = hq_image_dict[key]
             # add metadata
             adata.uns[spatial_key][key]['scalefactors'] = metadata
+            print("Metadata before recalculation:")
+            print(metadata)
 
         # store transformed and rotated coordinates in adata
         adata.obsm['spatial'][obs_mask] = coords_transrot
@@ -354,11 +367,13 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         recalculate_scale(adata, groupby=groupby, group=group, 
             save_scale=True, return_angle_and_pivot=False)
+        print("Metadata after recalculation:")
+        print(adata.uns[spatial_key][key]['scalefactors'])
 
     # resize images and store as `lowres` for plotting
     print("{}: Resize all images and store as `lowres`...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-    resize_images_in_adata(adata, scale_factor=scale_factor)
+    resize_images_in_adata(adata, scale_factor=lowres_factor)
 
     if not in_place:
         return adata

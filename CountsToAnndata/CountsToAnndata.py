@@ -42,14 +42,14 @@ class SelectionWindow:
         self.selectFile.grid(row=0,column=0)
 
         # set windows for scale factor selection
-        self.labelText = StringVar()
-        self.labelText.set("Scale factor:")
-        self.labelDir = Label(self.root, textvariable=self.labelText)
-        self.labelDir.grid(row=1, column=0)
+        # self.labelText = StringVar()
+        # self.labelText.set("Scale factor:")
+        # self.labelDir = Label(self.root, textvariable=self.labelText)
+        # self.labelDir.grid(row=1, column=0)
 
-        self.sf_default = StringVar(self.root, value="0.2")
-        self.scale_entry = Entry(self.root, textvariable=self.sf_default, width=4, justify=CENTER)
-        self.scale_entry.grid(row=1, column=1)
+        # self.sf_default = StringVar(self.root, value="0.2")
+        # self.scale_entry = Entry(self.root, textvariable=self.sf_default, width=4, justify=CENTER)
+        # self.scale_entry.grid(row=1, column=1)
 
         # set cancel button to exit script
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
@@ -72,7 +72,7 @@ class SelectionWindow:
     # Functions
     def closewindow(self, event=None): # event only needed for .bind which passes event object to function
         self.settings_file = self.entry.get()
-        self.scale_factor = self.scale_entry.get()
+        #self.scale_factor = self.scale_entry.get()
         self.root.destroy()
 
     def browsefunc(self):
@@ -349,7 +349,10 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, scale_factor_before_reg, grayscale=True, debug='False'):
+    def ProcessDatasets(self, 
+        #scale_factor_before_reg, 
+        #grayscale=True, 
+        debug=False):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -390,19 +393,8 @@ class CountsToAnndata():
                 # # get image directories
                 align_images = glob(dirs["align_images"])
                 hq_images = glob(dirs["hq_images"])
-
-                # # check if number of images matches number of channel names
-                # assert len(hq_images) == len(hq_ch_names), \
-                #     "Number of detected hq images [{}] does not match number of channel names [{}] in parameters file.".format(
-                #         len(hq_images), len(hq_ch_names))
-
-                # # check whether paths to alignment images and hq images are identical
-                # if not len(set(align_images) & set(hq_images)) == len(align_images):
-                #     print("Alignment images and hq are not identical. HQ images will be registered.")
-                #     register_hq = True
                 
                 # # detect alignment marker image
-                # align_img = [i for i in align_images if alignment_channel in i][0]
                 dapi_img = [i for i in align_images if self.dapi_channel in i][0]
 
                 # read images
@@ -475,7 +467,7 @@ class CountsToAnndata():
                                                                 reg_channel=self.reg_channel_label, 
                                                                 in_place=False, debug=debug, 
                                                                 do_registration=True,
-                                                                scale_factor_before_reg=scale_factor_before_reg
+                                                                #scale_factor_before_reg=scale_factor_before_reg
                                                                 )
                 
                 adata_trans.write(output_file)
@@ -487,6 +479,16 @@ class CountsToAnndata():
                                         unique_id=unique_id, 
                                         reg_channel_label=self.reg_channel_label
                                         )
+
+                if debug:
+                    # plot matchedVis
+                    for g, mv in adata_trans.uns['matchedVis'].items():
+                        plt.imshow(mv)
+                        plotpath = os.path.join(output_dir, "{}_matchedVis.png".format(g))
+                        print("Saving matched visualization into {}".format(plotpath))
+                        plt.savefig(plotpath, dpi=400)
+                        plt.close()
+                        
 
         print("{} : Finished all datasets. Output saved into {}".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", output_dir), 
@@ -543,11 +545,11 @@ if __name__ == "__main__":
 
         # read input of selection window
         settings_file = selection.settings_file
-        scale_factor_before_reg = float(selection.scale_factor)
+        #scale_factor_before_reg = float(selection.scale_factor)
 
     except tkinter.TclError:
         settings_file = input("Enter path to parameters .csv file: ")
-        scale_factor_before_reg = float(input("Enter scale factor: "))
+        #scale_factor_before_reg = float(input("Enter scale factor: "))
 
     settings_file = settings_file.strip('"')
     
@@ -582,7 +584,9 @@ if __name__ == "__main__":
 
     
     coa.AddVertices(settings_file=settings_file)
-    coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg, debug=False)
+    coa.ProcessDatasets(
+        #scale_factor_before_reg=scale_factor_before_reg, 
+        debug=True)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
