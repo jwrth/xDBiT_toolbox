@@ -28,7 +28,7 @@ class SelectionWindow:
 
         self.root = Tk()
         self.root.title('CountsToAnndata')
-        self.root.geometry("280x105")
+        self.root.geometry("400x135")
         self.root.option_add("*font", "Calibri 10")
 
         self.home = os.path.expanduser("~") # get home directory
@@ -42,22 +42,32 @@ class SelectionWindow:
         self.selectFile.grid(row=0,column=0)
 
         # set windows for scale factor selection
-        # self.labelText = StringVar()
-        # self.labelText.set("Scale factor:")
-        # self.labelDir = Label(self.root, textvariable=self.labelText)
-        # self.labelDir.grid(row=1, column=0)
+        self.labelText = StringVar()
+        self.labelText.set("Maximum pixel width for registration:")
+        self.labelDir = Label(self.root, textvariable=self.labelText)
+        self.labelDir.grid(row=1, column=0)
 
-        # self.sf_default = StringVar(self.root, value="0.2")
-        # self.scale_entry = Entry(self.root, textvariable=self.sf_default, width=4, justify=CENTER)
-        # self.scale_entry.grid(row=1, column=1)
+        self.maxpx_default = StringVar(self.root, value="4000")
+        self.maxpx_entry = Entry(self.root, textvariable=self.maxpx_default, width=4, justify=CENTER)
+        self.maxpx_entry.grid(row=1, column=1)
+
+        # set windows for scale factor selection
+        self.labelText2 = StringVar()
+        self.labelText2.set("Convert to 8bit:")
+        self.labelDir2 = Label(self.root, textvariable=self.labelText2)
+        self.labelDir2.grid(row=2, column=0)
+
+        self.convert_entry = IntVar(value=True)
+        self.checkbutton = Checkbutton(self.root, variable=self.convert_entry, onvalue=True, offvalue=False)
+        self.checkbutton.grid(row=2, column=1)
 
         # set cancel button to exit script
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
-        self.cancel.grid(row=2,column=1)
+        self.cancel.grid(row=3,column=1)
 
         # set okay button to continue script
         self.okay = Button(self.root, text="Okay", command=self.closewindow)
-        self.okay.grid(row=2,column=0)
+        self.okay.grid(row=3,column=0)
 
         # key bindings
         self.root.bind("<Return>", func=self.closewindow)
@@ -72,7 +82,8 @@ class SelectionWindow:
     # Functions
     def closewindow(self, event=None): # event only needed for .bind which passes event object to function
         self.settings_file = self.entry.get()
-        #self.scale_factor = self.scale_entry.get()
+        self.maxpx = self.maxpx_entry.get()
+        self.convert = self.convert_entry.get()
         self.root.destroy()
 
     def browsefunc(self):
@@ -142,13 +153,6 @@ class CountsToAnndata():
                 halt=True
         if halt:
             sys.exit()
-
-        # assert np.all([elem in self.parameters.index for elem in param_cats]), \
-        #     "Not all required categories found in parameter section {}".format(param_cats)
-        # assert np.all([elem in self.directories.columns for elem in dir_cats]), \
-        #     "Not all required column headers found in directory section {}".format(dir_cats)
-        # assert ~np.any([pd.isnull(self.parameters.loc[cat, "value"]) for cat in param_cats[:3]]), \
-        #     "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats[:3])
 
         # determine extra categories which are added later to adata.obs
         self.extra_cats_headers = [elem for elem in self.directories.columns if elem not in dir_cats]
@@ -349,10 +353,7 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, 
-        #scale_factor_before_reg, 
-        #grayscale=True, 
-        debug=False):
+    def ProcessDatasets(self, maxpx_before_reg, to_8bit=False, debug=False):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -385,6 +386,7 @@ class CountsToAnndata():
             if self.process_images[i]:
                 # create name of output files
                 output_filename = "{}_hqimages.h5ad".format(unique_id)
+                noimages_filename = "{}_noimages.h5ad".format(unique_id)
                 align_filename = "{}_alignimages.h5ad".format(unique_id)
 
                 # check if the vertices are given in the settings file
@@ -425,11 +427,14 @@ class CountsToAnndata():
             if self.register_hq[i]:
                 # create tmp directory
                 tmp_dir = os.path.join(output_dir, "tmp")
+                noimages_dir = os.path.join(output_dir, "noimages")
                 Path(tmp_dir).mkdir(parents=True, exist_ok=True)
+                Path(noimages_dir).mkdir(parents=True, exist_ok=True)
 
                 # generate path to output files for adata objects
                 align_outfile = os.path.join(tmp_dir, align_filename)
                 output_file = os.path.join(output_dir, output_filename)
+                noimages_file = os.path.join(noimages_dir, noimages_filename)
                 return_adata = True
             else:
                 align_outfile = os.path.join(output_dir, align_filename)
@@ -448,6 +453,7 @@ class CountsToAnndata():
                 frame=int(self.parameters.loc["frame", "value"]),
                 labels=channel_labels, 
                 vertices=self.vertices_list[i], 
+                to_8bit=to_8bit,
                 savepath=align_outfile, 
                 return_adata=return_adata
                 )
@@ -458,7 +464,7 @@ class CountsToAnndata():
                 image_dir_dict = {}
                 for i, n in enumerate(self.hq_ch_names):
                     selected_image_path = [elem for elem in hq_images if n.strip("*") in os.path.basename(elem)][0]
-                    image_dir_dict[unique_id + "_" + str(self.hq_ch_labels[i])] = selected_image_path
+                    image_dir_dict[unique_id + "-" + str(self.hq_ch_labels[i])] = selected_image_path
 
                 # start transformation
                 adata_trans = db.im.register_adata_coords_to_new_images(adata, 
@@ -467,10 +473,13 @@ class CountsToAnndata():
                                                                 reg_channel=self.reg_channel_label, 
                                                                 in_place=False, debug=debug, 
                                                                 do_registration=True,
-                                                                #scale_factor_before_reg=scale_factor_before_reg
+                                                                maxpx_before_reg=maxpx_before_reg, 
+                                                                to_8bit=to_8bit
                                                                 )
                 
+                # save adata after transformation with images
                 adata_trans.write(output_file)
+
 
                 # plot registration QC plot
                 self.registration_qc_plot(adata=adata, 
@@ -488,6 +497,10 @@ class CountsToAnndata():
                         print("Saving matched visualization into {}".format(plotpath))
                         plt.savefig(plotpath, dpi=400)
                         plt.close()
+
+                # remove images and save adata without images
+                db.tl.remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
+                adata_trans.write(noimages_file)
                         
 
         print("{} : Finished all datasets. Output saved into {}".format(
@@ -545,12 +558,14 @@ if __name__ == "__main__":
 
         # read input of selection window
         settings_file = selection.settings_file
-        #scale_factor_before_reg = float(selection.scale_factor)
+        maxpx = int(selection.maxpx)
+        convert = bool(selection.convert)
 
     except tkinter.TclError:
         settings_file = input("Enter path to parameters .csv file: ")
-        #scale_factor_before_reg = float(input("Enter scale factor: "))
+        maxpx = int(input("Enter maximum pixel width for registration: "))
 
+    #settings_file = "C:\\Users\\Johannes\\Documents\\homeoffice\\37_48\\CountsToAnndata\\37_48_CoA_param_withvertices_20220402_test.csv"
     settings_file = settings_file.strip('"')
     
     # read and check input file
@@ -563,8 +578,6 @@ if __name__ == "__main__":
 
     ## Load modules
     # get path of dbitx module and import functions
-
-
     print("Load modules...", flush=True)
     script_dir = os.path.dirname(os.path.realpath(__file__)) # read script location
     module_path = os.path.abspath(os.path.join(script_dir, ".."))
@@ -585,7 +598,7 @@ if __name__ == "__main__":
     
     coa.AddVertices(settings_file=settings_file)
     coa.ProcessDatasets(
-        #scale_factor_before_reg=scale_factor_before_reg, 
+        maxpx_before_reg=maxpx, to_8bit=convert,
         debug=True)
 
     print("{} : Script finished.".format(

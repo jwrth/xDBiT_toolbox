@@ -314,7 +314,7 @@ def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd
 
     return crange
 
-def remove_images(adata, uns_key='spatial', reg_key='registered', 
+def remove_images(adata, uns_key='spatial', reg_key='registered', other_keys=None,
     hires_only=False, hires_key='hires'):
     '''
     Remove all images from adata.
@@ -334,6 +334,13 @@ def remove_images(adata, uns_key='spatial', reg_key='registered',
     # remove registered images if available
     if reg_key in adata.uns:
         del adata.uns[reg_key]
+
+    # remove further keys if given
+    if other_keys is not None:
+        other_keys = [other_keys] if isinstance(other_keys, str) else list(other_keys)
+        for k in other_keys:
+            if k in adata.uns:
+                del adata.uns[k]
 
     #return adata
 

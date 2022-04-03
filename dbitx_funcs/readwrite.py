@@ -1,7 +1,6 @@
 from numpy.lib.arraysetops import unique
 import scanpy as sc
 import numpy as np
-import squidpy as sq
 import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
@@ -14,11 +13,11 @@ import cv2
 
 def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, convert_genes=True,
                         #dbitx=False, 
-                        grayscale=True, to_8bit=True,
+                        grayscale=True, to_8bit=False,
                         frame=100, unique_id=None, extra_categories=None, lowres_factor=0.2, 
                         organism='mmusculus',
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
-                        manual_pixel_offset_y=0, savepath=None, return_adata=False):
+                        manual_pixel_offset_y=0, savepath=None, return_adata=False, **kwargs):
     """
     Function to create adata object for squidpy from Dbit-seq data.
     Inputs are the path to the transcriptome matrix and the image. 
@@ -58,8 +57,6 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         [coord_to_um(c, resolution) for c in adata.obs['array_col']])
 
     if dbitx:
-        # adata.obs['well'] = np.array(
-        #     [str(elem.split(sep)[2]) for elem in adata.obs_names])
         adata.obs_names = np.array(["{e}_{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
         adata.obs['id'] = unique_id
     else:
@@ -75,14 +72,14 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
             images = [convert_to_8bit(i) for i in images]
 
         # make labels unique
-        unique_labels = [unique_id + "_" + lab for lab in labels]
+        unique_labels = [unique_id + "-" + lab for lab in labels]
 
 
         # read images and create metadata
         print("Align and create image metadata...")
         image_and_metadata = align_to_dict(
             images=images, labels=unique_labels, vertices=vertices,
-            resolution=resolution, n_channels=n_channels, frame=frame
+            resolution=resolution, n_channels=n_channels, frame=frame, **kwargs
         )
 
         # extract parameters from metadata
