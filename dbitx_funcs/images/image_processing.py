@@ -175,11 +175,11 @@ def resize_images_in_adata(adata, scale_factor):
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
-def recalculate_scale(adata, groupby, group, spatial_key='spatial', 
+def recalculate_scale(adata, groupby, group, ppm_given=None, spatial_key='spatial', 
     save_scale=True, return_angle_and_pivot=False):
     '''
-    Recalculates the scale `pixel_per_um` of all images of a given `group` in an anndata object.
-    Expects the images in `adata.uns[spatial_key]`
+    Recalculates the scale "pixel_per_um" of all images of a given `group` in an anndata object.
+    Expects the images in `adata.uns[spatial_key]`.
     '''
 
     a = extract_groups(adata, groupby=groupby, groups=group, extract_uns=True)
@@ -226,6 +226,7 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial',
                     
                     adata.uns[spatial_key][key]['scalefactors']['pixel_per_um'] = pixel_per_um
                     adata.uns[spatial_key][key]['scalefactors']['spot_diameter_real'] = res * pixel_per_um
+                    adata.uns[spatial_key][key]['scalefactors']['pixel_per_um_real'] = ppm_given
             break
         else:
             # if not both spots exists switch into next column

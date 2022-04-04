@@ -183,7 +183,7 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
     return registered, H, matchedVis
 
 def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, groups=None, reg_channel='dapi',
-                                        spatial_key='spatial', to_8bit=False, maxpx_before_reg=None,
+                                        spatial_key='spatial', to_8bit=False, maxpx_before_reg=None, ppmhq=None, 
                                         hires_key='hires', lowres_key='lowres', perspective_transform=False,
                                         rot_threshold=0, do_registration=False, lowres_factor=0.2,
                                         keepFraction=0.2, method='sift', debug=False, in_place=False):
@@ -292,7 +292,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
             coords_trans = cv2.transform(coords_reshaped, H)
             coords_trans = coords_trans.reshape(-1, 2)
 
-        # recalculate scale `pixel_per_um` in each image of this group and get rotation angle and pivot point
+        # get rotation angle and pivot point
         print("{}: Calculate rotation angle...".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
         rot_angle, pivot_point = recalculate_scale(
@@ -350,7 +350,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
         # recalculate scale and save in `scalefactors`
         print("{}: Recalculate scale...".format(
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        recalculate_scale(adata, groupby=groupby, group=group, 
+        recalculate_scale(adata, groupby=groupby, group=group, ppm_given=ppmhq,
             save_scale=True, return_angle_and_pivot=False)
 
     # resize images and store as `lowres` for plotting
@@ -402,7 +402,7 @@ def align_image(image, vertices, frame: int = 100, return_grayscale=True, perspe
 
 
 def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
-                  frame: int = 100, **kwargs):
+                    frame: int = 100, ppm_given=None, **kwargs):
 
     # Part 1: Align image
     print("\tAlign images...")
@@ -415,9 +415,10 @@ def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
     pts2 = np.float32([[frame, frame], [pxl_width + frame, frame],
                        [pxl_width + frame, pxl_width + frame], [frame, pxl_width + frame]])
 
-    # calculate metadata
+    # calculate resolution from distance of vertices and resolution
     um_width = ((n_channels - 1) * resolution * 2)
     pixel_per_um = pxl_width / um_width
+    
     spot_diameter = pixel_per_um * resolution
 
     # summarize metadata in dictionary
@@ -429,7 +430,8 @@ def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
         "spot_diameter_real": spot_diameter,
         "pixel_per_um": pixel_per_um,
         "resolution": resolution,
-        "tissue_hires_scalef": 1.0
+        "tissue_hires_scalef": 1.0,
+        "pixel_per_um_real": ppm_given
     }
 
     # Part 3: Summarize aligned image and metadata
