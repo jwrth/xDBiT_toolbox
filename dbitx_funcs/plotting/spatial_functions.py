@@ -14,6 +14,10 @@ from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
 from ..images import set_histogram
 from tqdm import tqdm
+import warnings
+
+# ignore future warnings (suppresses annoying pandas warning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,

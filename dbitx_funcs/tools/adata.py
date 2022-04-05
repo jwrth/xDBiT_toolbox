@@ -344,7 +344,7 @@ def remove_images(adata, uns_key='spatial', reg_key='registered', other_keys=Non
 
     #return adata
 
-def replace_images(adata, image_adata, spatial_key="spatial", inplace=True):
+def replace_images(adata, image_adata, spatial_key="spatial", inplace=True, verbose=True):
     '''
     Replace images in `adata` with images from `image_adata`.
     Images in both adatas are expected to be stored in `.uns[spatial_key]` under a unique id that must
@@ -363,8 +363,8 @@ def replace_images(adata, image_adata, spatial_key="spatial", inplace=True):
         if img_key in image_adata.uns[spatial_key].keys():
             adata_.uns[spatial_key][img_key] = image_adata.uns[spatial_key][img_key].copy()
             
-        else:
-            print("Image key {} not found in `image_adata`. Was skipped.")
+        elif verbose:
+            print("Image key {} not found in `image_adata`. Was skipped.".format(img_key))
             
     if not inplace:
         return adata_
