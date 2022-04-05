@@ -147,15 +147,17 @@ def convert_to_8bit(img):
     return (img)
 
 
-def resize_image(img, scale_factor):
+def resize_image(img, dim=None, scale_factor=None):
     '''
     Resize image by scale_factor
     '''
-    width = int(img.shape[1] * scale_factor)
-    height = int(img.shape[0] * scale_factor)
-    dim = (width, height)
+    if scale_factor is not None:
+        width = int(img.shape[1] * scale_factor)
+        height = int(img.shape[0] * scale_factor)
+        dim = (width, height)
 
     return cv2.resize(img, dim)
+        
 
 
 def resize_images_in_adata(adata, scale_factor):
@@ -169,15 +171,15 @@ def resize_images_in_adata(adata, scale_factor):
     for key in img_keys:
         img = adata.uns['spatial'][key]['images']['hires']
 
-        adata.uns['spatial'][key]['images']['lowres'] = resize_image(img, scale_factor)
+        adata.uns['spatial'][key]['images']['lowres'] = resize_image(img, scale_factor=scale_factor)
         adata.uns['spatial'][key]['scalefactors']['tissue_lowres_scalef'] = scale_factor
 
 
-def recalculate_scale(adata, groupby, group, spatial_key='spatial', 
+def recalculate_scale(adata, groupby, group, ppm_given=None, spatial_key='spatial', 
     save_scale=True, return_angle_and_pivot=False):
     '''
-    Recalculates the scale `pixel_per_um` of all images of a given `group` in an anndata object.
-    Expects the images in `adata.uns[spatial_key]`
+    Recalculates the scale "pixel_per_um" of all images of a given `group` in an anndata object.
+    Expects the images in `adata.uns[spatial_key]`.
     '''
 
     a = extract_groups(adata, groupby=groupby, groups=group, extract_uns=True)
@@ -224,6 +226,7 @@ def recalculate_scale(adata, groupby, group, spatial_key='spatial',
                     
                     adata.uns[spatial_key][key]['scalefactors']['pixel_per_um'] = pixel_per_um
                     adata.uns[spatial_key][key]['scalefactors']['spot_diameter_real'] = res * pixel_per_um
+                    adata.uns[spatial_key][key]['scalefactors']['pixel_per_um_real'] = ppm_given
             break
         else:
             # if not both spots exists switch into next column

@@ -14,6 +14,10 @@ from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
 from ..images import set_histogram
 from tqdm import tqdm
+import warnings
+
+# ignore future warnings (suppresses annoying pandas warning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,
@@ -109,10 +113,11 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             if histogram_setting == 'minmax':
                 print('bin hier')
                 image = set_histogram(image, lower=image.min(), upper=image.max(), bit_type=bit_type, )
+            elif isinstance(histogram_setting, tuple):
+                image = set_histogram(image, lower=histogram_setting[0], upper=histogram_setting[1], bit_type=bit_type)
             elif (histogram_setting > 0) & (histogram_setting < 1):
                 image = set_histogram(image, lower=image.min(), upper=int(image.max() * histogram_setting), bit_type=bit_type)
-            elif len(histogram_setting) == 2:
-                image = set_histogram(image, lower=histogram_setting[0], upper=histogram_setting[1], bit_type=bit_type)
+
             else:
                 print('Unknown format of `histogram_setting`. Must be either "minmax" or (minval, maxval) or value between 0 and 1', flush=True)
     else:

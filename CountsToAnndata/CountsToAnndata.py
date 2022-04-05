@@ -28,7 +28,7 @@ class SelectionWindow:
 
         self.root = Tk()
         self.root.title('CountsToAnndata')
-        self.root.geometry("280x105")
+        self.root.geometry("400x180")
         self.root.option_add("*font", "Calibri 10")
 
         self.home = os.path.expanduser("~") # get home directory
@@ -41,23 +41,63 @@ class SelectionWindow:
         self.selectFile = Button(self.root, text="Select settings file", command=self.browsefunc)
         self.selectFile.grid(row=0,column=0)
 
-        # set windows for scale factor selection
+        # set scale factor selection
         self.labelText = StringVar()
-        self.labelText.set("Scale factor:")
+        self.labelText.set("Maximum pixel width for registration:")
         self.labelDir = Label(self.root, textvariable=self.labelText)
         self.labelDir.grid(row=1, column=0)
 
-        self.sf_default = StringVar(self.root, value="0.2")
-        self.scale_entry = Entry(self.root, textvariable=self.sf_default, width=4, justify=CENTER)
-        self.scale_entry.grid(row=1, column=1)
+        self.maxpx_default = StringVar(self.root, value=4000)
+        self.maxpx_entry = Entry(self.root, textvariable=self.maxpx_default, width=4, justify=CENTER)
+        self.maxpx_entry.grid(row=1, column=1)
+
+        # set HQ image resolution selection selection
+        self.labelText2 = StringVar()
+        self.labelText2.set("Resolution HQ image [µm/px]:")
+        self.labelDir2 = Label(self.root, textvariable=self.labelText2)
+        self.labelDir2.grid(row=2, column=0)
+
+        self.ppmhq_default = IntVar(self.root, value=4.0480)
+        self.ppmhq_entry = Entry(self.root, textvariable=self.ppmhq_default, width=6, justify=CENTER)
+        self.ppmhq_entry.grid(row=2, column=1)
+
+        # set alignment image resolution selection selection
+        self.labelText3 = StringVar()
+        self.labelText3.set("Resolution alignment image [µm/px]:")
+        self.labelDir3 = Label(self.root, textvariable=self.labelText3)
+        self.labelDir3.grid(row=3, column=0)
+
+        self.ppmalign_default = IntVar(self.root, value=2.0231)
+        self.ppmalign_entry = Entry(self.root, textvariable=self.ppmalign_default, width=6, justify=CENTER)
+        self.ppmalign_entry.grid(row=3, column=1)
+
+        # set 8bit conversion checkbutton
+        self.labelText4 = StringVar()
+        self.labelText4.set("Convert to 8bit:")
+        self.labelDir4 = Label(self.root, textvariable=self.labelText4)
+        self.labelDir4.grid(row=4, column=0)
+
+        self.convert_entry = IntVar(value=True)
+        self.checkbutton = Checkbutton(self.root, variable=self.convert_entry, onvalue=True, offvalue=False)
+        self.checkbutton.grid(row=4, column=1)
+
+        # set 8bit conversion checkbutton
+        self.labelText5 = StringVar()
+        self.labelText5.set("Perspective transformation (else affine):")
+        self.labelDir5 = Label(self.root, textvariable=self.labelText5)
+        self.labelDir5.grid(row=4, column=0)
+
+        self.perspect_entry = IntVar(value=False)
+        self.checkbutton2 = Checkbutton(self.root, variable=self.perspect_entry, onvalue=True, offvalue=False)
+        self.checkbutton2.grid(row=4, column=1)
 
         # set cancel button to exit script
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
-        self.cancel.grid(row=2,column=1)
+        self.cancel.grid(row=5,column=1)
 
         # set okay button to continue script
         self.okay = Button(self.root, text="Okay", command=self.closewindow)
-        self.okay.grid(row=2,column=0)
+        self.okay.grid(row=5,column=0)
 
         # key bindings
         self.root.bind("<Return>", func=self.closewindow)
@@ -71,8 +111,13 @@ class SelectionWindow:
 
     # Functions
     def closewindow(self, event=None): # event only needed for .bind which passes event object to function
+        # collect variables
         self.settings_file = self.entry.get()
-        self.scale_factor = self.scale_entry.get()
+        self.maxpx = self.maxpx_entry.get()
+        self.convert = self.convert_entry.get()
+        self.perspect = self.perspect_entry.get()
+        self.ppmhq = self.ppmhq_entry.get()
+        self.ppmalign = self.ppmalign_entry.get()
         self.root.destroy()
 
     def browsefunc(self):
@@ -142,13 +187,6 @@ class CountsToAnndata():
                 halt=True
         if halt:
             sys.exit()
-
-        # assert np.all([elem in self.parameters.index for elem in param_cats]), \
-        #     "Not all required categories found in parameter section {}".format(param_cats)
-        # assert np.all([elem in self.directories.columns for elem in dir_cats]), \
-        #     "Not all required column headers found in directory section {}".format(dir_cats)
-        # assert ~np.any([pd.isnull(self.parameters.loc[cat, "value"]) for cat in param_cats[:3]]), \
-        #     "Not all required categories in parameter section have a value.\nRequired categories are: ({})".format(param_cats[:3])
 
         # determine extra categories which are added later to adata.obs
         self.extra_cats_headers = [elem for elem in self.directories.columns if elem not in dir_cats]
@@ -294,7 +332,7 @@ class CountsToAnndata():
                 if vertices_not_given:
                     import napari
                     # read alignment image
-                    alignment_image = cv2.imread(align_img)
+                    alignment_image = cv2.imread(align_img, -1)
 
                     ### Select corner spots in alignment image using napari viewer
                     # with napari.gui_qt():
@@ -349,7 +387,8 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, scale_factor_before_reg, grayscale=True, debug='False'):
+    def ProcessDatasets(self, maxpx_before_reg, to_8bit, ppmhq, ppmalign, perspective_transform,
+        debug=False):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -382,6 +421,7 @@ class CountsToAnndata():
             if self.process_images[i]:
                 # create name of output files
                 output_filename = "{}_hqimages.h5ad".format(unique_id)
+                noimages_filename = "{}_noimages.h5ad".format(unique_id)
                 align_filename = "{}_alignimages.h5ad".format(unique_id)
 
                 # check if the vertices are given in the settings file
@@ -390,19 +430,8 @@ class CountsToAnndata():
                 # # get image directories
                 align_images = glob(dirs["align_images"])
                 hq_images = glob(dirs["hq_images"])
-
-                # # check if number of images matches number of channel names
-                # assert len(hq_images) == len(hq_ch_names), \
-                #     "Number of detected hq images [{}] does not match number of channel names [{}] in parameters file.".format(
-                #         len(hq_images), len(hq_ch_names))
-
-                # # check whether paths to alignment images and hq images are identical
-                # if not len(set(align_images) & set(hq_images)) == len(align_images):
-                #     print("Alignment images and hq are not identical. HQ images will be registered.")
-                #     register_hq = True
                 
                 # # detect alignment marker image
-                # align_img = [i for i in align_images if alignment_channel in i][0]
                 dapi_img = [i for i in align_images if self.dapi_channel in i][0]
 
                 # read images
@@ -433,11 +462,14 @@ class CountsToAnndata():
             if self.register_hq[i]:
                 # create tmp directory
                 tmp_dir = os.path.join(output_dir, "tmp")
+                noimages_dir = os.path.join(output_dir, "noimages")
                 Path(tmp_dir).mkdir(parents=True, exist_ok=True)
+                Path(noimages_dir).mkdir(parents=True, exist_ok=True)
 
                 # generate path to output files for adata objects
                 align_outfile = os.path.join(tmp_dir, align_filename)
                 output_file = os.path.join(output_dir, output_filename)
+                noimages_file = os.path.join(noimages_dir, noimages_filename)
                 return_adata = True
             else:
                 align_outfile = os.path.join(output_dir, align_filename)
@@ -447,7 +479,7 @@ class CountsToAnndata():
 
             adata = db.dbitseq_to_squidpy(
                 matrix_path=matrix_file, 
-                images=images,
+                images=images, ppmalign=ppmalign,
                 resolution=int(self.parameters.loc["spot_width", "value"]), 
                 unique_id=unique_id, 
                 organism=organism,
@@ -456,6 +488,7 @@ class CountsToAnndata():
                 frame=int(self.parameters.loc["frame", "value"]),
                 labels=channel_labels, 
                 vertices=self.vertices_list[i], 
+                to_8bit=to_8bit,
                 savepath=align_outfile, 
                 return_adata=return_adata
                 )
@@ -466,18 +499,22 @@ class CountsToAnndata():
                 image_dir_dict = {}
                 for i, n in enumerate(self.hq_ch_names):
                     selected_image_path = [elem for elem in hq_images if n.strip("*") in os.path.basename(elem)][0]
-                    image_dir_dict[unique_id + "_" + str(self.hq_ch_labels[i])] = selected_image_path
+                    image_dir_dict[unique_id + "-" + str(self.hq_ch_labels[i])] = selected_image_path
 
                 # start transformation
                 adata_trans = db.im.register_adata_coords_to_new_images(adata, 
                                                                 groupby='id', 
-                                                                image_dir_dict=image_dir_dict, 
+                                                                image_dir_dict=image_dir_dict, ppmhq=ppmhq,
                                                                 reg_channel=self.reg_channel_label, 
                                                                 in_place=False, debug=debug, 
                                                                 do_registration=True,
-                                                                scale_factor_before_reg=scale_factor_before_reg
+                                                                perspective_transform=perspective_transform,
+                                                                maxpx_before_reg=maxpx_before_reg, 
+                                                                to_8bit=to_8bit
                                                                 )
                 
+                # save adata after transformation with images
+                print("Save adata into {}".format(output_file))
                 adata_trans.write(output_file)
 
                 # plot registration QC plot
@@ -487,6 +524,21 @@ class CountsToAnndata():
                                         unique_id=unique_id, 
                                         reg_channel_label=self.reg_channel_label
                                         )
+
+                if debug:
+                    # plot matchedVis
+                    for g, mv in adata_trans.uns['matchedVis'].items():
+                        plt.imshow(mv)
+                        plotpath = os.path.join(output_dir, "{}_matchedVis.png".format(g))
+                        print("Saving matched visualization into {}".format(plotpath))
+                        plt.savefig(plotpath, dpi=400)
+                        plt.close()
+
+                # remove images and save adata without images
+                print("Remove images and save adata without images into {}".format(noimages_file))
+                db.tl.remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
+                adata_trans.write(noimages_file)
+                        
 
         print("{} : Finished all datasets. Output saved into {}".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", output_dir), 
@@ -543,12 +595,17 @@ if __name__ == "__main__":
 
         # read input of selection window
         settings_file = selection.settings_file
-        scale_factor_before_reg = float(selection.scale_factor)
+        maxpx = int(selection.maxpx)
+        convert = bool(selection.convert)
+        perspective_transform = bool(selection.perspect)
+        ppmhq = float(selection.ppmhq) if len(selection.ppmhq) > 0 else None
+        ppmalign = float(selection.ppmalign) if len(selection.ppmalign) > 0 else None
 
     except tkinter.TclError:
         settings_file = input("Enter path to parameters .csv file: ")
-        scale_factor_before_reg = float(input("Enter scale factor: "))
+        maxpx = int(input("Enter maximum pixel width for registration: "))
 
+    #settings_file = "C:\\Users\\Johannes\\Documents\\homeoffice\\37_48\\CountsToAnndata\\37_48_CoA_param_withvertices_20220402_test.csv"
     settings_file = settings_file.strip('"')
     
     # read and check input file
@@ -561,8 +618,6 @@ if __name__ == "__main__":
 
     ## Load modules
     # get path of dbitx module and import functions
-
-
     print("Load modules...", flush=True)
     script_dir = os.path.dirname(os.path.realpath(__file__)) # read script location
     module_path = os.path.abspath(os.path.join(script_dir, ".."))
@@ -582,7 +637,10 @@ if __name__ == "__main__":
 
     
     coa.AddVertices(settings_file=settings_file)
-    coa.ProcessDatasets(scale_factor_before_reg=scale_factor_before_reg, debug=False)
+    coa.ProcessDatasets(
+        maxpx_before_reg=maxpx, to_8bit=convert,
+        ppmhq=ppmhq, ppmalign=ppmalign, perspective_transform=perspective_transform,
+        debug=True)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 

@@ -1,11 +1,10 @@
 from numpy.lib.arraysetops import unique
 import scanpy as sc
 import numpy as np
-import squidpy as sq
 import matplotlib.pyplot as plt
 import os
 from .calculations._calc import coord_to_um, coord_to_pixel
-from .images.image_processing import resize_images_in_adata, calc_image_param_per_spot
+from .images.image_processing import convert_to_8bit, resize_images_in_adata, calc_image_param_per_spot
 from .images.registration import align_to_dict
 from datetime import datetime
 from gprofiler import GProfiler
@@ -13,11 +12,12 @@ import cv2
 
 
 def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=None, vertices=None, convert_genes=True,
-                        #dbitx=False, 
-                        grayscale=True,
-                        frame=100, unique_id=None, extra_categories=None, resize_factor=0.2, organism='mmusculus',
+                        ppmalign=None, 
+                        grayscale=True, to_8bit=False,
+                        frame=100, unique_id=None, extra_categories=None, lowres_factor=0.2, 
+                        organism='mmusculus',
                         spatial_key="spatial", img_keys=None, transpose=True, sep="x", manual_pixel_offset_x=0, 
-                        manual_pixel_offset_y=0, savepath=None, return_adata=False):
+                        manual_pixel_offset_y=0, savepath=None, return_adata=False, **kwargs):
     """
     Function to create adata object for squidpy from Dbit-seq data.
     Inputs are the path to the transcriptome matrix and the image. 
@@ -39,9 +39,9 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         unique_id = f"{datetime.now():%Y-%m-%d_%H:%M:%S}"
 
     # check if input has three or two coordinates
-    dbitx = False
-    if len(adata.obs_names[0].split(sep)) == 3:
-        dbitx = True
+    # dbitx = False
+    # if len(adata.obs_names[0].split(sep)) == 3:
+    #     dbitx = True
 
     # add coordinates to adata object
     adata.obs['array_row'] = np.array(
@@ -56,27 +56,31 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
     adata.obs['um_col'] = np.array(
         [coord_to_um(c, resolution) for c in adata.obs['array_col']])
 
-    if dbitx:
-        # adata.obs['well'] = np.array(
-        #     [str(elem.split(sep)[2]) for elem in adata.obs_names])
-        adata.obs_names = np.array(["{e}_{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
-        adata.obs['id'] = unique_id
-    else:
-        adata.obs_names = np.array(["{e}{s}{uid}".format(e=elem, s=sep, uid=unique_id) for elem in adata.obs_names])
-        adata.obs['id'] = unique_id
+    #if dbitx:
+    adata.obs_names = np.array(["{e}-{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
+    adata.obs['id'] = unique_id
+    # else:
+    #     #adata.obs_names = np.array(["{e}{s}{uid}".format(e=elem, s=sep, uid=unique_id) for elem in adata.obs_names])
+    #     adata.obs_names = np.array(["{e}-{uid}".format(e=elem, uid=unique_id) for elem in adata.obs_names])
+    #     adata.obs['id'] = unique_id
 
     if images is not None:
         assert labels is not None, "No labels given."
         assert vertices is not None, "No vertices given."
 
+        if to_8bit:
+            # convert images to 8bit images
+            images = [convert_to_8bit(i) for i in images]
+
         # make labels unique
-        unique_labels = [unique_id + "_" + lab for lab in labels]
+        unique_labels = [unique_id + "-" + lab for lab in labels]
+
 
         # read images and create metadata
         print("Align and create image metadata...")
         image_and_metadata = align_to_dict(
-            images=images, labels=unique_labels, vertices=vertices,
-            resolution=resolution, n_channels=n_channels, frame=frame
+            images=images, labels=unique_labels, vertices=vertices, ppm_given=ppmalign,
+            resolution=resolution, n_channels=n_channels, frame=frame, **kwargs
         )
 
         # extract parameters from metadata
@@ -105,8 +109,8 @@ def dbitseq_to_squidpy(matrix_path, resolution, n_channels, images=None, labels=
         adata.uns[spatial_key] = image_and_metadata
 
         # Resize images
-        print("Resize images by factor {}...".format(resize_factor), flush=True)
-        resize_images_in_adata(adata, scale_factor=resize_factor) # add lowres image
+        print("Resize images by factor {} and save as lowres...".format(lowres_factor), flush=True)
+        resize_images_in_adata(adata, scale_factor=lowres_factor) # add lowres image
 
         # calculate mean intensity per spot for each channel
         print("Calculate channel mean per spot...", flush=True)
