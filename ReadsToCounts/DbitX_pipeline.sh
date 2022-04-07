@@ -60,8 +60,8 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -g <genomedir>      : Directory of STAR genome directory.  Required.
 -r <referencefasta> : Reference fasta of the Drop-seq reference metadata bundle.  Required.
 -d <dropseq_root>   : Directory containing Drop-seq executables.  Default: Subdirectory of the splitseq toolbox.
--o <outputdir>      : Where to write output bam.  Default: tmp.
--t <tmpdir>         : Where to write temporary files.  Default: out.
+-o <outputdir>      : Where to write output bam.  Default: out.
+-t <tmpdir>         : Where to write temporary files.  Default: tmp.
 -s <STAR_path>      : Full path of STAR.  Default: STAR is found via PATH environment variable.
 -c <cutadapt_path>  : Full path of cutadapt. Default: cutadapt is found via PATH environment variable.
 -b <barcode_dir>    : Full path to directory where the list of expected barcodes is stored. Default: subdirectory of the splitseq toolbox. 
@@ -230,7 +230,7 @@ filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTG
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2}"
 
 # generate .bam file
-generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=37_13 TMP_DIR=${tmpdir}"
+generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=DbitXpipe TMP_DIR=${tmpdir}"
 
 ## Stage 1: pre-alignment tag
 # Extract UMI (Bases 1-10 on Read 2)

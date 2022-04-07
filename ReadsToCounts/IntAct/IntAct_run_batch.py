@@ -1,7 +1,7 @@
   #!/usr/bin/env python
 
 '''
-Script to run DbitX pipeline on multiple batches.
+Script to run Split-seq pipeline on multiple batches.
 
 Usage:
 
@@ -12,12 +12,11 @@ Usage:
         - STAR genome fasta file path
         - directory of barcode legend .csv
         - number of expected spots
-        - mode
 
 Command for single analysis:
-nohup bash /home/jwirth/projects/DbitX_toolbox/DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
--r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/barcodes_legend.csv -n 2000 -m Dbit-seq -j 1 
-../37_30_A2_S2_R1_001.fastq ../37_30_A2_S2_R2_001.fastq &
+nohup bash /home/jwirth/projects/DbitX_toolbox/IntAct/IntAct_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
+-r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/ -n 2000 -m Dbit-seq -j 1 
+../RNA_R1_001.fastq ../RNA_R2_001.fastq ../features_R1_001.fastq ../features_R2_001.fastq 
 
 '''
 
@@ -29,7 +28,7 @@ from datetime import datetime
 import time
 import numpy as np
 
-print("Starting DbitX pipeline batch processing...", flush=True)
+print("Starting IntAct pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
@@ -55,12 +54,12 @@ for b in batch_numbers:
 
         # get directory
         log_dir = join(dirname(s["fastq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
-        out_dir = join(dirname(s["fastq_R1"]), "out")
-        tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
+        out_dir = dirname(s["fastq_R1"])
+        #tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
 
         print("Writing log to {}".format(log_dir), flush=True)
         print("Output directory: {}".format(out_dir), flush=True)
-        print("Temp directory: {}".format(tmp_dir), flush=True)
+        #print("Temp directory: {}".format(tmp_dir), flush=True)
 
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 
@@ -68,13 +67,13 @@ for b in batch_numbers:
         "-r", s["STAR_fasta"],
         "-b", s["legend"],
         "-n", str(s["expected_n_spots"]),
-        "-m", s["mode"],
+        #"-m", s["mode"],
         "-j", "1",
         "-o", out_dir,
-        "-t", tmp_dir,
-        "-l", # clear tmp files after finishing the script
-        #"-e", # for testing
-        s["fastq_R1"], s["fastq_R2"]]
+        #"-t", tmp_dir,
+        #"-c", # clear tmp files after finishing the script
+        "-e", # for testing
+        s["rnafq_R1"], s["rnafq_R2"]], s["featfq_R1"], s["featfq_R2"]
         )
 
         log_dirs.append(log_dir)
