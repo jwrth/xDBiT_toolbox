@@ -53,9 +53,9 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["fastq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
-        out_dir = dirname(s["fastq_R1"])
-        #tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
+        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
+        out_dir = dirname(s["rnafq_R1"])
+        #tmp_dir = join(dirname(s["rnafq_R1"]), "tmp")
 
         print("Writing log to {}".format(log_dir), flush=True)
         print("Output directory: {}".format(out_dir), flush=True)
@@ -72,8 +72,8 @@ for b in batch_numbers:
         "-o", out_dir,
         #"-t", tmp_dir,
         #"-c", # clear tmp files after finishing the script
-        "-e", # for testing
-        s["rnafq_R1"], s["rnafq_R2"]], s["featfq_R1"], s["featfq_R2"]
+        #"-e", # for testing
+        s["rnafq_R1"], s["rnafq_R2"], s["featfq_R1"], s["featfq_R2"]]
         )
 
         log_dirs.append(log_dir)

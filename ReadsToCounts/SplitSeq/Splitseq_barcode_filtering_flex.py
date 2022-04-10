@@ -354,7 +354,8 @@ if store_discarded:
 t_start = datetime.now()
 
 #%% Get expected barcodes and bridges
-bc_files = glob.glob(os.path.join(bc_dir,"*barcodes*.csv"))
+bc_files = glob.glob(os.path.join(bc_dir,"*cellbarcodes*.csv"))
+print(bc_files)
 bc1 = pd.read_csv(bc_files[0])
 bc2 = pd.read_csv(bc_files[1])
 bc3 = pd.read_csv(bc_files[2])

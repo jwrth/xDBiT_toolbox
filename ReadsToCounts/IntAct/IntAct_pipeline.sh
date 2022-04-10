@@ -49,16 +49,15 @@ reference=
 pipeline=0
 clear=0
 echo_prefix=
-dropseq_root=$(dirname $0)/external_tools/Drop-seq_tools-2.1.0
+splitseq_root=$(dirname $0)/../
+dropseq_root=${splitseq_root}/external_tools/Drop-seq_tools-2.1.0
 star_executable=STAR
 cutadapt_executable=cutadapt
 estimated_num_cells=500
 progname=`basename $0`
-splitseq_root=$(dirname $0)
 barcode_dir=${splitseq_root}/data/barcode_lists
 jobs=1
 feature_pipeline=1
-create_dge=
 shorten_summary=
 dist_alg=levenshtein
 multithreading=
@@ -81,7 +80,6 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -a                  : String matching algorithm (hamming or levenshtein). Levenshtein is default.
 -j                  : Number of threads for python filtering script in RNA pipeline. Default: 1.
 -c                  : Delete unnecessary files.
--x                  : Create feature DGE matrix? Redundant feature from development of feature pipeline.
 -k                  : Shorten summary?
 
 First input file: Input .bam file from RNA sample with both read 1 and read 2.
@@ -107,7 +105,6 @@ while getopts ":d:o:pg:r:es:n:b:a:j:cxk" options; do
     a ) dist_alg=$OPTARG;;
     j ) jobs=$OPTARG;;
     c ) clear=1;;
-	x ) create_dge="-x";;
 	k ) shorten_summary="-s";;
     h ) usage
           exit 1;;
@@ -172,21 +169,17 @@ check_set "$genomedir" "Genome directory" "-g"
 check_set "$reference" "Reference fasta"  "-r"
 
 # Check input arguments
-if (( $# > 2 ))
-then error_exit "Incorrect number of input files (more than two)"
-fi
-
 if (( $# == 0 ))
 then error_exit "No input file given."
 fi
 
 if (( $# == 2 ))
 then
-	echo "One input file found. Only RNA pipeline will be run"
+	echo "Two input fastq files found. Only RNA pipeline will be run"
 	feature_pipeline=0
 elif (( $# == 4 ))
 then 
-    echo "Two input files found. RNA and Feature pipeline will be run."
+    echo "Four input fastq files found. RNA and Feature pipeline will be run."
 else
     error_exit "Other number of input files than 2 or 4 given."
 fi
@@ -262,7 +255,7 @@ filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTG
 
 # generate .bam file
 rna_unmapped_bam="${rna_outdir}/unmapped.bam"
-generate_bam="java -jar ${picard_jar} FastqToSam F1=${rna_outdir}/R1_filtered.fastq.gz F2=${rna_outdir}/R2_filtered.fastq.gz O=${rna_unmapped_bam} SM=37_13 TMP_DIR=${rna_tmpdir}"
+generate_bam="java -jar ${picard_jar} FastqToSam F1=${rna_outdir}/R1_filtered.fastq.gz F2=${rna_outdir}/R2_filtered.fastq.gz O=${rna_unmapped_bam} SM=IntActpip TMP_DIR=${rna_tmpdir}"
 
 ## Stage 1: pre-alignment tag
 # Extract UMI (bases 1-10 of read 2)
@@ -300,7 +293,7 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${rna_outdir}/polyA_tri
 split_bam="bash ${splitseq_root}/src/splitbam.sh ${rna_tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${splitseq_root}/src/Splitseq_barcode_filtering_flex.py -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} -b ${barcode_dir} -a ${dist_alg} ${multithreading}"
+filter_barcodes="python ${splitseq_root}/SplitSeq/Splitseq_barcode_filtering_flex.py -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} -b ${barcode_dir} -a ${dist_alg} ${multithreading}"
 
 # add header and merge all bam files for alignment
 merge_filtered_bam="bash ${splitseq_root}/src/mergebam.sh ${rna_tmpdir}/tmp_split ${tagged_unmapped_bam}"
@@ -327,80 +320,78 @@ tag_with_gene_function="${dropseq_root}/TagReadWithGeneFunction O=${rna_outdir}/
 start_time=`date +%s`
 
 # Stage 0
-$echo_prefix $filter_fastq | tee ${rna_outdir}/cutadapt.out
-$echo_prefix $generate_bam | tee ${rna_tmpdir}/FastqToSam.out
+#$echo_prefix $filter_fastq | tee ${rna_outdir}/cutadapt.out
+# $echo_prefix $generate_bam | tee ${rna_tmpdir}/FastqToSam.out
 
-# Stage 1
-$echo_prefix $tag_molecules OUTPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam
-$echo_prefix $tag_cells_1 INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1.bam
-$echo_prefix $tag_cells_2 INPUT=$rna_tmpdir/unaligned_tagged_MC1.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1C2.bam
-$echo_prefix $tag_cells_3 INPUT=$rna_tmpdir/unaligned_tagged_MC1C2.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1C2C3.bam
-####$echo_prefix $correct_xq -i ${rna_tmpdir}/unaligned_tagged_MC1C2C3.bam -o ${rna_tmpdir}/unaligned_tagged_MC1C2C3_corrected.bam
-$echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MC1C2C3.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
+# # Stage 1
+# $echo_prefix $tag_molecules OUTPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam
+# $echo_prefix $tag_cells_1 INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1.bam
+# $echo_prefix $tag_cells_2 INPUT=$rna_tmpdir/unaligned_tagged_MC1.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1C2.bam
+# $echo_prefix $tag_cells_3 INPUT=$rna_tmpdir/unaligned_tagged_MC1C2.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MC1C2C3.bam
+# ####$echo_prefix $correct_xq -i ${rna_tmpdir}/unaligned_tagged_MC1C2C3.bam -o ${rna_tmpdir}/unaligned_tagged_MC1C2C3_corrected.bam
+# $echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MC1C2C3.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
 
-# Stage 2
-$echo_prefix $trim_starting_sequence INPUT=$rna_tmpdir/unaligned_tagged_filtered.bam OUTPUT=$rna_tmpdir/unaligned_tagged_trimmed_smart.bam
-$echo_prefix $trim_poly_a INPUT=$rna_tmpdir/unaligned_tagged_trimmed_smart.bam OUTPUT=$rna_tmpdir/unaligned_mc_tagged_polyA_filtered.bam
+# # Stage 2
+# $echo_prefix $trim_starting_sequence INPUT=$rna_tmpdir/unaligned_tagged_filtered.bam OUTPUT=$rna_tmpdir/unaligned_tagged_trimmed_smart.bam
+# $echo_prefix $trim_poly_a INPUT=$rna_tmpdir/unaligned_tagged_trimmed_smart.bam OUTPUT=$rna_tmpdir/unaligned_mc_tagged_polyA_filtered.bam
 
-files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam $rna_tmpdir/unaligned_tagged_MC1.bam $rna_tmpdir/unaligned_tagged_MC1C2.bam $rna_tmpdir/unaligned_tagged_MC1C2C3.bam \
-                $rna_tmpdir/unaligned_tagged_filtered.bam $rna_tmpdir/unaligned_tagged_trimmed_smart.bam"
+# files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam $rna_tmpdir/unaligned_tagged_MC1.bam $rna_tmpdir/unaligned_tagged_MC1C2.bam $rna_tmpdir/unaligned_tagged_MC1C2C3.bam \
+#                 $rna_tmpdir/unaligned_tagged_filtered.bam $rna_tmpdir/unaligned_tagged_trimmed_smart.bam"
 
-# Stage 3
-if [[ "${multithreading}" == "-m" ]]; then 
-    if [[ -d "${rna_tmpdir}/tmp_split" ]] && [[ ! -z "$(ls -A ${rna_tmpdir}/tmp_split)" ]]; then
-        echo "tmp_split exists but not empty. Remove all files now."
-        rm ${rna_tmpdir}/tmp_split/*
-        echo "All files in tmp_split removed."
-    fi
+# # Stage 3
+# if [[ "${multithreading}" == "-m" ]]; then 
+#     if [[ -d "${rna_tmpdir}/tmp_split" ]] && [[ ! -z "$(ls -A ${rna_tmpdir}/tmp_split)" ]]; then
+#         echo "tmp_split exists but not empty. Remove all files now."
+#         rm ${rna_tmpdir}/tmp_split/*
+#         echo "All files in tmp_split removed."
+#     fi
 
-    $echo_prefix $split_bam ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
-fi
+#     $echo_prefix $split_bam ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
+# fi
 
-echo "${filter_barcodes} -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam"
-$echo_prefix $filter_barcodes -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
+# echo "${filter_barcodes} -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam"
+# $echo_prefix $filter_barcodes -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
 
-if [[ "${multithreading}" == "-m" ]]
-then $echo_prefix $merge_filtered_bam
-fi
+# if [[ "${multithreading}" == "-m" ]]
+# then $echo_prefix $merge_filtered_bam
+# fi
 
-# exit 0 #break here, for testing only
+# # exit 0 #break here, for testing only
 
-# Stage 4
-$echo_prefix $sam_to_fastq FASTQ=$rna_tmpdir/unaligned_tagged_BC_filtered.fastq
-$echo_prefix $star_align --readFilesIn $rna_tmpdir/unaligned_tagged_BC_filtered.fastq
-files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_BC_filtered.fastq"
+# # Stage 4
+# $echo_prefix $sam_to_fastq FASTQ=$rna_tmpdir/unaligned_tagged_BC_filtered.fastq
+# $echo_prefix $star_align --readFilesIn $rna_tmpdir/unaligned_tagged_BC_filtered.fastq
+# files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_BC_filtered.fastq"
 
-# Stage 5
-$echo_prefix $sort_aligned
-$echo_prefix $merge_bam OUTPUT=$rna_tmpdir/merged.bam
-$echo_prefix $tag_with_gene_interval I=$rna_tmpdir/merged.bam O=$rna_tmpdir/gene_tagged.bam TMP_DIR=${rna_tmpdir}
-$echo_prefix $tag_with_gene_function INPUT=$rna_tmpdir/merged.bam
+# # Stage 5
+# $echo_prefix $sort_aligned
+# $echo_prefix $merge_bam OUTPUT=$rna_tmpdir/merged.bam
+# $echo_prefix $tag_with_gene_interval I=$rna_tmpdir/merged.bam O=$rna_tmpdir/gene_tagged.bam TMP_DIR=${rna_tmpdir}
+# $echo_prefix $tag_with_gene_function INPUT=$rna_tmpdir/merged.bam
 
-files_to_delete="$files_to_delete $rna_tmpdir/merged.bam $rna_tmpdir/gene_tagged.bam"
+# files_to_delete="$files_to_delete $rna_tmpdir/merged.bam $rna_tmpdir/gene_tagged.bam"
 
-## Stage 6: create DGE matrix
+# ## Stage 6: create DGE matrix
 
-# counting exonic reads only
-dge="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 TMP_dir=${rna_tmpdir}"
-$echo_prefix $dge
+# # counting exonic reads only
+# dge="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 TMP_dir=${rna_tmpdir}"
+# $echo_prefix $dge
 
-# counting both intronic and exonic reads
-dge_with_introns="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 LOCUS_FUNCTION_LIST=INTRONIC TMP_dir=${rna_tmpdir}"
-$echo_prefix $dge_with_introns
+# # counting both intronic and exonic reads
+# dge_with_introns="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 LOCUS_FUNCTION_LIST=INTRONIC TMP_dir=${rna_tmpdir}"
+# $echo_prefix $dge_with_introns
 
-# collect RNAseq metrics with PICARD
-rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
-$echo_prefix $rnaseq_metrics
+# # collect RNAseq metrics with PICARD
+# rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
+# $echo_prefix $rnaseq_metrics
 
-end_time=`date +%s`
-run_time=`expr $end_time - $start_time`
-total_time=`show_time $run_time`
-echo "RNA part finished using ${dist_alg} algorithm in ${total_time}"
+# end_time=`date +%s`
+# run_time=`expr $end_time + 1 - $start_time`
+# total_time=`show_time $run_time`
+# echo "RNA part finished using ${dist_alg} algorithm in ${total_time}"
 
 if (( $feature_pipeline == 1 ))
 then
-
-
 	### PART 2: FEATURE
     start_time=`date +%s`
 	rna_dge=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz
@@ -451,26 +442,26 @@ then
 	## Stage 3: Filter barcodes
 
 	# filter each split file
-	filter_barcodes="python ${splitseq_root}/intact/feature_filtering_intact.py -t ${feat_tmpdir} -d ${feat_outdir} \
+	filter_barcodes="python ${splitseq_root}/IntAct/IntAct_feature_filtering.py -t ${feat_tmpdir} -d ${feat_outdir} \
 	-n ${estimated_num_cells} -b ${barcode_dir} -a ${dist_alg} ${multithreading} \
-	-r ${rna_dge} ${shorten_summary} ${create_dge}"
+	-r ${rna_dge} ${shorten_summary} -x"
 
     # Stage 0
-    $echo_prefix $filter_fastq | tee ${feat_outdir}/cutadapt.out
-    $echo_prefix $generate_bam | tee ${feat_tmpdir}/FastqToSam.out
+    # $echo_prefix $filter_fastq | tee ${feat_outdir}/cutadapt.out
+    # $echo_prefix $generate_bam | tee ${feat_tmpdir}/FastqToSam.out
 
-	# Stage 1
-	$echo_prefix $tag_molecules OUTPUT=$feat_tmpdir/feat_tagged_Molecular.bam
-	$echo_prefix $tag_cells_1 INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1.bam
-	$echo_prefix $tag_cells_2 INPUT=$feat_tmpdir/feat_tagged_MC1.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2.bam
-	$echo_prefix $tag_cells_3 INPUT=$feat_tmpdir/feat_tagged_MC1C2.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3.bam
-	$echo_prefix $tag_feature1 INPUT=$feat_tmpdir/feat_tagged_MC1C2C3.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3F1.bam
-    $echo_prefix $tag_feature2 INPUT=$feat_tmpdir/feat_tagged_MC1C2C3F1.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3F2.bam
+	# # Stage 1
+	# $echo_prefix $tag_molecules OUTPUT=$feat_tmpdir/feat_tagged_Molecular.bam
+	# $echo_prefix $tag_cells_1 INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1.bam
+	# $echo_prefix $tag_cells_2 INPUT=$feat_tmpdir/feat_tagged_MC1.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2.bam
+	# $echo_prefix $tag_cells_3 INPUT=$feat_tmpdir/feat_tagged_MC1C2.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3.bam
+	# $echo_prefix $tag_feature1 INPUT=$feat_tmpdir/feat_tagged_MC1C2C3.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3F1.bam
+    # $echo_prefix $tag_feature2 INPUT=$feat_tmpdir/feat_tagged_MC1C2C3F1.bam OUTPUT=$feat_tmpdir/feat_tagged_MC1C2C3F2.bam
 
-	$echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MC1C2C3F.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
+	# $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MC1C2C3F2.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
 
 	files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam $feat_tmpdir/feat_tagged_MC1.bam $feat_tmpdir/feat_tagged_MC1C2.bam $feat_tmpdir/feat_tagged_MC1C2C3.bam \
-	$feat_tmpdir/feat_tagged_MC1C2C3F.bam"
+	$feat_tmpdir/feat_tagged_MC1C2C3F1.bam $feat_tmpdir/feat_tagged_MC1C2C3F2.bam"
 
 	# Stage 2
 
@@ -478,7 +469,7 @@ then
 	$echo_prefix $filter_barcodes -i ${feat_tmpdir}/feat_tagged_filtered.bam
 
 	end_time=`date +%s`
-	run_time=`expr $end_time - $start_time`
+	run_time=`expr $end_time + 1 - $start_time`
 	total_time=`show_time $run_time`
 	echo "Feature part finished using ${dist_alg} algorithm in ${total_time}"
 
@@ -487,7 +478,7 @@ then
 	fi
 
 	abs_end_time=`date +%s`
-	abs_run_time=`expr $abs_end_time - $abs_start_time`
+	abs_run_time=`expr ${abs_end_time} + 1 - ${abs_start_time}`
 	abs_total_time=`show_time $abs_run_time`
 	echo "Multimodal Split-seq pipeline finished using ${dist_alg} algorithm in ${abs_total_time}"
 fi
