@@ -363,16 +363,16 @@ def featurefilter(in_bam):
                         n[12]+=1
                         collapse_count+=1
                         
-                    else:
-                        d = [lv.hamming(umi, u) for u in current_umi_list]
-                        idx = [i for i,e in enumerate(d) if e<=1] # check if there is a UMI in the list with hamming distance smaller than 1
+                    # else:
+                    #     d = [lv.hamming(umi, u) for u in current_umi_list]
+                    #     idx = [i for i,e in enumerate(d) if e<=1] # check if there is a UMI in the list with hamming distance smaller than 1
 
-                        if len(idx) >= 1:
-                            add = False
+                    #     if len(idx) >= 1:
+                    #         add = False
 
-                            # record
-                            n[13]+=1
-                            collapse_count+=1
+                    #         # record
+                    #         n[13]+=1
+                    #         collapse_count+=1
 
                 else:
                     add = False
@@ -580,7 +580,7 @@ if create_dge:
     print('RNA cell list: ' + str(rna_dge_file), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
     print('Found %d [%.2f%%] complete cellular barcodes in RNA cell list' % (n[11], n[11]/float(n[0])*100), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
     print('%d [%.2f%%] cases where UMI was found directly in UMI list and was not added to DGE matrix.' % (n[12], n[12]/float(n[0])*100), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
-    print('%d [%.2f%%] cases where UMI was found with hamming distance of 1 in UMI list and was not added to DGE matrix.' % (n[13], n[13]/float(n[0])*100), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
+    #print('%d [%.2f%%] cases where UMI was found with hamming distance of 1 in UMI list and was not added to DGE matrix.' % (n[13], n[13]/float(n[0])*100), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
     print('Found %d [%.2f%%] unique UMIs with correct cell and feature barcode that were added to the DGE matrix' % (n[14], n[14]/float(n[0])*100), file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
 else:
     print('No DGE matrix generated.', file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
