@@ -170,12 +170,15 @@ def featurefilter(in_bam):
         n[0]+=1
         keep = True
         add = True
+        xgfound = True
+        xhfound = True
 
         # extract barcodes from tags
         xd = entry.get_tag('XD').rstrip('N')
         xe = entry.get_tag('XE')
         xf = entry.get_tag('XF')
-        xg = entry.get_tag('XG') + entry.get_tag('XH') # feature barcode concatenated
+        xg = entry.get_tag('XG')
+        xh = entry.get_tag('XH')
         umi = entry.get_tag('XM')
 
         if len(xd) >= 6:    
@@ -204,8 +207,42 @@ def featurefilter(in_bam):
                     n[10]+=1
                     n_feature[featurename]+=1
                 else:
-                    keep=False
+                    xgfound=False
 
+            if xh in fbc.Barcode.values:
+
+                # get feature name
+                featurename = fbc_dict[xh]
+
+                entry.set_tag('gn', featurename, value_type = 'Z')
+
+                # record
+                n[9]+=1
+                n_feature[featurename]+=1
+
+            else:
+                # If barcode is not found in feature barcode list: Check for mismatches in feature barcode
+                d = [compute_dist(xh,bc) for bc in fbc.Barcode.values]
+                idx = [i for i,e in enumerate(d) if e<=dist_threshold]
+
+                if len(idx)==1:
+                    xh = fbc.Barcode.values[idx[0]]
+                    featurename = fbc_dict[xh]
+                    entry.set_tag('gn', featurename, value_type = 'Z')
+
+                    # record
+                    n[10]+=1
+                    n_feature[featurename]+=1
+                else:
+                    xhfound=False
+            
+            if not xgfound or xhfound:
+                keep=False
+            elif xgfound and xhfound:
+                # save interaction
+                featurename = fbc_dict[xg] + "+" + fbc_dict[xh]
+                entry.set_tag('gn', featurename, value_type = 'Z')
+            
             # Cellular barcode filtering
             if xd in bc1.Barcode.values and xe in bc2.Barcode.values and xf in bc3.Barcode.values:
                 # all three barcodes directly found as in original split-seq protocol
@@ -346,7 +383,10 @@ def featurefilter(in_bam):
                 # Generation of DGE matrix
                 # If full cellular barcode was found: Check if cellular barcode of current read is in RNA cell list
                 if xc_well in rna_cell_list:
+                    # get feature name of current read
+                    featurename = entry.get_tag('gn')
 
+                    # get current umi list
                     current_umi_list = umi_dict[xc_well][featurename]
 
                     # record
@@ -363,16 +403,16 @@ def featurefilter(in_bam):
                         n[12]+=1
                         collapse_count+=1
                         
-                    else:
-                        d = [lv.hamming(umi, u) for u in current_umi_list]
-                        idx = [i for i,e in enumerate(d) if e<=1] # check if there is a UMI in the list with hamming distance smaller than 1
+                    # else:
+                    #     d = [lv.hamming(umi, u) for u in current_umi_list]
+                    #     idx = [i for i,e in enumerate(d) if e<=1] # check if there is a UMI in the list with hamming distance smaller than 1
 
-                        if len(idx) >= 1:
-                            add = False
+                    #     if len(idx) >= 1:
+                    #         add = False
 
-                            # record
-                            n[13]+=1
-                            collapse_count+=1
+                    #         # record
+                    #         n[13]+=1
+                    #         collapse_count+=1
 
                 else:
                     add = False
