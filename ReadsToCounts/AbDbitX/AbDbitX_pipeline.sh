@@ -325,82 +325,82 @@ tag_with_gene_function="${dropseq_root}/TagReadWithGeneFunction O=${rna_outdir}/
 #### Start pipeline
 start_time=`date +%s`
 
-# # Stage 0
-# $echo_prefix $filter_fastq | tee ${rna_outdir}/cutadapt.out
-# $echo_prefix $generate_bam | tee ${rna_tmpdir}/FastqToSam.out
+# Stage 0
+$echo_prefix $filter_fastq | tee ${rna_outdir}/cutadapt.out
+$echo_prefix $generate_bam | tee ${rna_tmpdir}/FastqToSam.out
 
-# # Stage 1
-# $echo_prefix $tag_molecules OUTPUT=${rna_tmpdir}/unaligned_tagged_Molecular.bam
+# Stage 1
+$echo_prefix $tag_molecules OUTPUT=${rna_tmpdir}/unaligned_tagged_Molecular.bam
 
-# if (( $multiwell == 1))
-# then
-#     $echo_prefix $tag_cells_well INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MW.bam
-#     $echo_prefix $tag_cells_y INPUT=$rna_tmpdir/unaligned_tagged_MW.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MWY.bam
-#     $echo_prefix $tag_cells_x INPUT=$rna_tmpdir/unaligned_tagged_MWY.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MWYX.bam
-#     $echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
+if (( $multiwell == 1))
+then
+    $echo_prefix $tag_cells_well INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MW.bam
+    $echo_prefix $tag_cells_y INPUT=$rna_tmpdir/unaligned_tagged_MW.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MWY.bam
+    $echo_prefix $tag_cells_x INPUT=$rna_tmpdir/unaligned_tagged_MWY.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MWYX.bam
+    $echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MWYX.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
 
-#     files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam \
-#                 $rna_tmpdir/unaligned_tagged_MW.bam $rna_tmpdir/unaligned_tagged_MWY.bam \
-#                 $rna_tmpdir/unaligned_tagged_MWYX.bam $rna_tmpdir/unaligned_tagged_filtered.bam"
-# else
-#     $echo_prefix $tag_cells_y INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MY.bam
-#     $echo_prefix $tag_cells_x INPUT=$rna_tmpdir/unaligned_tagged_MY.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MYX.bam
-#     $echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MYX.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
+    files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam \
+                $rna_tmpdir/unaligned_tagged_MW.bam $rna_tmpdir/unaligned_tagged_MWY.bam \
+                $rna_tmpdir/unaligned_tagged_MWYX.bam $rna_tmpdir/unaligned_tagged_filtered.bam"
+else
+    $echo_prefix $tag_cells_y INPUT=$rna_tmpdir/unaligned_tagged_Molecular.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MY.bam
+    $echo_prefix $tag_cells_x INPUT=$rna_tmpdir/unaligned_tagged_MY.bam OUTPUT=$rna_tmpdir/unaligned_tagged_MYX.bam
+    $echo_prefix $filter_bam INPUT=$rna_tmpdir/unaligned_tagged_MYX.bam OUTPUT=$rna_tmpdir/unaligned_tagged_filtered.bam
 
-#     files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam \
-#                 $rna_tmpdir/unaligned_tagged_MY.bam $rna_tmpdir/unaligned_tagged_MYX.bam \
-#                 $rna_tmpdir/unaligned_tagged_filtered.bam"
-# fi
+    files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_Molecular.bam \
+                $rna_tmpdir/unaligned_tagged_MY.bam $rna_tmpdir/unaligned_tagged_MYX.bam \
+                $rna_tmpdir/unaligned_tagged_filtered.bam"
+fi
 
-# # Stage 2
-# $echo_prefix $trim_poly_a INPUT=$rna_tmpdir/unaligned_tagged_filtered.bam OUTPUT=$rna_tmpdir/unaligned_mc_tagged_polyA_filtered.bam
+# Stage 2
+$echo_prefix $trim_poly_a INPUT=$rna_tmpdir/unaligned_tagged_filtered.bam OUTPUT=$rna_tmpdir/unaligned_mc_tagged_polyA_filtered.bam
 
-# # Stage 3
-# if [[ "${multithreading}" == "-m" ]]; then 
-#     if [[ -d "${tmpdir}/tmp_split" ]] && [[ ! -z "$(ls -A ${rna_tmpdir}/tmp_split)" ]]; then
-#         echo "tmp_split exists but not empty. Remove all files now."
-#         rm ${tmpdir}/tmp_split/*
-#         echo "All files in tmp_split removed."
-#     fi
-#     $echo_prefix $split_bam ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
-# fi
+# Stage 3
+if [[ "${multithreading}" == "-m" ]]; then 
+    if [[ -d "${tmpdir}/tmp_split" ]] && [[ ! -z "$(ls -A ${rna_tmpdir}/tmp_split)" ]]; then
+        echo "tmp_split exists but not empty. Remove all files now."
+        rm ${tmpdir}/tmp_split/*
+        echo "All files in tmp_split removed."
+    fi
+    $echo_prefix $split_bam ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
+fi
 
-# echo "${filter_barcodes} -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam"
-# $echo_prefix $filter_barcodes -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
+echo "${filter_barcodes} -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam"
+$echo_prefix $filter_barcodes -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
 
-# if [[ "${multithreading}" == "-m" ]]
-# then $echo_prefix $merge_filtered_bam
-# fi
+if [[ "${multithreading}" == "-m" ]]
+then $echo_prefix $merge_filtered_bam
+fi
 
-# # Stage 4
-# $echo_prefix $sam_to_fastq FASTQ=$rna_tmpdir/unaligned_tagged_BC_filtered.fastq
-# $echo_prefix $star_align --readFilesIn $rna_tmpdir/unaligned_tagged_BC_filtered.fastq
-# files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_BC_filtered.fastq"
-# # Stage 5
-# $echo_prefix $sort_aligned
-# $echo_prefix $merge_bam OUTPUT=$rna_tmpdir/merged.bam
-# $echo_prefix $tag_with_gene_interval I=$rna_tmpdir/merged.bam O=$rna_tmpdir/gene_tagged.bam TMP_DIR=${rna_tmpdir}
-# $echo_prefix $tag_with_gene_function INPUT=$rna_tmpdir/merged.bam
-# files_to_delete="$files_to_delete $rna_tmpdir/merged.bam $rna_tmpdir/gene_tagged.bam"
+# Stage 4
+$echo_prefix $sam_to_fastq FASTQ=$rna_tmpdir/unaligned_tagged_BC_filtered.fastq
+$echo_prefix $star_align --readFilesIn $rna_tmpdir/unaligned_tagged_BC_filtered.fastq
+files_to_delete="$files_to_delete $rna_tmpdir/unaligned_tagged_BC_filtered.fastq"
+# Stage 5
+$echo_prefix $sort_aligned
+$echo_prefix $merge_bam OUTPUT=$rna_tmpdir/merged.bam
+$echo_prefix $tag_with_gene_interval I=$rna_tmpdir/merged.bam O=$rna_tmpdir/gene_tagged.bam TMP_DIR=${rna_tmpdir}
+$echo_prefix $tag_with_gene_function INPUT=$rna_tmpdir/merged.bam
+files_to_delete="$files_to_delete $rna_tmpdir/merged.bam $rna_tmpdir/gene_tagged.bam"
 
 
-# ## Stage 6: create DGE matrix
-# # counting exonic reads only
-# dge="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 TMP_dir=${rna_tmpdir}"
-# $echo_prefix $dge
+## Stage 6: create DGE matrix
+# counting exonic reads only
+dge="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 TMP_dir=${rna_tmpdir}"
+$echo_prefix $dge
 
-# # counting both intronic and exonic reads
-# dge_with_introns="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 LOCUS_FUNCTION_LIST=INTRONIC TMP_dir=${rna_tmpdir}"
-# $echo_prefix $dge_with_introns
+# counting both intronic and exonic reads
+dge_with_introns="${dropseq_root}/DigitalExpression I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz READ_MQ=10 EDIT_DISTANCE=1 MIN_NUM_GENES_PER_CELL=100 LOCUS_FUNCTION_LIST=INTRONIC TMP_dir=${rna_tmpdir}"
+$echo_prefix $dge_with_introns
 
-# # collect RNAseq metrics with PICARD
-# rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
-# $echo_prefix $rnaseq_metrics
+# collect RNAseq metrics with PICARD
+rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
+$echo_prefix $rnaseq_metrics
 
-# end_time=`date +%s`
-# run_time=`expr $end_time - $start_time`
-# total_time=`show_time $run_time`
-# echo "AbDbitX RNA pipeline finished in ${total_time}"
+end_time=`date +%s`
+run_time=`expr $end_time - $start_time`
+total_time=`show_time $run_time`
+echo "AbDbitX RNA pipeline finished in ${total_time}"
 
 if (( $feature_pipeline == 1 ))
 then
@@ -469,35 +469,35 @@ then
 	-n ${estimated_num_cells} -b ${barcode_file} ${multithreading} \
 	-f ${feature_file} -r ${rna_dge}"
 
-    # # Stage 0
-    # $echo_prefix $filter_fastq | tee ${feat_outdir}/cutadapt.out
-    # $echo_prefix $generate_bam | tee ${feat_tmpdir}/FastqToSam.out
+    # Stage 0
+    $echo_prefix $filter_fastq | tee ${feat_outdir}/cutadapt.out
+    $echo_prefix $generate_bam | tee ${feat_tmpdir}/FastqToSam.out
 
-	# # # Stage 1
-	# $echo_prefix $tag_molecules OUTPUT=$feat_tmpdir/feat_tagged_Molecular.bam
+	# # Stage 1
+	$echo_prefix $tag_molecules OUTPUT=$feat_tmpdir/feat_tagged_Molecular.bam
 
-    # if (( $multiwell == 1))
-    # then
-    #     $echo_prefix $tag_cells_well INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MW.bam
-    #     $echo_prefix $tag_cells_y INPUT=$feat_tmpdir/feat_tagged_MW.bam OUTPUT=$feat_tmpdir/feat_tagged_MWY.bam
-    #     $echo_prefix $tag_cells_x INPUT=$feat_tmpdir/feat_tagged_MWY.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYX.bam
-    #     $echo_prefix $tag_feature INPUT=$feat_tmpdir/feat_tagged_MWYX.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYXF.bam
-    #     $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MWYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
+    if (( $multiwell == 1))
+    then
+        $echo_prefix $tag_cells_well INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MW.bam
+        $echo_prefix $tag_cells_y INPUT=$feat_tmpdir/feat_tagged_MW.bam OUTPUT=$feat_tmpdir/feat_tagged_MWY.bam
+        $echo_prefix $tag_cells_x INPUT=$feat_tmpdir/feat_tagged_MWY.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYX.bam
+        $echo_prefix $tag_feature INPUT=$feat_tmpdir/feat_tagged_MWYX.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYXF.bam
+        $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MWYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
         
 
-    #     files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam \
-    #               $feat_tmpdir/feat_tagged_MW.bam $feat_tmpdir/feat_tagged_MWY.bam \
-    #               $feat_tmpdir/feat_tagged_MWYX.bam $feat_tmpdir/feat_tagged_MWYXF.bam"
-    # else
-    #     $echo_prefix $tag_cells_y INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MY.bam
-    #     $echo_prefix $tag_cells_x INPUT=$feat_tmpdir/feat_tagged_MY.bam OUTPUT=$feat_tmpdir/feat_tagged_MYX.bam
-    #     $echo_prefix $tag_feature INPUT=$feat_tmpdir/feat_tagged_MYX.bam OUTPUT=$feat_tmpdir/feat_tagged_MYXF.bam
-    #     $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
+        files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam \
+                  $feat_tmpdir/feat_tagged_MW.bam $feat_tmpdir/feat_tagged_MWY.bam \
+                  $feat_tmpdir/feat_tagged_MWYX.bam $feat_tmpdir/feat_tagged_MWYXF.bam"
+    else
+        $echo_prefix $tag_cells_y INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MY.bam
+        $echo_prefix $tag_cells_x INPUT=$feat_tmpdir/feat_tagged_MY.bam OUTPUT=$feat_tmpdir/feat_tagged_MYX.bam
+        $echo_prefix $tag_feature INPUT=$feat_tmpdir/feat_tagged_MYX.bam OUTPUT=$feat_tmpdir/feat_tagged_MYXF.bam
+        $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
 
-    #     files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam \
-    #                 $feat_tmpdir/feat_tagged_MY.bam $feat_tmpdir/feat_tagged_MYX.bam \
-    #                 $feat_tmpdir/feat_tagged_MYXF.bam"
-    # fi
+        files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam \
+                    $feat_tmpdir/feat_tagged_MY.bam $feat_tmpdir/feat_tagged_MYX.bam \
+                    $feat_tmpdir/feat_tagged_MYXF.bam"
+    fi
 
 	# Stage 2
 

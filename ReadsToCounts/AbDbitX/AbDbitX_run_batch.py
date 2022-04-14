@@ -1,23 +1,24 @@
   #!/usr/bin/env python
 
 '''
-Script to run DbitX pipeline on multiple batches.
+Script to run AbDbitX pipeline on multiple batches.
 
 Usage:
-
-    Idea:
     Input is a .csv file giving the parameters:
-        - directory of fastqs
+        - directory of fastqs (2 for RNA only, 4 for RNA+features)
         - STAR genome directory
         - STAR genome fasta file path
         - directory of barcode legend .csv
+        - (Optional) feature legend file
         - number of expected spots
         - mode
 
 Command for single analysis:
-nohup bash /home/jwirth/projects/DbitX_toolbox/DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
--r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/barcodes_legend.csv -n 2000 -m Dbit-seq -j 1 
-../37_30_A2_S2_R1_001.fastq ../37_30_A2_S2_R2_001.fastq &
+nohup bash path/to/DbitX_toolbox/AbDbitX/AbDbitX_pipeline.sh \
+-g path/to/genomes_STAR/mm_STARmeta/STAR/ -r path/to/genomes_STAR/mm_STARmeta/Mm_metadata.fasta \
+-b path/to/barcodes/barcodes_legend.csv -f path/to/barcodes/feature_legend.csv \
+-n 2000 -m Dbit-seq -j 1 \
+path/to/RNA_R1.fastq path/to/RNA_R2.fastq path/to/features_R1.fastq path/to/features_R2.fastq &
 
 '''
 
