@@ -562,8 +562,8 @@ if __name__ == '__main__':
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('Found %d [%.2f%%] unique UMIs with correct cell and feature barcode that were added to the DGE matrix' % (record_dict['features']['added'], record_dict['features']['added']/record_dict['total_count']*100), 
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
-        for v in feature_legend.Feature.values:
-            print('Feature %s was found %d times' % (v, record_dict['features'][v]), 
+        for v, b in zip(feature_legend.Feature.values, feature_legend.Barcode.values):
+            print('Feature %s (%s) was found %d times' % (v, b, record_dict['features'][v]), 
                     file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('Feature spot-count matrix was saved into %s.' % dge_out_file, 
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
