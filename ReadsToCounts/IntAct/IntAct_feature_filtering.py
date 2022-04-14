@@ -39,7 +39,7 @@ Copyright: Johannes Wirth, Meier Lab, Helmholtz Zentrum München, 2020
     
 """
 
-#%% libraries
+# libraries
 import sys, os, timeit, h5py
 import pysam
 import itertools
@@ -60,7 +60,7 @@ import json
 import gzip
 
 
-#%% Functions
+# Functions
 def hamming(s1, s2):
     """Calculate the Hamming distance between two strings"""
     assert len(s1) == len(s2)
@@ -418,7 +418,7 @@ def featurefilter(in_bam):
     outfile.close()
     return [n, [n_well1, n_well2, n_well3], all_bcs, n_all_bcs, dge, umi_dict, record_collapse, record_adds, total_umi_dict]
     
-#%%Setup input parser
+#Setup input parser
 parser = ArgumentParser()
 parser.add_argument("-i" "--input_bam", action="store", dest="input_bam", default="-", help="Specify the input bam file. Defaults to stdin.")
 parser.add_argument("-n" "--est_num_cells", action="store", dest="est_num_cells", default=2500, help="Estimated number of cells. Defaults to 2500.",type=int)
@@ -434,7 +434,7 @@ parser.add_argument('-s', action='store_true', help="Shorten summary?")
 parser.add_argument('-r', "--rna_dge_file", action='store', dest="rna_dge_file", default="-", help="Specify RNA DGE matrix.")
 parser.add_argument('-x', action='store_true', help="Create DGE matrix?")
 
-#%% Parse input
+# Parse input
 args = parser.parse_args()
 
 debug_flag = args.debug_flag
@@ -469,7 +469,7 @@ if bc_dir==".":
 if multi and create_dge:
     sys.exit("Multithreading and DGE generation not compatible!")
     
-#%% Write parameters to logfile
+# Write parameters to logfile
 print('Splitseq barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'feature_filtering_log.txt'), 'w'))
 print('Input bam: %s' % input_bam, file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
 print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'feature_filtering_log.txt'),'a'))
@@ -482,11 +482,11 @@ if store_discarded:
         os.remove(os.path.join(out_dir,'discarded_reads.txt'))
         print('Old version of discarded reads.txt deleted.')
 
-#%% Start timing
+# Start timing
 #t_start = timeit.default_timer()
 t_start = datetime.now()
 
-#%% Get expected barcodes and bridges
+# Get expected barcodes and bridges
 cellbc_files = glob.glob(os.path.join(bc_dir,"*cellbarcodes_*.csv"))
 bc1 = pd.read_csv(cellbc_files[0])
 bc2 = pd.read_csv(cellbc_files[1])
@@ -497,7 +497,7 @@ fbc_file = glob.glob(os.path.join(bc_dir,"*featurebarcodes*.csv"))
 fbc = pd.read_csv(fbc_file[0])
 
 
-#%% Generate dictionaries for barcode-well and barcode-feature assignment
+# Generate dictionaries for barcode-well and barcode-feature assignment
 bc1_dict = {bc1.Barcode.values[x]:bc1.WellPosition.values[x][0]+bc1.WellPosition.values[x][1:].zfill(2) for x in range(len(bc1))}
 bc2_dict = {bc2.Barcode.values[x]:bc2.WellPosition.values[x][0]+bc2.WellPosition.values[x][1:].zfill(2) for x in range(len(bc2))}
 bc3_dict = {bc3.Barcode.values[x]:bc3.WellPosition.values[x][0]+bc3.WellPosition.values[x][1:].zfill(2) for x in range(len(bc3))}
@@ -508,7 +508,7 @@ fbc_dict = {fbc.Barcode.values[x]:fbc.Feature.values[x] for x in range(len(fbc))
 #cell_dict = dict()
 
 
-#%% for debugging only
+# for debugging only
 if debug_flag:
     for entry in itertools.islice(infile, 10 ):
         print(entry.query_name)
@@ -520,7 +520,7 @@ if debug_flag:
 
 
 if multi:
-    #%% start multithreaded filtering   
+    # start multithreaded filtering   
     if __name__ == '__main__':
         files = glob.glob(os.path.join(split_dir, 'x*.bam'))
         ncores = len(files)
@@ -601,7 +601,7 @@ if not shorten_summary:
     # calculate cumulative fraction of reads
     all_bc_cumsum = np.cumsum(sorted(list(all_bc_counts.values()), reverse=True))/n_all_bcs
 
-#%% plotting summary graphs
+# plotting summary graphs
 fig, axes = plt.subplots(2,2)
 p1 = axes[0,0].imshow(np.log10(bc1_matrix+1));  axes[0,0].set_title('Number of reads per RT barcode')
 clb = fig.colorbar(p1, ax=axes[0,0]); clb.set_label('No. BCs, log10')
@@ -617,11 +617,11 @@ if not shorten_summary:
 fig.set_size_inches(12,7)
 fig.savefig(os.path.join(out_dir,'feature_filtering_summary.pdf'),bbox_inches='tight')
 
-#%% Stop timing
+# Stop timing
 t_stop = datetime.now()
 t_elapsed = t_stop-t_start
 
-#%% Save the QC output
+# Save the QC output
 f = h5py.File(os.path.join(out_dir,'splitseq_feature_filtering_QC_data.hdf5'), 'w')
 
 f.create_dataset('BC1_plate_overview', data = bc1_matrix)
@@ -658,5 +658,5 @@ json.dump(total_umi_dict, total_umi_file)
 total_umi_file.close()
 
 
-#%% print info to stdout
+# print info to stdout
 print("Summary generated. Elapsed time: " + str(t_elapsed), flush=True)
