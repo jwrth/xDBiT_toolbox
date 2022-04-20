@@ -168,7 +168,7 @@ def standard_preprocessing(adata_in,
                 # find neighbors
                 sc.pp.neighbors(adata, use_rep="X_scanorama")
                 sc.tl.umap(adata)
-                sc.tl.tsne(adata)
+                sc.tl.tsne(adata, use_rep="X_scanorama")
 
         # clustering
         print("Leiden clustering...")
