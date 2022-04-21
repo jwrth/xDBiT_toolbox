@@ -35,6 +35,7 @@ class SelectionWindow:
 
         # set entry window for file
         self.entry = Entry(self.root)
+        self.entry.insert(END, "Z:/Daten/01 HPC/03 Team Meier/08_Projects/37_Spatial_Barcoding/37_43/CountsToAnndata/37_43_CtoA_params+hq_withvertices_220421.csv")
         self.entry.grid(row=0,column=1)
 
         # set file select button
@@ -221,7 +222,8 @@ class CountsToAnndata():
                 print("More than one `hq_images:channel_names` labelled with `*` found: {}".format(reg_id))
                 sys.exit()
             else:
-                input("No channel in hq_images:channel_names labelled with `*`. No hq image will be added if available. Press enter to continue anyway...")
+                print("No channel in hq_images:channel_names labelled with `*` to indicate registration channel.")
+                input("No hq image will be added if available. Press enter to continue anyway...")
                 self.reg_channel_label = None
 
 
@@ -387,8 +389,7 @@ class CountsToAnndata():
             flush=True)
 
 
-    def ProcessDatasets(self, maxpx_before_reg, to_8bit, ppmhq, ppmalign, perspective_transform,
-        debug=False):
+    def ProcessDatasets(self, maxpx_before_reg, to_8bit, ppmhq, ppmalign, perspective_transform):
         '''
         Process images:
             - Align coordinates to alignment images
@@ -477,7 +478,7 @@ class CountsToAnndata():
 
             # align transcriptomic data to alignment images using the selected vertices
 
-            adata = db.dbitseq_to_squidpy(
+            adata = dbitseq_to_squidpy(
                 matrix_path=matrix_file, 
                 images=images, ppmalign=ppmalign,
                 resolution=int(self.parameters.loc["spot_width", "value"]), 
@@ -502,11 +503,11 @@ class CountsToAnndata():
                     image_dir_dict[unique_id + "-" + str(self.hq_ch_labels[i])] = selected_image_path
 
                 # start transformation
-                adata_trans = db.im.register_adata_coords_to_new_images(adata, 
+                adata_trans = register_adata_coords_to_new_images(adata, 
                                                                 groupby='id', 
                                                                 image_dir_dict=image_dir_dict, ppmhq=ppmhq,
                                                                 reg_channel=self.reg_channel_label, 
-                                                                in_place=False, debug=debug, 
+                                                                in_place=False, 
                                                                 do_registration=True,
                                                                 perspective_transform=perspective_transform,
                                                                 maxpx_before_reg=maxpx_before_reg, 
@@ -525,18 +526,20 @@ class CountsToAnndata():
                                         reg_channel_label=self.reg_channel_label
                                         )
 
-                if debug:
-                    # plot matchedVis
-                    for g, mv in adata_trans.uns['matchedVis'].items():
-                        plt.imshow(mv)
-                        plotpath = os.path.join(output_dir, "{}_matchedVis.png".format(g))
-                        print("Saving matched visualization into {}".format(plotpath))
-                        plt.savefig(plotpath, dpi=400)
-                        plt.close()
+                # plot matchedVis
+                plotdir = os.path.join(output_dir, "registration_checks")
+                Path(plotdir).mkdir(parents=True, exist_ok=True)
+                
+                for g, mv in adata_trans.uns['matchedVis'].items():
+                    plotpath = os.path.join(plotdir, "{}_matchedVis.png".format(g))
+                    plt.imshow(mv)
+                    print("Saving matched visualization into {}".format(plotpath))
+                    plt.savefig(plotpath, dpi=400)
+                    plt.close()
 
                 # remove images and save adata without images
                 print("Remove images and save adata without images into {}".format(noimages_file))
-                db.tl.remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
+                remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
                 adata_trans.write(noimages_file)
                         
 
@@ -549,7 +552,9 @@ class CountsToAnndata():
         Plot to check how well the registration worked.
         '''
         # create plot to check success of registration
-        plotpath = os.path.join(output_dir, unique_id + "_check_registration.png")
+        plotdir = os.path.join(output_dir, "registration_checks")
+        Path(plotdir).mkdir(parents=True, exist_ok=True)
+        plotpath = os.path.join(plotdir, unique_id + "_check_registration.png")
 
         # parameters
         idxs = adata.obs['id'].unique()
@@ -563,7 +568,7 @@ class CountsToAnndata():
 
         for r, idx in enumerate(idxs):
             for c, ad in enumerate([adata, adata_trans]):
-                db.pl.spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
+                spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
                             lowres=False,
                             xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
                             axis=axs[r+c], fig=fig)
@@ -624,7 +629,11 @@ if __name__ == "__main__":
     if module_path not in sys.path:
         sys.path.append(module_path)
 
-    import dbitx_funcs as db
+    from dbitx_funcs.readwrite import dbitseq_to_squidpy
+    from dbitx_funcs.tools import remove_images
+    from dbitx_funcs.images import register_adata_coords_to_new_images
+    from dbitx_funcs.plotting import spatial
+
     import matplotlib.pyplot as plt
     
     from pathlib import Path
@@ -639,8 +648,7 @@ if __name__ == "__main__":
     coa.AddVertices(settings_file=settings_file)
     coa.ProcessDatasets(
         maxpx_before_reg=maxpx, to_8bit=convert,
-        ppmhq=ppmhq, ppmalign=ppmalign, perspective_transform=perspective_transform,
-        debug=True)
+        ppmhq=ppmhq, ppmalign=ppmalign, perspective_transform=perspective_transform)
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 

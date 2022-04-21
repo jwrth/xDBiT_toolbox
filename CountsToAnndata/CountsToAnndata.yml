@@ -1,0 +1,16 @@
+name: CountsToAnndata
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.8
+  - numpy
+  - pandas
+  - napari
+  - opencv
+  - seaborn
+  - python-igraph
+  - scanpy
+  - leidenalg
+  - gprofiler-official
+prefix: D:\Users\johannes.wirth\Anaconda3\envs\CountsToAnndata

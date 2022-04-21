@@ -1,5 +1,3 @@
-import NaiveDE
-import SpatialDE
 import pandas as pd
 from collections import OrderedDict
 import numpy as np
@@ -10,6 +8,9 @@ from .. import utils
 from ..exceptions import ModuleNotFoundOnWindows
 
 def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spatialde', use_raw=False):
+
+    import NaiveDE
+    import SpatialDE
 
     print("Prepare data for SpatialDE analysis")
     if layer is not None:

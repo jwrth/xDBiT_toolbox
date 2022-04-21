@@ -1,4 +1,3 @@
-from mofapy2.run.entry_point import entry_point
 
 def run_mofa(adata, output_file="ST_model.hdf5", 
              n_factors=10, features_subset="highly_variable", 
@@ -7,6 +6,8 @@ def run_mofa(adata, output_file="ST_model.hdf5",
     '''
     Run mefisto/mofa on adata.
     '''
+
+    from mofapy2.run.entry_point import entry_point
     
     # Set up mofa options
     ent = entry_point()
