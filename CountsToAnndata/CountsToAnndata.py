@@ -35,7 +35,7 @@ class SelectionWindow:
 
         # set entry window for file
         self.entry = Entry(self.root)
-        self.entry.insert(END, "Z:/Daten/01 HPC/03 Team Meier/08_Projects/37_Spatial_Barcoding/37_43/CountsToAnndata/37_43_CtoA_params+hq_withvertices_220421.csv")
+        self.entry.insert(END, "Z:/Daten/01 HPC/03 Team Meier/08_Projects/37_Spatial_Barcoding/37_30/CountsToAnndata/37_30_CtoA_params.csv")
         self.entry.grid(row=0,column=1)
 
         # set file select button
@@ -223,7 +223,6 @@ class CountsToAnndata():
                 sys.exit()
             else:
                 print("No channel in hq_images:channel_names labelled with `*` to indicate registration channel.")
-                input("No hq image will be added if available. Press enter to continue anyway...")
                 self.reg_channel_label = None
 
 
@@ -255,11 +254,11 @@ class CountsToAnndata():
             "`experiment_id` and `unique_id` together do not give a unique set of ids. \n" \
                 "This would cause that one file is overwritten by another"
 
-        # assert that for each dataset there are either both hq_image and align_image or None of both
-        assert np.all([pd.notnull(a) == pd.notnull(b) for a, b in zip(self.directories["align_images"], self.directories["hq_images"])]), \
-            "For some datasets only alignment images OR hq images were given.Either both are given or None.\n" \
-                "If you wish to use the alignment images as hq images put the alignment directories also into\n" \
-                    "the hq image section. If you wish to create an anndata without image data leave both sections empty."
+        # # assert that for each dataset there are either both hq_image and align_image or None of both
+        # assert np.all([pd.notnull(a) == pd.notnull(b) for a, b in zip(self.directories["align_images"], self.directories["hq_images"])]), \
+        #     "For some datasets only alignment images OR hq images were given.Either both are given or None.\n" \
+        #         "If you wish to use the alignment images as hq images put the alignment directories also into\n" \
+        #             "the hq image section. If you wish to create an anndata without image data leave both sections empty."
 
         ## add general parameters to class
         self.n_datasets = len(self.directories)
@@ -289,43 +288,59 @@ class CountsToAnndata():
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}", i+1, self.n_datasets), 
                 flush=True)
 
-            # check what images are given for this dataset
-            images_given = pd.notnull(dirs["align_images"]) and pd.notnull(dirs["hq_images"])
+            # check if alignment images are given
+            images_given = pd.notnull(dirs["align_images"]) #and pd.notnull(dirs["hq_images"])
 
             # check if both alignment and hq_images exist
             if images_given:
+                # check if all given aligment image paths exist
                 self.align_images_exist[i] = np.all(os.path.isfile(img) for img in glob(dirs["align_images"]))
-                self.hq_images_exist[i] = np.all(os.path.isfile(img) for img in glob(dirs["hq_images"]))
-                self.process_images[i] = self.align_images_exist[i] and self.hq_images_exist[i]
+                self.process_images[i] = self.align_images_exist[i] #and self.hq_images_exist[i]
             else:
                 self.process_images[i] = False
 
-            #register_hq = False
             if self.process_images[i]:
                 # check if the vertices are given in the settings file
                 vertices_not_given = pd.isnull(dirs["vertices_x"]) or pd.isnull(dirs["vertices_y"])
 
                 # get image directories
                 align_images = glob(dirs["align_images"])
-                hq_images = glob(dirs["hq_images"])
+                
 
                 ## Decide whether to do hq image registration or not
-                # check if number of images matches number of channel names
-                assert len(hq_images) == len(self.hq_ch_names), \
-                    "Number of detected hq images [{}] does not match number of channel names [{}] in parameters file.".format(
-                        len(hq_images), len(self.hq_ch_names))
+                # check if hq images are given
+                if pd.notnull(dirs["hq_images"]):
+                    hq_images = glob(dirs["hq_images"])
+                    # check if all given hq_images exist and registration should be done
+                    if np.all(os.path.isfile(img) for img in hq_images):
+                        print("HQ images are given and exist.")
 
-                # check whether paths to alignment images and hq images are identical
-                if not len(set(align_images) & set(hq_images)) == len(align_images):
-                    if self.reg_channel_label is not None:
-                        print("Alignment images and hq are not identical. HQ images will be registered.")
-                        self.register_hq[i] = True
+                        # check if a "*" was given to indicate the registration channel
+                        if self.reg_channel_label is not None:
+                            print("Registration of HQ images and alignment images will be performed.")
+                            self.register_hq[i] = True
+                        else:
+                            print("No channel in hq_images:channel_names labelled with `*` to indicate registration channel.")
+                            print("NO REGISTRATION WILL BE PERFORMED EVEN THOUGH IMAGES ARE GIVEN!")
                     else:
-                        print("Alignment images and hq are not identical and could be registered " \
-                            "but no channel in `hq_images:channel_names` was labelled with `*`." \
-                                "Therefore, the hq images are not added.")
-                else:
-                    print("Alignment images and hq are identical. HQ images will not be registered.")
+                        print("No HQ images given. Pipeline is run without registration.")
+
+                # # check if number of images matches number of channel names
+                # assert len(hq_images) == len(self.hq_ch_names), \
+                #     "Number of detected hq images [{}] does not match number of channel names [{}] in parameters file.".format(
+                #         len(hq_images), len(self.hq_ch_names))
+
+                # # check whether paths to alignment images and hq images are identical
+                # if not len(set(align_images) & set(hq_images)) == len(align_images):
+                #     if self.reg_channel_label is not None:
+                #         print("Alignment images and hq are not identical. HQ images will be registered.")
+                #         self.register_hq[i] = True
+                #     else:
+                #         print("Alignment images and hq are not identical and could be registered " \
+                #             "but no channel in `hq_images:channel_names` was labelled with `*`." \
+                #                 "Therefore, the hq images are not added.")
+                # else:
+                #     print("Alignment images and hq are identical. HQ images will not be registered.")
                 
                 # detect alignment marker image
                 align_img = [elem for elem in align_images if self.alignment_channel in elem][0]
@@ -343,7 +358,7 @@ class CountsToAnndata():
                     points_fetched = False
                     while points_fetched is not True:
                         try:
-                            viewer = napari.view_image(alignment_image, 
+                            viewer = napari.view_image(db.im.convert_to_8bit(alignment_image), # napari viewer had problems with 16-bit images 
                                 title="Select corner spots in alignment image {} of {} ".format(i+1, self.n_datasets))
                             napari.run()
 
@@ -369,7 +384,7 @@ class CountsToAnndata():
                     self.settings.loc[self.dir_start+i+1, self.vertx_id+1] = " ".join([str(elem[1]) for elem in self.vertices_list[i]])
                     # save settings file with coordinates of vertices
                     self.settings.to_csv(self.settings_new, index=None, header=None)
-                    print("Vertices selected and saved for dataset {} of {}.".format(i, self.n_datasets), 
+                    print("Vertices selected and saved for dataset {} of {}.".format(i+1, self.n_datasets), 
                         flush=True)
 
                 else:
@@ -430,7 +445,6 @@ class CountsToAnndata():
 
                 # # get image directories
                 align_images = glob(dirs["align_images"])
-                hq_images = glob(dirs["hq_images"])
                 
                 # # detect alignment marker image
                 dapi_img = [i for i in align_images if self.dapi_channel in i][0]
@@ -444,7 +458,7 @@ class CountsToAnndata():
                     image_paths = [dapi_img]
                     channel_labels = [self.reg_channel_label]
                 else:
-                    image_paths = hq_images # is equal to align_images in this case
+                    image_paths = align_images # is equal to align_images in this case
                     channel_labels = self.hq_ch_labels
                 
                 images = [cv2.imread(d, -1) for d in image_paths]
@@ -478,7 +492,7 @@ class CountsToAnndata():
 
             # align transcriptomic data to alignment images using the selected vertices
 
-            adata = dbitseq_to_squidpy(
+            adata = db.dbitseq_to_squidpy(
                 matrix_path=matrix_file, 
                 images=images, ppmalign=ppmalign,
                 resolution=int(self.parameters.loc["spot_width", "value"]), 
@@ -496,6 +510,7 @@ class CountsToAnndata():
 
             ### Registration of hiqh-quality imaging data
             if self.register_hq[i]:
+                hq_images = glob(dirs["hq_images"])
                 # create image_dir_dict
                 image_dir_dict = {}
                 for i, n in enumerate(self.hq_ch_names):
@@ -503,7 +518,7 @@ class CountsToAnndata():
                     image_dir_dict[unique_id + "-" + str(self.hq_ch_labels[i])] = selected_image_path
 
                 # start transformation
-                adata_trans = register_adata_coords_to_new_images(adata, 
+                adata_trans = db.im.register_adata_coords_to_new_images(adata, 
                                                                 groupby='id', 
                                                                 image_dir_dict=image_dir_dict, ppmhq=ppmhq,
                                                                 reg_channel=self.reg_channel_label, 
@@ -539,7 +554,7 @@ class CountsToAnndata():
 
                 # remove images and save adata without images
                 print("Remove images and save adata without images into {}".format(noimages_file))
-                remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
+                db.tl.remove_images(adata_trans, hires_only=False, other_keys='matchedVis')
                 adata_trans.write(noimages_file)
                         
 
@@ -568,7 +583,7 @@ class CountsToAnndata():
 
         for r, idx in enumerate(idxs):
             for c, ad in enumerate([adata, adata_trans]):
-                spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
+                db.pl.spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
                             lowres=False,
                             xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
                             axis=axs[r+c], fig=fig)
@@ -629,13 +644,9 @@ if __name__ == "__main__":
     if module_path not in sys.path:
         sys.path.append(module_path)
 
-    from dbitx_funcs.readwrite import dbitseq_to_squidpy
-    from dbitx_funcs.tools import remove_images
-    from dbitx_funcs.images import register_adata_coords_to_new_images
-    from dbitx_funcs.plotting import spatial
+    import dbitx_funcs as db
 
     import matplotlib.pyplot as plt
-    
     from pathlib import Path
     import cv2
 

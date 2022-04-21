@@ -144,7 +144,7 @@ def convert_to_8bit(img):
     '''
     img = (img / img.max()) * 255
     img = np.uint8(img)
-    return (img)
+    return img
 
 
 def resize_image(img, dim=None, scale_factor=None):
