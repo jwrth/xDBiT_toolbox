@@ -9,7 +9,7 @@ import numpy as np
 from .image_processing import resize_image, recalculate_scale, rotateImage, resize_images_in_adata, convert_to_8bit
 
 def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=None,
-                   debug=False, method="sift", ratio_test=True, flann=True, 
+                   method="sift", ratio_test=True, flann=True, 
                    perspective_transform=False, 
                    do_registration=True,
                    return_grayscale=True):
@@ -111,12 +111,9 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
         print("Number of matches used: {}".format(len(good_matches)))
 
     # check to see if we should visualize the matched keypoints
-    if debug:
-        print("{}: Debugging mode - Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
-        matchedVis = cv2.drawMatches(image_scaled, kpsA, template_scaled, kpsB,
-                                     good_matches, None)
-    else:
-        matchedVis = None
+    print("{}: Display matches...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+    matchedVis = cv2.drawMatches(image_scaled, kpsA, template_scaled, kpsB,
+                                    good_matches, None)
     
     # Get keypoints
     print("{}: Fetch keypoints...".format(
@@ -186,7 +183,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
                                         spatial_key='spatial', to_8bit=False, maxpx_before_reg=None, ppmhq=None, 
                                         hires_key='hires', lowres_key='lowres', perspective_transform=False,
                                         rot_threshold=0, do_registration=False, lowres_factor=0.2,
-                                        keepFraction=0.2, method='sift', debug=False, in_place=False):
+                                        keepFraction=0.2, method='sift', in_place=False):
     '''
     Function to add new images to an adata object and register the coordinates accordingly.
 
@@ -250,7 +247,7 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
             f"{datetime.now():%Y-%m-%d %H:%M:%S}", reg_key))
         registered_img, H, matchedVis = register_image(image_adata, image_to_register, do_registration=do_registration, 
                                 maxpx=maxpx_before_reg, perspective_transform=perspective_transform,
-                                keepFraction=keepFraction, method=method, debug=debug)
+                                keepFraction=keepFraction, method=method)
 
         if matchedVis is not None:
             if 'matchedVis' in adata.uns.keys():

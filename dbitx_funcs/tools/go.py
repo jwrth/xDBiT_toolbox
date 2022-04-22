@@ -6,7 +6,6 @@ import json
 import pandas as pd
 import numpy as np
 from gprofiler import GProfiler
-import gseapy
 from pathlib import Path
 from .adata import collect_deg_data
 from ..utils import SpeciesToID
@@ -181,6 +180,8 @@ class GOEnrichment():
         enrichr_libraries='GO_Biological_Process_2018', outdir=None, no_plot=True,
         uns_key_added='enrichment', return_df=True, sortby='pvals_adj', ascending=True,
         **kwargs):
+
+        import gseapy
 
         deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
                         sortby=sortby, ascending=ascending)

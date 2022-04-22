@@ -1,5 +1,3 @@
-import NaiveDE
-import SpatialDE
 import pandas as pd
 from collections import OrderedDict
 import numpy as np
@@ -10,6 +8,9 @@ from .. import utils
 from ..exceptions import ModuleNotFoundOnWindows
 
 def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spatialde', use_raw=False):
+
+    import NaiveDE
+    import SpatialDE
 
     print("Prepare data for SpatialDE analysis")
     if layer is not None:
@@ -168,7 +169,7 @@ def standard_preprocessing(adata_in,
                 # find neighbors
                 sc.pp.neighbors(adata, use_rep="X_scanorama")
                 sc.tl.umap(adata)
-                sc.tl.tsne(adata)
+                sc.tl.tsne(adata, use_rep="X_scanorama")
 
         # clustering
         print("Leiden clustering...")

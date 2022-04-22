@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from adjustText import adjust_text
 from ..tools import create_deg_df, get_nrows_maxcols, check_list, nth_repl_all, collect_deg_data, extract_groups, check_raw
 from ..readwrite import save_and_show_figure
 import seaborn as sns
@@ -202,6 +201,7 @@ def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', p
                         texts.append(axs[i].text(x, y, g, size=annotation_fontsize))
             
                 if correct_annotation:
+                    from adjustText import adjust_text
                     adjust_text(texts, arrowprops=dict(arrowstyle="-", color='k', lw=0.5), ax=axs[i])
 
             # counter
@@ -244,6 +244,9 @@ def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', p
 def correlate_significance_two_groups(adata, deg_key, spatialde_key, groupby, 
 deg_splits='all', threshold = 0.05, increment = 10e-16, offset = 1.02, vmin = -3, vmax = 3, 
 linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, save_only=False, show=True, dpi_save=300):
+
+    if adjust:
+        from adjustText import adjust_text
 
     # extract the groups that were used in the DEG analysis
     splitby = adata.uns[deg_key]['params']['groupby']
