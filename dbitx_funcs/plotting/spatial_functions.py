@@ -381,7 +381,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         return fig, ax
 
 
-def spatial(adata, keys, groupby='well_name', groups=None, raw=False, max_cols=4, 
+def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
     dpi_display=80, header_names=None,
