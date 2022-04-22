@@ -193,7 +193,7 @@ class GOEnrichment():
             target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
 
             if top_n is not None:
-                    target_genes = target_genes[:top_n]
+                target_genes = target_genes[:top_n]
 
             e = gseapy.enrichr(gene_list=target_genes, gene_sets=enrichr_libraries, organism=organism, outdir=outdir, no_plot=no_plot, **kwargs).results
             
