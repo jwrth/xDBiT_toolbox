@@ -142,13 +142,16 @@ def create_color_dict(adata, key, palette):
 
     return color_dict
 
-def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None):
+def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None, use_raw=False):
     '''
     Function to generate pandas dataframe from DEG analyze which used the `sc.tl.rank_genes_groups()` function.
     '''
 
     # transform keys to list
     keys = [keys] if isinstance(keys, str) else list(keys)
+
+    # check if .raw should be used
+    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=use_raw)
 
     # check if there were any additional categories added
     cats = ['names', 'scores', 'pvals', 'pvals_adj', 'logfoldchanges']
@@ -181,7 +184,7 @@ def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None)
 
             if include_means:
                 df['names'] = decode_list(df['names']) # decode byte-coded strings if there are any
-                df['means'] = [adata.var.loc[name]['means'] for name in df['names']]
+                df['means'] = [adata_var.loc[name]['means'] for name in df['names']]
             
             group_list.append(df)
         
