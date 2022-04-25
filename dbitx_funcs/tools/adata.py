@@ -1,3 +1,4 @@
+from xml.etree.ElementInclude import include
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -142,7 +143,7 @@ def create_color_dict(adata, key, palette):
 
     return color_dict
 
-def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None, use_raw=False):
+def create_deg_df(adata, keys, groups=None, include_means=False, added_cats=None, use_raw=False):
     '''
     Function to generate pandas dataframe from DEG analyze which used the `sc.tl.rank_genes_groups()` function.
     '''
@@ -151,7 +152,7 @@ def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None,
     keys = [keys] if isinstance(keys, str) else list(keys)
 
     # check if .raw should be used
-    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=use_raw)
+    _, adata_var, _ = check_raw(adata, use_raw=use_raw)
 
     # check if there were any additional categories added
     cats = ['names', 'scores', 'pvals', 'pvals_adj', 'logfoldchanges']
@@ -197,7 +198,7 @@ def create_deg_df(adata, keys, groups=None, include_means=True, added_cats=None,
     return final_df
 
 def collect_deg_data(adata, keys, groups=None, foldchanges_label='logfoldchanges', pvals_label='pvals_adj', gene_names='names', 
-                fc_threshold=1, pval_threshold=0.05, **kwargs):
+                fc_threshold=1, pval_threshold=0.05, include_means=False, **kwargs):
 
     '''
     Collect data of a DEG analysis.
@@ -229,7 +230,7 @@ def collect_deg_data(adata, keys, groups=None, foldchanges_label='logfoldchanges
             groups = extracted_groups
 
         # extract data and collect in dictionary
-        datas = {g: create_deg_df(adata, keys=key, groups=g, **kwargs) for g in groups}
+        datas = {g: create_deg_df(adata, keys=key, groups=g, include_means=include_means, **kwargs) for g in groups}
 
         data_dict = {}
         updown_dict = {}
