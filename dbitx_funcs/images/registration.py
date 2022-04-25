@@ -403,7 +403,10 @@ def align_to_dict(images, labels, vertices, resolution: int, n_channels: int,
 
     # Part 1: Align image
     print("\tAlign images...")
-    aligned = [align_image(img, vertices, frame, **kwargs) for img in images]
+    aligned = []
+    for i, img in enumerate(images):
+        print("\t\tProcessing image {} of {}:".format(i+1, len(images)))
+        aligned.append(align_image(img, vertices, frame, **kwargs))
 
     # Part 2: Create metadata
     print("\tCreate metadata...")
