@@ -352,6 +352,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                     #cax.axis('off')
                     if crange is not None:
                         clb.mappable.set_clim(crange[0], crange[1])
+                    else:
+                        clb.mappable.set_clim(0, np.percentile(color, 95))
                     if percent:
                         clb.ax.set_title('%')
 
@@ -384,7 +386,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
 def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
-    dpi_display=80, header_names=None,
+    dpi_display=80, header_names=None, 
+    crange=None,
     xlim=None, ylim=None,
     **kwargs):
     
@@ -439,11 +442,16 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
 
                     # create color dictionary if key is categorical
                     color_dict = create_color_dict(adata, key, palette)
+                
+                    if crange is None:
+                        crange_ = crange_per_key_dict[key]
+                    else:
+                        crange_ = crange
 
                     spatial_single(adata, key, raw=raw, groupby=groupby,
                             group=group, fig=fig, axis=axs[row, col], show=False,
                             xlim=xlim, ylim=ylim, 
-                            spot_size=spot_size, crange=crange_per_key_dict[key], 
+                            spot_size=spot_size, crange=crange_, 
                             palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
 
             for ax, row in zip(axs[:, 0], groups):
@@ -472,9 +480,14 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
                 # create color dictionary if key is categorical
                 color_dict = create_color_dict(adata, key, palette)
 
+                if crange is None:
+                    crange_ = crange_per_key_dict[key]
+                else:
+                    crange_ = crange
+
                 spatial_single(adata, key, raw=raw, groupby=groupby,
                         group=group, fig=fig, axis=axs[i], show=False,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_per_key_dict[key],
+                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_,
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
 
                 axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
@@ -502,7 +515,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
         # if there is only one group use `spatial_single` function
         spatial_single(adata, keys, raw=raw, groupby=groupby, group=groups[0], show=True,
                         xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols,
-                        palette=palette, pd_dataframe=pd_dataframe, 
+                        palette=palette, pd_dataframe=pd_dataframe, crange=crange,
                         savepath=savepath, save_only=save_only,
                         **kwargs
                         )

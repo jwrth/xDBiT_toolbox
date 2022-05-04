@@ -301,14 +301,14 @@ def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd
         #c = adata_X[[elem in groups for elem in adata.obs[groupby]], adata_var_names == key]
         c = adata_X[:, adata_var_names == key]
         cmin = c.min()
-        cmax = c.max()
+        cmax = np.percentile(c, 95)
         crange = [cmin, cmax]
     elif key in obs.columns:
         if obs[key].dtype.name.startswith('float') or obs[key].dtype.name.startswith('int'):
             #c = obs[key][[elem in groups for elem in obs[groupby]]]
             c = obs[key]
             cmin = c.min()
-            cmax = c.max()
+            cmax = np.percentile(c, 95)
             crange = [cmin, cmax]
         else:
             return
