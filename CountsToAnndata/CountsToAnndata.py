@@ -14,7 +14,7 @@ Usage:
 import sys
 import os
 from tkinter import *
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 import tkinter
 import numpy as np
 import pandas as pd
@@ -110,7 +110,15 @@ class SelectionWindow:
         self.root.grid_columnconfigure(0, minsize=100)
         self.root.grid_columnconfigure(1, minsize=180)
 
+        # state what happens when the window is closed
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     # Functions
+    def on_closing(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.root.destroy()
+            sys.exit()
+    
     def closewindow(self, event=None): # event only needed for .bind which passes event object to function
         # collect variables
         self.settings_file = self.entry.get()
