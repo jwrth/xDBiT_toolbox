@@ -1,3 +1,4 @@
+from lib2to3.pytree import convert
 from matplotlib import pyplot as plt
 from matplotlib import patches
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -12,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
 from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
-from ..images import set_histogram
+from ..images import set_histogram, convert_to_8bit
 from tqdm import tqdm
 import warnings
 
@@ -108,11 +109,13 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             image = adata.uns['spatial'][image_key]['images']['hires']
             scale_factor = image_metadata['tissue_hires_scalef']
 
-        if histogram_setting is not None:
-            bit_type = np.uint8 if image.max() < 256 else np.uint16
+        bit_type = np.uint8 if image.max() < 256 else np.uint16
+        if histogram_setting is None:
+            # do min max scaling
+            image = set_histogram(image, lower=image.min(), upper=np.percentile(image, 99), bit_type=bit_type)
+        else:
             if histogram_setting == 'minmax':
-                print('bin hier')
-                image = set_histogram(image, lower=image.min(), upper=image.max(), bit_type=bit_type, )
+                image = set_histogram(image, lower=image.min(), upper=image.max(), bit_type=bit_type)
             elif isinstance(histogram_setting, tuple):
                 image = set_histogram(image, lower=histogram_setting[0], upper=histogram_setting[1], bit_type=bit_type)
             elif (histogram_setting > 0) & (histogram_setting < 1):
