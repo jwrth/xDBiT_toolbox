@@ -288,7 +288,7 @@ def collect_spatialde_results(adata, uns_key):
     #results_df = results_df[['age', 'well_name', 'g', 'l', 'qval']]
     return results_df
 
-def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd_dataframe=None):
+def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd_dataframe=None, ctype='minmax'):
 
     if data_in_dataframe and pd_dataframe is not None:
         obs = pd_dataframe
@@ -301,7 +301,11 @@ def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd
         #c = adata_X[[elem in groups for elem in adata.obs[groupby]], adata_var_names == key]
         c = adata_X[:, adata_var_names == key]
         cmin = c.min()
-        cmax = np.percentile(c, 95)
+
+        if ctype == 'percentile':
+            cmax = np.percentile(c, 95)
+        else:
+            cmax = c.max()
         crange = [cmin, cmax]
     elif key in obs.columns:
         if obs[key].dtype.name.startswith('float') or obs[key].dtype.name.startswith('int'):

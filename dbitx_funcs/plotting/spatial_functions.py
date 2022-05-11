@@ -33,7 +33,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             image_key=None, lowres=True, histogram_setting=None,
             alpha=1, palette="tab10", color_dict=None,
             header_x=0.5, header_y=0.98, header_fontsize=20,
-            save_only=False, savepath=None, save_background=None, crange=None, colorbar=True,
+            save_only=False, savepath=None, save_background=None, crange=None, crange_type='minmax', colorbar=True,
             verbose=True):
 
     if isinstance(pd_dataframe, pd.DataFrame):
@@ -354,9 +354,11 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                     #clb = plt.colorbar(s, ax=cax, shrink=1)
                     #cax.axis('off')
                     if crange is not None:
-                        clb.mappable.set_clim(crange[0], crange[1])
+                            clb.mappable.set_clim(crange[0], crange[1])
                     else:
-                        clb.mappable.set_clim(0, np.percentile(color, 95))
+                        if crange_type == 'percentile':
+                            clb.mappable.set_clim(0, np.percentile(color, 99))
+                        
                     if percent:
                         clb.ax.set_title('%')
 
@@ -390,7 +392,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
     dpi_display=80, header_names=None, 
-    crange=None,
+    crange=None, crange_type='minmax',
     xlim=None, ylim=None,
     **kwargs):
     
@@ -424,7 +426,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
 
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
-                use_raw=raw, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe) if key not in normalize_crange_not_for else None for key in keys}
+                use_raw=raw, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe, ctype=crange_type) if key not in normalize_crange_not_for else None for key in keys}
     if multigroups:
         if multikeys:
             n_rows = len(groups)
@@ -490,7 +492,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
 
                 spatial_single(adata, key, raw=raw, groupby=groupby,
                         group=group, fig=fig, axis=axs[i], show=False,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_,
+                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_, crange_type=crange_type,
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
 
                 axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
@@ -519,7 +521,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
         spatial_single(adata, keys, raw=raw, groupby=groupby, group=groups[0], show=True,
                         xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols,
                         palette=palette, pd_dataframe=pd_dataframe, crange=crange,
-                        savepath=savepath, save_only=save_only,
+                        savepath=savepath, save_only=save_only, crange_type=crange_type,
                         **kwargs
                         )
 
