@@ -164,8 +164,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
 
     if xlim is None:
         if plot_pixel:
-            xmin = x_pixelcoord.min()
-            xmax = x_pixelcoord.max()
+            xmin = x_pixelcoord.min() * scale_factor
+            xmax = x_pixelcoord.max() * scale_factor
         else:
             xmin = x_coord.min()
             xmax = x_coord.max()
@@ -177,8 +177,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
 
     if ylim is None:
         if plot_pixel:
-            ymin = y_pixelcoord.min()
-            ymax = y_pixelcoord.max()
+            ymin = y_pixelcoord.min() * scale_factor
+            ymax = y_pixelcoord.max() * scale_factor
         else:
             ymin = y_coord.min()
             ymax = y_coord.max()    
@@ -296,7 +296,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         else:
             if plot_pixel:
                 # plot transcriptomic data
-                s = ax.scatter(x_pixelcoord, y_pixelcoord, c=color, marker=spot_type,
+                s = ax.scatter(x_pixelcoord * scale_factor, y_pixelcoord * scale_factor, c=color, marker=spot_type,
                                 s=size, alpha=alpha, edgecolors=None)
                 if image is not None:
                     ax.imshow(image, origin='upper', cmap='gray')
