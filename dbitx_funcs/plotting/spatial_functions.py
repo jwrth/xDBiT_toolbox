@@ -1,6 +1,6 @@
 from lib2to3.pytree import convert
 from matplotlib import pyplot as plt
-from matplotlib import patches
+from matplotlib import patches, colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.ticker as mticker
 import math
@@ -31,9 +31,10 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             xlim=None, ylim=None, oversize=1, dpi_display=80, figsize=(8.2,6),
             #image=None, image_metadata=None, 
             image_key=None, lowres=True, histogram_setting=None,
-            alpha=1, palette="tab10", color_dict=None,
+            alpha=1, palette="tab10", color_dict=None, cmap='viridis', 
             header_x=0.5, header_y=0.98, header_fontsize=20,
-            save_only=False, savepath=None, save_background=None, crange=None, crange_type='minmax', colorbar=True,
+            crange=None, crange_type='minmax', colorbar=True, cmap_center=None,
+            save_only=False, savepath=None, save_background=None, 
             verbose=True):
 
     if isinstance(pd_dataframe, pd.DataFrame):
@@ -76,6 +77,12 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
     if header_names is not None:
         assert len(header_names) == len(keys)
 
+    # check if cmap is supposed to be centered
+    if cmap_center is None:
+        normalize=None
+    else:
+        normalize = colors.CenteredNorm(vcenter=cmap_center)
+        
     # get image data and or metadata
     if image_key is not None:
         # check if image_key gives unique match
@@ -297,15 +304,16 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             if plot_pixel:
                 # plot transcriptomic data
                 s = ax.scatter(x_pixelcoord * scale_factor, y_pixelcoord * scale_factor, c=color, marker=spot_type,
-                                s=size, alpha=alpha, edgecolors=None)
+                                s=size, alpha=alpha, edgecolors=None, cmap=cmap)
                 if image is not None:
                     ax.imshow(image, origin='upper', cmap='gray')
             else:
                 if key is not None:
                     # plot transcriptomic data
                     if not categorical:
+
                         s = ax.scatter(x_coord, y_coord, c=color, marker=spot_type,
-                                    s=size, alpha=alpha, edgecolors=None)
+                                    s=size, alpha=alpha, edgecolors=None, cmap=cmap, norm=normalize)
                     else:
                         sns.scatterplot(x='x_coord', y='y_coord', data=data,
                                         hue=key, marker=spot_type, s=size*1.6, ax=ax, edgecolor="none", palette=color_dict, alpha=alpha)
