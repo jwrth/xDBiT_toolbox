@@ -514,6 +514,10 @@ savepath=None, save_only=False, show=True, dpi_save=300):
         # convert libraries to list if they are string
         libraries = [libraries] if isinstance(libraries, str) else list(libraries)
 
+        # check if all libraries are in dataframe
+        notin = [elem for elem in libraries if elem not in enrichment['source'].unique()]
+        assert len(notin) == 0, "Following libraries could not be found in the `source` column: {}".format(notin)
+
         # filter for libraries
         enrichment = enrichment[enrichment['source'].isin(libraries)].copy()
 

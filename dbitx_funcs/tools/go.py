@@ -146,9 +146,9 @@ class GOEnrichment():
                 "term": "native"
             }, inplace=True)
 
-            # add new categories
-            e["Enrichment score"] = [-np.log10(elem) for elem in e["fdr"]]
-            e["Gene ratio"] = [a/b for a,b in zip(e["number_of_genes"], e["number_of_genes_in_background"])]
+            ## add new categories
+            # e["Enrichment score"] = [-np.log10(elem) for elem in e["fdr"]]
+            # e["Gene ratio"] = [a/b for a,b in zip(e["number_of_genes"], e["number_of_genes_in_background"])]
             
             # sort by p_value
             e.sort_values('Enrichment score', inplace=True, ascending=False)
@@ -262,6 +262,17 @@ class StringDB:
 
         ## Read and parse the results
         self.result = pd.DataFrame(json.loads(response.text))
+
+        # rename columns to align them to gprofiler results
+        self.result.rename(columns={
+            "category": "source",
+            "description": "name",
+            "term": "native"
+            }, inplace=True)
+
+        # calculate enrichment score        
+        self.result['Enrichment score'] = [-np.log10(elem) for elem in self.result["fdr"]]
+        self.result["Gene ratio"] = [a/b for a,b in zip(self.result["number_of_genes"], self.result["number_of_genes_in_background"])]
 
         if self.return_results:
             return self.result
