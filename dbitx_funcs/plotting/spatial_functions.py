@@ -22,7 +22,9 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
 def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_dataframe=None,
-            header=None, headersize=18, header_names=None, raw=False, percent=False,
+            header=None, headersize=18, header_names=None, 
+            raw=False, layer=None,
+            percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
             spot_size=50, spot_type='s', clb_pad=0.02,
@@ -71,8 +73,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         header_names = [header_names] if isinstance(header_names, str) else list(header_names)
 
     # check if plotting raw data
-    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=raw)
-
+    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=raw, layer=layer)
 
     if header_names is not None:
         assert len(header_names) == len(keys)
@@ -311,7 +312,6 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                 if key is not None:
                     # plot transcriptomic data
                     if not categorical:
-
                         s = ax.scatter(x_coord, y_coord, c=color, marker=spot_type,
                                     s=size, alpha=alpha, edgecolors=None, cmap=cmap, norm=normalize)
                     else:
@@ -396,7 +396,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         return fig, ax
 
 
-def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4, 
+def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
     dpi_display=80, header_names=None, 
@@ -434,7 +434,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
 
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
-                use_raw=raw, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe, ctype=crange_type) if key not in normalize_crange_not_for else None for key in keys}
+                use_raw=raw, layer=layer, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe, ctype=crange_type) if key not in normalize_crange_not_for else None for key in keys}
     if multigroups:
         if multikeys:
             n_rows = len(groups)
@@ -461,7 +461,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
                     else:
                         crange_ = crange
 
-                    spatial_single(adata, key, raw=raw, groupby=groupby,
+                    spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
                             group=group, fig=fig, axis=axs[row, col], show=False,
                             xlim=xlim, ylim=ylim, 
                             spot_size=spot_size, crange=crange_, 
@@ -498,7 +498,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
                 else:
                     crange_ = crange
 
-                spatial_single(adata, key, raw=raw, groupby=groupby,
+                spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
                         group=group, fig=fig, axis=axs[i], show=False,
                         xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_, crange_type=crange_type,
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
@@ -526,7 +526,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, max_cols=4,
             return fig, ax
     else:
         # if there is only one group use `spatial_single` function
-        spatial_single(adata, keys, raw=raw, groupby=groupby, group=groups[0], show=True,
+        spatial_single(adata, keys, raw=raw, layer=layer, groupby=groupby, group=groups[0], show=True,
                         xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols,
                         palette=palette, pd_dataframe=pd_dataframe, crange=crange,
                         savepath=savepath, save_only=save_only, crange_type=crange_type,

@@ -120,17 +120,20 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     #     return adata
 
 
-def check_raw(adata, use_raw):
+def check_raw(adata, use_raw, layer):
     # check if plotting raw data
     if use_raw:
         adata_X = adata.raw.X
         adata_var = adata.raw.var
         adata_var_names = adata.raw.var_names
     else:
-        adata_X = adata.X
+        if layer is None:
+            adata_X = adata.X
+        else:
+            adata_X = adata.layers[layer].toarray()
         adata_var = adata.var
         adata_var_names = adata.var_names
-
+    
     return adata_X, adata_var, adata_var_names
     
 def create_color_dict(adata, key, palette):
@@ -288,14 +291,15 @@ def collect_spatialde_results(adata, uns_key):
     #results_df = results_df[['age', 'well_name', 'g', 'l', 'qval']]
     return results_df
 
-def get_crange(adata, groupby, groups, key, use_raw, data_in_dataframe=False, pd_dataframe=None, ctype='minmax'):
+def get_crange(adata, groupby, groups, key, use_raw, 
+    layer=None, data_in_dataframe=False, pd_dataframe=None, ctype='minmax'):
 
     if data_in_dataframe and pd_dataframe is not None:
         obs = pd_dataframe
     else:
         obs = adata.obs
     
-    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=use_raw)
+    adata_X, adata_var, adata_var_names = check_raw(adata, use_raw=use_raw, layer=layer)
 
     if key in adata_var_names:
         #c = adata_X[[elem in groups for elem in adata.obs[groupby]], adata_var_names == key]
