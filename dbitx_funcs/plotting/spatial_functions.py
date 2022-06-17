@@ -27,7 +27,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
-            spot_size=50, spot_type='s', clb_pad=0.02,
+            spot_size=50, spot_type='s', clb_pad=0,
             axis=None, fig=None, show=True,
             patch_style=None, patch_xy=(1000, 1000), patch_radius=1000, patch_color='r',
             xlim=None, ylim=None, oversize=1, dpi_display=80, figsize=(8.2,6),
@@ -499,7 +499,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
                     crange_ = crange
 
                 spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
-                        group=group, fig=fig, axis=axs[i], show=False,
+                        group=group, fig=fig, axis=axs[i], show=False, header_names=header_names,
                         xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_, crange_type=crange_type,
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
 
@@ -527,7 +527,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     else:
         # if there is only one group use `spatial_single` function
         spatial_single(adata, keys, raw=raw, layer=layer, groupby=groupby, group=groups[0], show=True,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols,
+                        xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols, header_names=header_names,
                         palette=palette, pd_dataframe=pd_dataframe, crange=crange,
                         savepath=savepath, save_only=save_only, crange_type=crange_type,
                         **kwargs
