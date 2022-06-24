@@ -27,7 +27,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
-            spot_size=50, spot_type='s', clb_pad=0,
+            spot_size=50, spot_type='s', clb_pad=0.05,
             axis=None, fig=None, show=True,
             patch_style=None, patch_xy=(1000, 1000), patch_radius=1000, patch_color='r',
             xlim=None, ylim=None, oversize=1, dpi_display=80, figsize=(8.2,6),
