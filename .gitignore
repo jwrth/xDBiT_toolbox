@@ -6,6 +6,7 @@ sftp-config.json
 # folder names commonly used
 data/
 tmp/
+out/
 figures/
 */test_files/testrun/
 
