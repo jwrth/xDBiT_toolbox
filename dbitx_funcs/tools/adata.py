@@ -343,9 +343,10 @@ def remove_images(adata, uns_key='spatial', reg_key='registered', other_keys=Non
             for res_key in res_keys:
                 del adata.uns[uns_key][key]['images'][res_key]
 
-    # remove registered images if available
-    if reg_key in adata.uns:
-        del adata.uns[reg_key]
+    if not hires_only:
+        # remove registered images if available
+        if reg_key in adata.uns:
+            del adata.uns[reg_key]
 
     # remove further keys if given
     if other_keys is not None:
