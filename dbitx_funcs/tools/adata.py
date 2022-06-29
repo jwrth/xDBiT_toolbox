@@ -120,7 +120,7 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     #     return adata
 
 
-def check_raw(adata, use_raw, layer):
+def check_raw(adata, use_raw, layer=None):
     # check if plotting raw data
     if use_raw:
         adata_X = adata.raw.X
