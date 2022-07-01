@@ -35,7 +35,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             image_key=None, lowres=True, histogram_setting=None,
             alpha=1, palette="tab10", color_dict=None, cmap='viridis', 
             header_x=0.5, header_y=0.98, header_fontsize=20,
-            crange=None, crange_type='minmax', colorbar=True, cmap_center=None,
+            crange=None, crange_type='minmax', colorbar=True, clb_title=None,
+            cmap_center=None,
             save_only=False, savepath=None, save_background=None, 
             verbose=True):
 
@@ -360,6 +361,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                     
                     # set colorbar
                     clb.ax.tick_params(labelsize=14)
+                    
+                    if clb_title is not None:
+                        clb.ax.set_ylabel(clb_title, rotation=270, fontdict={"fontsize": 14}, labelpad=20)
 
                     if crange is not None:
                             clb.mappable.set_clim(crange[0], crange[1])
