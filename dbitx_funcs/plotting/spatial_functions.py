@@ -16,6 +16,8 @@ from ..readwrite import save_and_show_figure
 from ..images import set_histogram, convert_to_8bit
 from tqdm import tqdm
 import warnings
+from pathlib import Path
+import os
 
 # ignore future warnings (suppresses annoying pandas warning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -383,16 +385,22 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
 
     if header is not None:
         plt.suptitle(header, fontsize=headersize, x=header_x, y=header_y)
+
     if savepath is not None:
         fig.tight_layout()
         print("Saving figure to file " + savepath)
+        
+        # create path if it does not exist
+        Path(os.path.dirname(savepath)).mkdir(parents=True, exist_ok=True)
+
+        # save figure
         plt.savefig(savepath, dpi=dpi_save,
                     facecolor=save_background, bbox_inches='tight')
         print("Saved.")
 
     if save_only:
         plt.close(fig)
-    if show:
+    elif show:
         fig.tight_layout()
         return plt.show()
     else:
@@ -519,6 +527,11 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
         fig.tight_layout()
         if savepath is not None:
             print("Saving figure to file " + savepath)
+
+            # create path if it does not exist
+            Path(os.path.dirname(savepath)).mkdir(parents=True, exist_ok=True)
+
+            # save figure
             plt.savefig(savepath, dpi=dpi_save, bbox_inches='tight')
             print("Saved.")
         if save_only:
