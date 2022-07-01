@@ -352,15 +352,15 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             if categorical:
                 ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
             else:
-                divider = make_axes_locatable(ax)
-                #cax = divider.append_axes("right", size="0%", pad=1)
                 if colorbar:
-                    clb = fig.colorbar(s, ax=ax, shrink=1, 
-                        pad=clb_pad, 
-                        aspect=40)
+                    # divide axis to fit colorbar
+                    divider = make_axes_locatable(ax)
+                    cax = divider.append_axes("right", size="4%", pad=0.1)
+                    clb = fig.colorbar(s, cax=cax)
+                    
+                    # set colorbar
                     clb.ax.tick_params(labelsize=14)
-                    #clb = plt.colorbar(s, ax=cax, shrink=1)
-                    #cax.axis('off')
+
                     if crange is not None:
                             clb.mappable.set_clim(crange[0], crange[1])
                     else:
@@ -370,7 +370,6 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
                     if percent:
                         clb.ax.set_title('%')
 
-        
     if n_plots > 1:
         # check if there are empty plots remaining
         while i < n_rows * max_cols - 1:
