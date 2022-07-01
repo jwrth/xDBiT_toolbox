@@ -7,8 +7,8 @@ import pandas as pd
 import numpy as np
 from gprofiler import GProfiler
 from pathlib import Path
-from .adata import collect_deg_data
-from ..utils import SpeciesToID
+from .adata import collect_deg_data, create_deg_df
+from ..utils import SpeciesToID, find_between
 
 class GOEnrichment():
     def __init__(self):
@@ -16,51 +16,29 @@ class GOEnrichment():
     
     def prepare_enrichment(self, adata: AnnData = None, key: str = None, key_added: str = None, 
             #uns_key_added: str = 'enrichment', return_df: bool = True, 
-            sortby: str = 'pvals_adj', ascending: bool = True):
+            sortby: str = 'scores', sign_threshold: float = 0.05
+            ):
 
         if adata is None and key is None:
             raise ValueError("`adata` and `key` are all None.")
         if key_added is None:
             key_added = key
 
-        # get information for up and down regulation from key
-        if key is not None:
-            _, _, _, deg, _ = collect_deg_data(adata, keys=key)
-            deg = pd.concat(deg[key])
-            deg = deg.sort_values(sortby, ascending=ascending)
+        # fetch DGE results
+        deg = create_deg_df(adata, keys=key)
 
-            if deg.reference.unique()[0] != 'rest':
-                # extract group and reference
-                group = deg.group.unique().tolist()
-                reference = deg.reference.unique().tolist()
+        # get groups
+        groups = deg.group.unique().tolist()
 
-                # make sure there is only one reference or group
-                assert len(group) == len(reference) == 1, "More than one group or reference"
-                group = group[0]
-                reference = reference[0]
+        # make sure there is only one reference or group
+        reference = deg.reference.unique().tolist()
+        assert len(reference) == 1, "More than one group or reference"
 
-                # give the reference `rest` a name
-                up = deg.xs('up', level=1)
-                down = deg.xs('down', level=1).rename(index={group: reference})
+        # sort out non-significant results
+        deg = deg.query('pvals_adj < {}'.format(sign_threshold))
 
-                group = down.group.copy()
-                ref = down.reference.copy()
-                down["reference"] = group
-                down["group"] = ref
-
-                down['scores'] = down['scores'] * -1
-                down['logfoldchanges'] = down['logfoldchanges'] * -1
-                down['combined'] = down['combined'] * -1
-
-                deg = pd.concat([up, down])
-                deg.drop('updown', axis=1, inplace=True)
-            else:
-                deg = deg.xs('up', level=1).copy()
-
-            # get groups from key
-            groups = deg['group'].unique()
-        else:
-            groups = [key_added]
+        # sort dataframe
+        deg.sort_values(sortby, ascending=False)
 
         return deg, groups, key_added
 
@@ -69,16 +47,17 @@ class GOEnrichment():
         **kwargs: Any):
 
         deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        sortby=sortby, ascending=ascending)
+                        sortby=sortby, 
+                        )
         
         if organism is None:
             raise ValueError("`organism` not specified. Needs gprofiler naming conventions, e.g. `mmusculus`")
 
         enrichment_dict = {}
         for i, group in enumerate(groups):
-            #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
             if key is not None:
-                target_genes = deg.xs(group).names.tolist()
+                #target_genes = deg.xs(group).names.tolist()
+                target_genes = deg.query('group == "{}"'.format(group)).names.tolist()
             
             if top_n is not None:
                 target_genes = target_genes[:top_n]
@@ -120,7 +99,9 @@ class GOEnrichment():
         **kwargs: Any):
 
         deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added,
-                        sortby=sortby, ascending=ascending)
+                        sortby=sortby, 
+                        #ascending=ascending
+                        )
 
         if organism is None:
             raise ValueError("`organism` not specified. Needs to gprofiler naming conventions, e.g. `mmusculus`")
@@ -129,7 +110,9 @@ class GOEnrichment():
         for i, group in enumerate(groups):
             #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
             if key is not None:
-                target_genes = deg.xs(group).names.tolist()
+                #target_genes = deg.xs(group).names.tolist()
+
+                target_genes = deg.query('group == "{}"'.format(group)).names.tolist()
             
             if top_n is not None:
                 target_genes = target_genes[:top_n]
@@ -249,19 +232,34 @@ class StringDB:
         ## Construct the request
         request_url = "/".join([string_api_url, output_format, method])
 
-        ## Set parameters
-        params = {
+        while True:
+            ## Set parameters
+            params = {
 
-            "identifiers" : "%0d".join(genes), # your protein
-            "species" : tax_id, # species NCBI identifier 
-            "caller_identity" : "www.awesome_app.org" # your app name
-        }
+                "identifiers" : "%0d".join(genes), # your protein
+                "species" : tax_id, # species NCBI identifier 
+                "caller_identity" : "www.awesome_app.org" # your app name
+            }
 
-        ## Call STRING
-        response = requests.post(request_url, data=params)
+            ## Call STRING
+            response = requests.post(request_url, data=params)
+            response = json.loads(response.text)
 
-        ## Read and parse the results
-        self.result = pd.DataFrame(json.loads(response.text))
+            # make sure STRING found all genes
+            try:
+                ## Read and parse the results
+                self.result = pd.DataFrame(response)
+            except ValueError:
+                if response['Error'] == 'not found':
+                    # extract error message and identify missing gene that caused the error
+                    ermsg = response['ErrorMessage']
+                    missing_gene = find_between(ermsg, first="called '", last="' in the")
+
+                    # remove missing gene from list
+                    genes.remove(missing_gene)
+                    print("Gene '{}' was not found by STRING and was removed from query.".format(missing_gene))
+            else:
+                break                  
 
         # rename columns to align them to gprofiler results
         self.result.rename(columns={
