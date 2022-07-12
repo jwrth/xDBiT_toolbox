@@ -691,6 +691,7 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
 
 def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None,
     range_min=None, range_max=None, 
+    extra_cats=None,
     #stepsize=0.01, 
     nsteps=100,
     show_progress=False,
@@ -700,7 +701,8 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     xlabel=None,ylabel=None,
     values_into_title=None, title_suffix='',
     #ax=None, 
-    legend_fontsize=24, xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
+    legend_fontsize=24, legend_x=1.0, plot_legend=True,
+    xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
     savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
     dpi_save=300, return_fig_axis=False,
     loess=True, **kwargs):
@@ -715,7 +717,6 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             the radial expression and different cell types)
 
     '''
-
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
 
@@ -768,6 +769,9 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     df = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
                                 nsteps=nsteps)
+
+                    if extra_cats is not None:
+                        df = df.join(adata.obs.loc[group_mask, extra_cats].reset_index(drop=True))
 
                 else:
                     splits = group_obs[splitby].unique()
@@ -824,10 +828,15 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
 
                 axs[i].set_title(key, fontsize=title_fontsize)
-                axs[i].legend(fontsize=legend_fontsize)
+                
                 axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
                 axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
                 axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+
+                if plot_legend:
+                    axs[i].legend(fontsize=legend_fontsize, bbox_to_anchor=(legend_x, 1), loc='upper left')
+                else:
+                    axs[i].legend().remove()
 
                 if values_into_title is None:
                     axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
@@ -878,7 +887,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
         # return data
         data_collection = pd.concat(data_collection)
-        data_collection.index.names = ['key', groupby, 'id']
+        data_collection.index.names = ['key', groupby, None]
         return data_collection
 
     else: 
