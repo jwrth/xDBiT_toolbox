@@ -740,139 +740,118 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
     data_collection = {}
     for i, key in (enumerate(tqdm(keys)) if show_progress else enumerate(keys)):
-        ## Plotting
-        if loess:
-            groups = adata.obs[groupby].unique()
+        # select data per group
+        groups = adata.obs[groupby].unique()
 
-            # check if plotting raw data
-            X, var, var_names = check_raw(adata, use_raw=use_raw)
-            
-            group_collection = {}
-            for group in groups:
-                #partial = extract_groups(adata, groupby=groupby, groups=group)
-                group_mask = adata.obs[groupby] == group
-                group_obs = adata.obs.loc[group_mask, :].copy()
+        # check if plotting raw data
+        X, var, var_names = check_raw(adata, use_raw=use_raw)
+        
+        group_collection = {}
+        for group in groups:
+            #partial = extract_groups(adata, groupby=groupby, groups=group)
+            group_mask = adata.obs[groupby] == group
+            group_obs = adata.obs.loc[group_mask, :].copy()
 
-                # select only group values from matrix
-                group_X = X[group_mask, :]
+            # select only group values from matrix
+            group_X = X[group_mask, :]
 
-                if splitby is None:
-                    # select x value
-                    x = adata.obs.loc[group_mask, x_category].values
+            if splitby is None:
+                # select x value
+                x = adata.obs.loc[group_mask, x_category].values
 
-                    # extract expression values as y
-                    idx = var.index.get_loc(key)
-                    #y = X[:, idx].copy()
-                    y = group_X[:, idx].copy()
-                    
+                # extract expression values as y
+                idx = var.index.get_loc(key)
+                #y = X[:, idx].copy()
+                y = group_X[:, idx].copy()
+                
+                if loess:
                     # do smooth fitting
                     df = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
                                 nsteps=nsteps)
-
-                    if extra_cats is not None:
-                        df = df.join(adata.obs.loc[group_mask, extra_cats].reset_index(drop=True))
-
                 else:
-                    splits = group_obs[splitby].unique()
-                    df_collection = {}
+                    # set up dataframe without smooth fitting
+                    df = pd.DataFrame({"x": x, "y_pred": y})
 
-                    # get min and max values for x values
-                    x = group_obs[x_category].values
-                    range_min = x.min()
-                    range_max = x.max()
-                    for split in splits:
-                        # extract x values                                            
-                        split_mask = group_obs[splitby] == split
-                        x = group_obs.loc[split_mask, x_category].values
+                if extra_cats is not None:
+                    df = df.join(adata.obs.loc[group_mask, extra_cats].reset_index(drop=True))
 
-                        # extract expression values as y
-                        idx = var.index.get_loc(key)
-                        y = group_X[split_mask, idx].copy()
+            else:
+                splits = group_obs[splitby].unique()
+                df_collection = {}
 
-                        # do smooth fitting
+                # get min and max values for x values
+                x = group_obs[x_category].values
+                range_min = x.min()
+                range_max = x.max()
+                for split in splits:
+                    # extract x values                                            
+                    split_mask = group_obs[splitby] == split
+                    x = group_obs.loc[split_mask, x_category].values
+
+                    # extract expression values as y
+                    idx = var.index.get_loc(key)
+                    y = group_X[split_mask, idx].copy()
+
+                    # do smooth fitting
+                    if loess:
                         df_split = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
                                 nsteps=nsteps)
+                    else:
+                        # set up dataframe without smooth fitting
+                        df = pd.DataFrame({"x": x, "y_pred": y})
 
-                        # collect data
-                        df_collection[split] = df_split
-                    
-                    df_collection = pd.concat(df_collection)
-                    
-                    # calculate mean and std
-                    df = df_collection[['x', 'y_pred']].groupby('x').mean()
-                    df['std'] = df_collection[['x', 'y_pred']].groupby('x').std()
-                    df['conf_lower'] = [a-b for a,b in zip(df['y_pred'], df['std'])]
-                    df['conf_upper'] = [a+b for a,b in zip(df['y_pred'], df['std'])]
-                    df.reset_index(inplace=True)
-                if return_data:
-                    group_collection[group] = df
-                else:
+                    # collect data
+                    df_collection[split] = df_split
+                
+                df_collection = pd.concat(df_collection)
+                
+                # calculate mean and std
+                df = df_collection[['x', 'y_pred']].groupby('x').mean()
+                df['std'] = df_collection[['x', 'y_pred']].groupby('x').std()
+                df['conf_lower'] = [a-b for a,b in zip(df['y_pred'], df['std'])]
+                df['conf_upper'] = [a+b for a,b in zip(df['y_pred'], df['std'])]
+                df.reset_index(inplace=True)
+            if return_data:
+                group_collection[group] = df
+            else:
+                # sort by x-value
+                df.sort_values('x', inplace=True)
+
+                # plotting
+                cols = df.columns
+                if 'conf_lower' in cols and 'conf_upper' in cols:
                     axs[i].fill_between(df['x'], 
-                                    #df['y_pred'] - df['std'],
-                                    #df['y_pred'] + df['std'],
                                     df['conf_lower'],
                                     df['conf_upper'],
                                     alpha = 0.2,
                                     color = 'grey')
-                    axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)
+                axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)
+
+        if not return_data:
+            if xlabel is None:
+                xlabel = x_category
+            if ylabel is None:
+                ylabel = "Gene expression"
 
 
+            axs[i].set_title(key, fontsize=title_fontsize)
+            
+            axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
+            axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
+            axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
 
-            if not return_data:
-                if xlabel is None:
-                    xlabel = x_category
-                if ylabel is None:
-                    ylabel = "Gene expression"
+            if plot_legend:
+                axs[i].legend(fontsize=legend_fontsize, bbox_to_anchor=(legend_x, 1), loc='upper left')
+            else:
+                axs[i].legend().remove()
 
-
-                axs[i].set_title(key, fontsize=title_fontsize)
-                
-                axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
-                axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
-                axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
-
-                if plot_legend:
-                    axs[i].legend(fontsize=legend_fontsize, bbox_to_anchor=(legend_x, 1), loc='upper left')
-                else:
-                    axs[i].legend().remove()
-
-                if values_into_title is None:
-                    axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
-                else:
-                    assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
-                    axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
-        else:
-            # plot binned values
-            # sort out expression values of 0 since they disturbed the result in case of well C2 (bin 7 and 8 showed expression of 0)
-            print("Plotting the binned version of the plot is deprecated and currently not activated.")
-            # data = data.query('expression > 0')
-
-            # data = data.groupby([groupby, 'bin', splitby]).mean()
-            # data.reset_index(inplace=True)
-
-            # # Plotting
-            # # if ax is None:
-            # #     fig, ax = plt.subplots(1,1)
-
-            # sns.lineplot(data=data, x="bin", y="expression", hue=groupby, ax=axs[i])
-
-            # xticks = [int(elem) for elem in sorted(data.bin.unique())]
-            # xticks = xticks[::1] # in case one wants to skip ticks this can be done here
-
-            # axs[i].xaxis.set_major_locator(mticker.FixedLocator(xticks))
-
-            # if x_limit_labels is not None:
-            #     xlabels = [str(elem) for elem in xticks]
-            #     xlabels[0] = x_limit_labels[0]
-            #     xlabels[-1] = x_limit_labels[1]
-            #     axs[i].set_xticklabels(xlabels)
-
-            # if xlabel is not None:
-            #     axs[i].set_xlabel(xlabel)
-
-            # axs[i].set_title(key)
+            if values_into_title is None:
+                axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
+            else:
+                assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
+                axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
 
         if return_data:
             # collect data
