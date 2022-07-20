@@ -692,6 +692,7 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
 def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None,
     range_min=None, range_max=None, 
     extra_cats=None,
+    pd_dataframe=None,
     #stepsize=0.01, 
     nsteps=100,
     show_progress=False,
@@ -719,6 +720,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             the radial expression and different cell types)
 
     '''
+
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
 
@@ -759,12 +761,17 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
             if splitby is None:
                 # select x value
-                x = adata.obs.loc[group_mask, x_category].values
+                x = group_obs.loc[:, x_category].values
 
-                # extract expression values as y
-                idx = var.index.get_loc(key)
-                #y = X[:, idx].copy()
-                y = group_X[:, idx].copy()
+                if key in var_names:
+                    # extract expression values as y
+                    idx = var.index.get_loc(key)
+                    y = group_X[:, idx].copy()
+                elif key in group_obs.columns:
+                    y = group_obs.loc[:, key].values.copy()
+                else:
+                    print("Key '{}' not found.".format(key))
+
                 
                 if loess:
                     # do smooth fitting
