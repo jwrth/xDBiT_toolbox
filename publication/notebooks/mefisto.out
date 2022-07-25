@@ -1,0 +1,1529 @@
+nohup: ignoring input
+Import library...
+Read data from ['out/Heart_adata_pp_wohires_deg.h5ad', 'out/Spleen_adata_pp_wohires_deg.h5ad', 'out/Brain_adata_pp_wohires_deg.h5ad', 'out/Liver_adata_pp_wohires_deg.h5ad', 'out/Kidney_adata_pp_wohires_deg.h5ad']
+2022-07-22 15:54:10: Start training...
+Processing Heart: 37_38_A3
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=975 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -13445386.90 
+
+Iteration 1: time=1.09, ELBO=1172543.27, deltaELBO=14617930.170 (108.72078488%), Factors=10
+Iteration 2: time=0.69, ELBO=1207296.59, deltaELBO=34753.319 (0.25847764%), Factors=10
+Iteration 3: time=0.70, ELBO=1215415.88, deltaELBO=8119.289 (0.06038717%), Factors=10
+Iteration 4: time=0.70, ELBO=1217276.05, deltaELBO=1860.175 (0.01383504%), Factors=10
+Iteration 5: time=0.69, ELBO=1217753.41, deltaELBO=477.361 (0.00355037%), Factors=10
+Iteration 6: time=0.68, ELBO=1218132.27, deltaELBO=378.861 (0.00281778%), Factors=10
+Iteration 7: time=0.68, ELBO=1219149.53, deltaELBO=1017.254 (0.00756582%), Factors=10
+Iteration 8: time=0.69, ELBO=1221480.16, deltaELBO=2330.636 (0.01733409%), Factors=10
+Iteration 9: time=0.68, ELBO=1223421.24, deltaELBO=1941.079 (0.01443677%), Factors=10
+Optimising sigma node...
+Iteration 10: time=21.63, ELBO=1239497.49, deltaELBO=16076.248 (0.11956702%), Factors=10
+Iteration 11: time=1.63, ELBO=1218550.01, deltaELBO=-20947.479 (0.15579677%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.64, ELBO=1223971.63, deltaELBO=5421.616 (0.04032324%), Factors=10
+Iteration 13: time=1.63, ELBO=1225304.33, deltaELBO=1332.699 (0.00991194%), Factors=10
+Iteration 14: time=1.64, ELBO=1225841.43, deltaELBO=537.106 (0.00399472%), Factors=10
+Iteration 15: time=1.64, ELBO=1226165.50, deltaELBO=324.069 (0.00241026%), Factors=10
+Iteration 16: time=1.65, ELBO=1226399.27, deltaELBO=233.772 (0.00173868%), Factors=10
+Iteration 17: time=1.66, ELBO=1226588.17, deltaELBO=188.900 (0.00140494%), Factors=10
+Iteration 18: time=1.66, ELBO=1226751.82, deltaELBO=163.649 (0.00121714%), Factors=10
+Iteration 19: time=1.70, ELBO=1226899.37, deltaELBO=147.547 (0.00109738%), Factors=10
+Optimising sigma node...
+Iteration 20: time=22.06, ELBO=1228525.90, deltaELBO=1626.532 (0.01209733%), Factors=10
+Iteration 21: time=1.90, ELBO=1228312.09, deltaELBO=-213.808 (0.00159019%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.90, ELBO=1228500.64, deltaELBO=188.544 (0.00140230%), Factors=10
+Iteration 23: time=1.93, ELBO=1228612.44, deltaELBO=111.799 (0.00083151%), Factors=10
+Iteration 24: time=1.95, ELBO=1228713.79, deltaELBO=101.358 (0.00075385%), Factors=10
+Iteration 25: time=1.96, ELBO=1228806.85, deltaELBO=93.060 (0.00069213%), Factors=10
+Iteration 26: time=2.02, ELBO=1228893.58, deltaELBO=86.722 (0.00064499%), Factors=10
+Iteration 27: time=2.02, ELBO=1228975.29, deltaELBO=81.717 (0.00060777%), Factors=10
+Iteration 28: time=2.06, ELBO=1229053.16, deltaELBO=77.870 (0.00057916%), Factors=10
+Iteration 29: time=2.09, ELBO=1229128.31, deltaELBO=75.144 (0.00055888%), Factors=10
+Optimising sigma node...
+Iteration 30: time=45.78, ELBO=1229203.79, deltaELBO=75.482 (0.00056140%), Factors=10
+Iteration 31: time=2.16, ELBO=1229322.85, deltaELBO=119.061 (0.00088552%), Factors=10
+Iteration 32: time=2.21, ELBO=1229394.15, deltaELBO=71.302 (0.00053031%), Factors=10
+Iteration 33: time=2.13, ELBO=1229464.79, deltaELBO=70.640 (0.00052539%), Factors=10
+Iteration 34: time=2.15, ELBO=1229534.75, deltaELBO=69.954 (0.00052028%), Factors=10
+Iteration 35: time=2.15, ELBO=1229603.80, deltaELBO=69.056 (0.00051360%), Factors=10
+Iteration 36: time=2.14, ELBO=1229671.72, deltaELBO=67.920 (0.00050515%), Factors=10
+Iteration 37: time=2.14, ELBO=1229737.98, deltaELBO=66.256 (0.00049278%), Factors=10
+Iteration 38: time=2.04, ELBO=1229802.07, deltaELBO=64.088 (0.00047665%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Heart_37_38_A3.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Heart_37_38_A3.hdf5...
+Processing Heart: 37_38_B1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=921 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -12403070.85 
+
+Iteration 1: time=0.62, ELBO=899344.12, deltaELBO=13302414.965 (107.25097943%), Factors=10
+Iteration 2: time=0.62, ELBO=921109.79, deltaELBO=21765.675 (0.17548618%), Factors=10
+Iteration 3: time=0.62, ELBO=925729.97, deltaELBO=4620.180 (0.03725029%), Factors=10
+Iteration 4: time=0.62, ELBO=926046.94, deltaELBO=316.969 (0.00255556%), Factors=10
+Iteration 5: time=0.62, ELBO=926096.17, deltaELBO=49.230 (0.00039692%), Factors=10
+Iteration 6: time=0.62, ELBO=926065.30, deltaELBO=-30.872 (0.00024890%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 7: time=0.62, ELBO=926038.14, deltaELBO=-27.160 (0.00021898%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 8: time=0.62, ELBO=926019.33, deltaELBO=-18.805 (0.00015161%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 9: time=0.62, ELBO=926007.86, deltaELBO=-11.469 (0.00009247%), Factors=10
+Warning, lower bound is decreasing...
+Optimising sigma node...
+Iteration 10: time=15.29, ELBO=936327.96, deltaELBO=10320.100 (0.08320600%), Factors=10
+Iteration 11: time=1.49, ELBO=928917.27, deltaELBO=-7410.693 (0.05974886%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.54, ELBO=930813.83, deltaELBO=1896.558 (0.01529103%), Factors=10
+Iteration 13: time=1.53, ELBO=931119.20, deltaELBO=305.368 (0.00246203%), Factors=10
+Iteration 14: time=1.53, ELBO=931212.82, deltaELBO=93.624 (0.00075484%), Factors=10
+Iteration 15: time=1.51, ELBO=931254.61, deltaELBO=41.791 (0.00033694%), Factors=10
+Iteration 16: time=1.50, ELBO=931280.83, deltaELBO=26.224 (0.00021143%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Heart_37_38_B1.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Heart_37_38_B1.hdf5...
+Processing Heart: 37_46_A3
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=1051 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -14631042.41 
+
+Iteration 1: time=0.78, ELBO=1365442.72, deltaELBO=15996485.124 (109.33250467%), Factors=10
+Iteration 2: time=0.78, ELBO=1424868.70, deltaELBO=59425.987 (0.40616372%), Factors=10
+Iteration 3: time=0.79, ELBO=1428003.15, deltaELBO=3134.450 (0.02142328%), Factors=10
+Iteration 4: time=0.78, ELBO=1430204.39, deltaELBO=2201.235 (0.01504497%), Factors=10
+Iteration 5: time=0.77, ELBO=1430901.63, deltaELBO=697.245 (0.00476552%), Factors=10
+Iteration 6: time=0.77, ELBO=1431142.00, deltaELBO=240.368 (0.00164286%), Factors=10
+Iteration 7: time=0.77, ELBO=1431396.32, deltaELBO=254.323 (0.00173824%), Factors=10
+Iteration 8: time=0.77, ELBO=1431664.27, deltaELBO=267.943 (0.00183133%), Factors=10
+Iteration 9: time=0.78, ELBO=1431944.87, deltaELBO=280.609 (0.00191790%), Factors=10
+Optimising sigma node...
+Iteration 10: time=24.80, ELBO=1448925.12, deltaELBO=16980.250 (0.11605632%), Factors=10
+Iteration 11: time=1.91, ELBO=1432941.68, deltaELBO=-15983.448 (0.10924340%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.91, ELBO=1435920.01, deltaELBO=2978.331 (0.02035625%), Factors=10
+Iteration 13: time=1.93, ELBO=1437193.58, deltaELBO=1273.571 (0.00870458%), Factors=10
+Iteration 14: time=1.93, ELBO=1437970.16, deltaELBO=776.582 (0.00530777%), Factors=10
+Iteration 15: time=1.90, ELBO=1438528.13, deltaELBO=557.966 (0.00381358%), Factors=10
+Iteration 16: time=1.93, ELBO=1438957.00, deltaELBO=428.875 (0.00293127%), Factors=10
+Iteration 17: time=1.91, ELBO=1439294.02, deltaELBO=337.017 (0.00230344%), Factors=10
+Iteration 18: time=1.93, ELBO=1439560.73, deltaELBO=266.708 (0.00182289%), Factors=10
+Iteration 19: time=4.36, ELBO=1439777.39, deltaELBO=216.667 (0.00148087%), Factors=10
+Optimising sigma node...
+Iteration 20: time=23.72, ELBO=1440823.73, deltaELBO=1046.334 (0.00715147%), Factors=10
+Iteration 21: time=1.96, ELBO=1440622.73, deltaELBO=-200.999 (0.00137379%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.90, ELBO=1440839.37, deltaELBO=216.639 (0.00148068%), Factors=10
+Iteration 23: time=2.04, ELBO=1441006.97, deltaELBO=167.607 (0.00114556%), Factors=10
+Iteration 24: time=2.07, ELBO=1441149.73, deltaELBO=142.759 (0.00097572%), Factors=10
+Iteration 25: time=2.04, ELBO=1441277.93, deltaELBO=128.195 (0.00087619%), Factors=10
+Iteration 26: time=2.08, ELBO=1441392.69, deltaELBO=114.764 (0.00078438%), Factors=10
+Iteration 27: time=2.09, ELBO=1441496.74, deltaELBO=104.050 (0.00071116%), Factors=10
+Iteration 28: time=2.14, ELBO=1441592.85, deltaELBO=96.105 (0.00065685%), Factors=10
+Iteration 29: time=2.22, ELBO=1441683.85, deltaELBO=91.008 (0.00062202%), Factors=10
+Optimising sigma node...
+Iteration 30: time=27.72, ELBO=1441008.04, deltaELBO=-675.818 (0.00461907%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 31: time=2.71, ELBO=1441138.94, deltaELBO=130.903 (0.00089470%), Factors=10
+Iteration 32: time=2.14, ELBO=1441245.95, deltaELBO=107.005 (0.00073136%), Factors=10
+Iteration 33: time=2.21, ELBO=1441345.51, deltaELBO=99.565 (0.00068050%), Factors=10
+Iteration 34: time=2.23, ELBO=1441440.84, deltaELBO=95.334 (0.00065159%), Factors=10
+Iteration 35: time=2.23, ELBO=1441532.29, deltaELBO=91.450 (0.00062504%), Factors=10
+Iteration 36: time=2.18, ELBO=1441618.68, deltaELBO=86.387 (0.00059044%), Factors=10
+Iteration 37: time=2.17, ELBO=1441699.13, deltaELBO=80.449 (0.00054985%), Factors=10
+Iteration 38: time=2.23, ELBO=1441773.82, deltaELBO=74.689 (0.00051048%), Factors=10
+Iteration 39: time=2.19, ELBO=1441841.65, deltaELBO=67.835 (0.00046364%), Factors=10
+Optimising sigma node...
+Iteration 40: time=25.45, ELBO=1442711.48, deltaELBO=869.824 (0.00594506%), Factors=10
+Iteration 41: time=2.25, ELBO=1442853.00, deltaELBO=141.526 (0.00096730%), Factors=10
+Iteration 42: time=2.21, ELBO=1442920.22, deltaELBO=67.214 (0.00045939%), Factors=10
+Iteration 43: time=2.96, ELBO=1442969.88, deltaELBO=49.663 (0.00033944%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Heart_37_46_A3.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Heart_37_46_A3.hdf5...
+Processing Heart: 37_46_B1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=1076 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -14967753.52 
+
+Iteration 1: time=1.93, ELBO=1234630.66, deltaELBO=16202384.185 (108.24860364%), Factors=10
+Iteration 2: time=0.79, ELBO=1289869.20, deltaELBO=55238.534 (0.36905026%), Factors=10
+Iteration 3: time=0.80, ELBO=1291686.41, deltaELBO=1817.210 (0.01214083%), Factors=10
+Iteration 4: time=0.81, ELBO=1292582.29, deltaELBO=895.887 (0.00598545%), Factors=10
+Iteration 5: time=0.80, ELBO=1294102.49, deltaELBO=1520.202 (0.01015651%), Factors=10
+Iteration 6: time=0.79, ELBO=1294230.83, deltaELBO=128.340 (0.00085744%), Factors=10
+Iteration 7: time=0.79, ELBO=1294350.92, deltaELBO=120.088 (0.00080231%), Factors=10
+Iteration 8: time=0.79, ELBO=1294474.79, deltaELBO=123.870 (0.00082758%), Factors=10
+Iteration 9: time=0.80, ELBO=1294597.48, deltaELBO=122.688 (0.00081968%), Factors=10
+Optimising sigma node...
+Iteration 10: time=28.31, ELBO=1308742.51, deltaELBO=14145.031 (0.09450337%), Factors=10
+Iteration 11: time=1.36, ELBO=1293722.39, deltaELBO=-15020.121 (0.10034987%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.36, ELBO=1296236.02, deltaELBO=2513.634 (0.01679366%), Factors=10
+Iteration 13: time=1.35, ELBO=1297082.45, deltaELBO=846.430 (0.00565502%), Factors=10
+Iteration 14: time=1.35, ELBO=1297617.68, deltaELBO=535.228 (0.00357587%), Factors=10
+Iteration 15: time=1.35, ELBO=1298008.83, deltaELBO=391.144 (0.00261325%), Factors=10
+Iteration 16: time=1.34, ELBO=1298312.94, deltaELBO=304.113 (0.00203179%), Factors=10
+Iteration 17: time=1.35, ELBO=1298558.66, deltaELBO=245.719 (0.00164166%), Factors=10
+Iteration 18: time=1.37, ELBO=1298757.98, deltaELBO=199.326 (0.00133170%), Factors=10
+Iteration 19: time=1.38, ELBO=1298920.38, deltaELBO=162.392 (0.00108495%), Factors=10
+Optimising sigma node...
+Iteration 20: time=24.75, ELBO=1299106.87, deltaELBO=186.494 (0.00124597%), Factors=10
+Iteration 21: time=1.40, ELBO=1298792.93, deltaELBO=-313.936 (0.00209742%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.41, ELBO=1298954.72, deltaELBO=161.789 (0.00108092%), Factors=10
+Iteration 23: time=1.36, ELBO=1299083.52, deltaELBO=128.803 (0.00086054%), Factors=10
+Iteration 24: time=1.36, ELBO=1299190.77, deltaELBO=107.245 (0.00071651%), Factors=10
+Iteration 25: time=1.36, ELBO=1299281.74, deltaELBO=90.974 (0.00060780%), Factors=10
+Iteration 26: time=1.35, ELBO=1299360.75, deltaELBO=79.011 (0.00052787%), Factors=10
+Iteration 27: time=1.55, ELBO=1299429.37, deltaELBO=68.611 (0.00045840%), Factors=10
+Iteration 28: time=1.34, ELBO=1299489.78, deltaELBO=60.410 (0.00040360%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Heart_37_46_B1.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Heart_37_46_B1.hdf5...
+Processing Spleen: 37_46_A1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=918 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -12534646.13 
+
+Iteration 1: time=0.62, ELBO=639023.75, deltaELBO=13173669.889 (105.09805979%), Factors=10
+Iteration 2: time=0.59, ELBO=696917.39, deltaELBO=57893.637 (0.46186894%), Factors=10
+Iteration 3: time=0.61, ELBO=697078.23, deltaELBO=160.835 (0.00128312%), Factors=10
+Iteration 4: time=0.61, ELBO=697248.56, deltaELBO=170.334 (0.00135891%), Factors=10
+Iteration 5: time=0.60, ELBO=697693.94, deltaELBO=445.375 (0.00355316%), Factors=10
+Iteration 6: time=0.61, ELBO=698931.26, deltaELBO=1237.328 (0.00987127%), Factors=10
+Iteration 7: time=0.59, ELBO=699105.13, deltaELBO=173.867 (0.00138709%), Factors=10
+Iteration 8: time=0.60, ELBO=699227.09, deltaELBO=121.959 (0.00097297%), Factors=10
+Iteration 9: time=0.61, ELBO=699335.71, deltaELBO=108.619 (0.00086655%), Factors=10
+Optimising sigma node...
+Iteration 10: time=10.29, ELBO=711714.18, deltaELBO=12378.470 (0.09875405%), Factors=10
+Iteration 11: time=1.52, ELBO=688809.31, deltaELBO=-22904.872 (0.18273250%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.55, ELBO=690533.54, deltaELBO=1724.236 (0.01375576%), Factors=10
+Iteration 13: time=1.57, ELBO=691314.84, deltaELBO=781.300 (0.00623312%), Factors=10
+Iteration 14: time=1.55, ELBO=691847.88, deltaELBO=533.035 (0.00425249%), Factors=10
+Iteration 15: time=1.55, ELBO=692242.67, deltaELBO=394.789 (0.00314958%), Factors=10
+Iteration 16: time=1.53, ELBO=692544.55, deltaELBO=301.877 (0.00240834%), Factors=10
+Iteration 17: time=1.54, ELBO=692779.06, deltaELBO=234.519 (0.00187097%), Factors=10
+Iteration 18: time=1.53, ELBO=692963.72, deltaELBO=184.656 (0.00147316%), Factors=10
+Iteration 19: time=1.54, ELBO=693110.36, deltaELBO=146.643 (0.00116990%), Factors=10
+Optimising sigma node...
+Iteration 20: time=11.50, ELBO=693252.99, deltaELBO=142.630 (0.00113788%), Factors=10
+Iteration 21: time=1.56, ELBO=690927.21, deltaELBO=-2325.783 (0.01855483%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.55, ELBO=691055.07, deltaELBO=127.856 (0.00102002%), Factors=10
+Iteration 23: time=1.56, ELBO=691150.43, deltaELBO=95.363 (0.00076080%), Factors=10
+Iteration 24: time=1.56, ELBO=691225.15, deltaELBO=74.719 (0.00059610%), Factors=10
+Iteration 25: time=1.57, ELBO=691283.81, deltaELBO=58.662 (0.00046800%), Factors=10
+Iteration 26: time=1.57, ELBO=691330.51, deltaELBO=46.701 (0.00037257%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Spleen_37_46_A1.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Spleen_37_46_A1.hdf5...
+Processing Spleen: 37_46_A2
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=895 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -12389459.65 
+
+Iteration 1: time=0.59, ELBO=476174.41, deltaELBO=12865634.056 (103.84338320%), Factors=10
+Iteration 2: time=0.59, ELBO=520021.78, deltaELBO=43847.368 (0.35390864%), Factors=10
+Iteration 3: time=0.59, ELBO=520491.53, deltaELBO=469.748 (0.00379151%), Factors=10
+Iteration 4: time=0.59, ELBO=521315.54, deltaELBO=824.017 (0.00665095%), Factors=10
+Iteration 5: time=0.60, ELBO=521472.13, deltaELBO=156.583 (0.00126384%), Factors=10
+Iteration 6: time=0.59, ELBO=521510.45, deltaELBO=38.318 (0.00030928%), Factors=10
+Iteration 7: time=0.59, ELBO=521561.47, deltaELBO=51.025 (0.00041185%), Factors=10
+Iteration 8: time=0.58, ELBO=521623.97, deltaELBO=62.498 (0.00050444%), Factors=10
+Iteration 9: time=0.58, ELBO=521691.32, deltaELBO=67.355 (0.00054365%), Factors=10
+Optimising sigma node...
+Iteration 10: time=17.45, ELBO=534026.76, deltaELBO=12335.433 (0.09956393%), Factors=10
+Iteration 11: time=1.57, ELBO=508833.01, deltaELBO=-25193.742 (0.20334819%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.56, ELBO=511431.36, deltaELBO=2598.348 (0.02097224%), Factors=10
+Iteration 13: time=1.56, ELBO=512400.95, deltaELBO=969.583 (0.00782587%), Factors=10
+Iteration 14: time=1.57, ELBO=513010.83, deltaELBO=609.889 (0.00492264%), Factors=10
+Iteration 15: time=1.59, ELBO=513438.29, deltaELBO=427.457 (0.00345016%), Factors=10
+Iteration 16: time=1.58, ELBO=513749.93, deltaELBO=311.637 (0.00251534%), Factors=10
+Iteration 17: time=1.60, ELBO=513982.65, deltaELBO=232.724 (0.00187841%), Factors=10
+Iteration 18: time=1.61, ELBO=514160.13, deltaELBO=177.478 (0.00143249%), Factors=10
+Iteration 19: time=1.63, ELBO=514295.83, deltaELBO=135.700 (0.00109529%), Factors=10
+Optimising sigma node...
+Iteration 20: time=22.07, ELBO=514412.86, deltaELBO=117.031 (0.00094460%), Factors=10
+Iteration 21: time=1.64, ELBO=514181.98, deltaELBO=-230.881 (0.00186353%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.63, ELBO=514253.06, deltaELBO=71.075 (0.00057367%), Factors=10
+Iteration 23: time=1.66, ELBO=514307.51, deltaELBO=54.452 (0.00043950%), Factors=10
+Iteration 24: time=1.66, ELBO=514350.28, deltaELBO=42.770 (0.00034521%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Spleen_37_46_A2.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Spleen_37_46_A2.hdf5...
+Processing Spleen: 37_38_A1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=666 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -9209205.16 
+
+Iteration 1: time=0.35, ELBO=179876.52, deltaELBO=9389081.679 (101.95322523%), Factors=10
+Iteration 2: time=0.35, ELBO=212407.84, deltaELBO=32531.319 (0.35324785%), Factors=10
+Iteration 3: time=0.35, ELBO=214293.04, deltaELBO=1885.198 (0.02047081%), Factors=10
+Iteration 4: time=0.34, ELBO=218378.27, deltaELBO=4085.233 (0.04436032%), Factors=10
+Iteration 5: time=0.34, ELBO=218936.21, deltaELBO=557.945 (0.00605856%), Factors=10
+Iteration 6: time=0.35, ELBO=219333.10, deltaELBO=396.888 (0.00430969%), Factors=10
+Iteration 7: time=0.35, ELBO=219692.83, deltaELBO=359.730 (0.00390620%), Factors=10
+Iteration 8: time=0.36, ELBO=220024.96, deltaELBO=332.124 (0.00360643%), Factors=10
+Iteration 9: time=0.34, ELBO=220328.07, deltaELBO=303.117 (0.00329146%), Factors=10
+Optimising sigma node...
+Iteration 10: time=7.16, ELBO=227329.35, deltaELBO=7001.279 (0.07602479%), Factors=10
+Iteration 11: time=0.52, ELBO=210673.46, deltaELBO=-16655.895 (0.18086137%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=0.52, ELBO=214088.66, deltaELBO=3415.207 (0.03708471%), Factors=10
+Iteration 13: time=0.52, ELBO=215031.25, deltaELBO=942.581 (0.01023521%), Factors=10
+Iteration 14: time=0.53, ELBO=215569.17, deltaELBO=537.922 (0.00584113%), Factors=10
+Iteration 15: time=0.51, ELBO=215963.92, deltaELBO=394.758 (0.00428655%), Factors=10
+Iteration 16: time=0.52, ELBO=216283.19, deltaELBO=319.269 (0.00346684%), Factors=10
+Iteration 17: time=0.52, ELBO=216553.01, deltaELBO=269.816 (0.00292986%), Factors=10
+Iteration 18: time=0.52, ELBO=216783.48, deltaELBO=230.473 (0.00250264%), Factors=10
+Iteration 19: time=0.53, ELBO=216978.93, deltaELBO=195.450 (0.00212233%), Factors=10
+Optimising sigma node...
+Iteration 20: time=18.66, ELBO=217187.96, deltaELBO=209.029 (0.00226978%), Factors=10
+Iteration 21: time=0.53, ELBO=216093.31, deltaELBO=-1094.653 (0.01188651%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=0.51, ELBO=216264.51, deltaELBO=171.204 (0.00185905%), Factors=10
+Iteration 23: time=0.50, ELBO=216377.70, deltaELBO=113.191 (0.00122911%), Factors=10
+Iteration 24: time=0.52, ELBO=216459.50, deltaELBO=81.791 (0.00088815%), Factors=10
+Iteration 25: time=0.50, ELBO=216519.29, deltaELBO=59.792 (0.00064927%), Factors=10
+Iteration 26: time=0.51, ELBO=216564.05, deltaELBO=44.760 (0.00048604%), Factors=10
+Iteration 27: time=0.51, ELBO=216597.22, deltaELBO=33.176 (0.00036025%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Spleen_37_38_A1.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Spleen_37_38_A1.hdf5...
+Processing Spleen: 37_38_A2
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=805 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -10929840.33 
+
+Iteration 1: time=0.49, ELBO=-142080.53, deltaELBO=10787759.795 (98.70006762%), Factors=10
+Iteration 2: time=0.48, ELBO=-125882.96, deltaELBO=16197.571 (0.14819586%), Factors=10
+Iteration 3: time=0.48, ELBO=-124906.83, deltaELBO=976.138 (0.00893094%), Factors=10
+Iteration 4: time=0.48, ELBO=-124745.31, deltaELBO=161.511 (0.00147770%), Factors=10
+Iteration 5: time=0.49, ELBO=-124589.11, deltaELBO=156.204 (0.00142915%), Factors=10
+Iteration 6: time=0.48, ELBO=-124430.33, deltaELBO=158.784 (0.00145276%), Factors=10
+Iteration 7: time=0.47, ELBO=-124268.28, deltaELBO=162.049 (0.00148263%), Factors=10
+Iteration 8: time=0.49, ELBO=-124105.21, deltaELBO=163.070 (0.00149197%), Factors=10
+Iteration 9: time=0.48, ELBO=-123948.49, deltaELBO=156.722 (0.00143389%), Factors=10
+Optimising sigma node...
+Iteration 10: time=13.37, ELBO=-118978.11, deltaELBO=4970.373 (0.04547526%), Factors=10
+Iteration 11: time=0.62, ELBO=-125998.39, deltaELBO=-7020.275 (0.06423035%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=0.63, ELBO=-124400.91, deltaELBO=1597.483 (0.01461579%), Factors=10
+Iteration 13: time=0.64, ELBO=-123923.37, deltaELBO=477.531 (0.00436906%), Factors=10
+Iteration 14: time=0.64, ELBO=-123671.49, deltaELBO=251.884 (0.00230455%), Factors=10
+Iteration 15: time=0.62, ELBO=-123508.10, deltaELBO=163.393 (0.00149492%), Factors=10
+Iteration 16: time=0.64, ELBO=-123391.79, deltaELBO=116.308 (0.00106413%), Factors=10
+Iteration 17: time=0.63, ELBO=-123306.17, deltaELBO=85.618 (0.00078334%), Factors=10
+Iteration 18: time=0.61, ELBO=-123241.57, deltaELBO=64.601 (0.00059105%), Factors=10
+Iteration 19: time=0.63, ELBO=-123193.53, deltaELBO=48.038 (0.00043951%), Factors=10
+Optimising sigma node...
+Iteration 20: time=13.83, ELBO=-123124.95, deltaELBO=68.588 (0.00062753%), Factors=10
+Iteration 21: time=0.64, ELBO=-123346.81, deltaELBO=-221.866 (0.00202992%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=0.65, ELBO=-123308.17, deltaELBO=38.643 (0.00035356%), Factors=10
+Iteration 23: time=0.65, ELBO=-123284.30, deltaELBO=23.867 (0.00021837%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Spleen_37_38_A2.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Spleen_37_38_A2.hdf5...
+Processing Brain: 37_46_C2
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=857 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -12221080.18 
+
+Iteration 1: time=0.55, ELBO=693906.01, deltaELBO=12914986.197 (105.67794339%), Factors=10
+Iteration 2: time=0.53, ELBO=763041.53, deltaELBO=69135.514 (0.56570707%), Factors=10
+Iteration 3: time=0.53, ELBO=767720.92, deltaELBO=4679.388 (0.03828948%), Factors=10
+Iteration 4: time=0.54, ELBO=768249.95, deltaELBO=529.030 (0.00432883%), Factors=10
+Iteration 5: time=0.52, ELBO=768665.70, deltaELBO=415.755 (0.00340195%), Factors=10
+Iteration 6: time=0.55, ELBO=769022.44, deltaELBO=356.742 (0.00291907%), Factors=10
+Iteration 7: time=0.54, ELBO=769337.97, deltaELBO=315.529 (0.00258184%), Factors=10
+Iteration 8: time=0.55, ELBO=769635.14, deltaELBO=297.162 (0.00243155%), Factors=10
+Iteration 9: time=3.28, ELBO=770219.55, deltaELBO=584.418 (0.00478205%), Factors=10
+Optimising sigma node...
+Iteration 10: time=22.02, ELBO=789777.96, deltaELBO=19558.405 (0.16003827%), Factors=10
+Iteration 11: time=2.22, ELBO=755299.61, deltaELBO=-34478.349 (0.28212194%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.23, ELBO=762512.06, deltaELBO=7212.448 (0.05901645%), Factors=10
+Iteration 13: time=1.23, ELBO=764344.94, deltaELBO=1832.880 (0.01499769%), Factors=10
+Iteration 14: time=1.22, ELBO=765226.67, deltaELBO=881.728 (0.00721481%), Factors=10
+Iteration 15: time=1.22, ELBO=765797.41, deltaELBO=570.740 (0.00467013%), Factors=10
+Iteration 16: time=1.23, ELBO=766223.47, deltaELBO=426.060 (0.00348627%), Factors=10
+Iteration 17: time=1.21, ELBO=766569.66, deltaELBO=346.196 (0.00283278%), Factors=10
+Iteration 18: time=1.21, ELBO=766865.37, deltaELBO=295.712 (0.00241969%), Factors=10
+Iteration 19: time=1.20, ELBO=767126.35, deltaELBO=260.972 (0.00213543%), Factors=10
+Optimising sigma node...
+Iteration 20: time=20.24, ELBO=768724.82, deltaELBO=1598.472 (0.01307963%), Factors=10
+Iteration 21: time=1.47, ELBO=767282.11, deltaELBO=-1442.704 (0.01180505%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.47, ELBO=767567.13, deltaELBO=285.019 (0.00233219%), Factors=10
+Iteration 23: time=1.47, ELBO=767793.75, deltaELBO=226.616 (0.00185430%), Factors=10
+Iteration 24: time=1.48, ELBO=767994.81, deltaELBO=201.063 (0.00164521%), Factors=10
+Iteration 25: time=1.47, ELBO=768176.47, deltaELBO=181.656 (0.00148642%), Factors=10
+Iteration 26: time=1.45, ELBO=768340.34, deltaELBO=163.871 (0.00134089%), Factors=10
+Iteration 27: time=1.45, ELBO=768489.57, deltaELBO=149.234 (0.00122112%), Factors=10
+Iteration 28: time=1.47, ELBO=768625.99, deltaELBO=136.418 (0.00111625%), Factors=10
+Iteration 29: time=1.46, ELBO=768751.73, deltaELBO=125.743 (0.00102891%), Factors=10
+Optimising sigma node...
+Iteration 30: time=21.93, ELBO=768229.01, deltaELBO=-522.721 (0.00427721%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 31: time=1.42, ELBO=767185.47, deltaELBO=-1043.545 (0.00853889%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 32: time=1.41, ELBO=767342.40, deltaELBO=156.928 (0.00128407%), Factors=10
+Iteration 33: time=1.37, ELBO=767479.27, deltaELBO=136.877 (0.00112001%), Factors=10
+Iteration 34: time=1.39, ELBO=767600.47, deltaELBO=121.197 (0.00099170%), Factors=10
+Iteration 35: time=1.43, ELBO=767708.81, deltaELBO=108.343 (0.00088652%), Factors=10
+Iteration 36: time=1.45, ELBO=767806.44, deltaELBO=97.625 (0.00079882%), Factors=10
+Iteration 37: time=1.47, ELBO=767893.61, deltaELBO=87.172 (0.00071329%), Factors=10
+Iteration 38: time=1.50, ELBO=767972.44, deltaELBO=78.828 (0.00064502%), Factors=10
+Iteration 39: time=1.53, ELBO=768042.90, deltaELBO=70.460 (0.00057654%), Factors=10
+Optimising sigma node...
+Iteration 40: time=21.91, ELBO=768764.10, deltaELBO=721.206 (0.00590132%), Factors=10
+Iteration 41: time=1.57, ELBO=768682.03, deltaELBO=-82.074 (0.00067157%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 42: time=1.59, ELBO=768736.15, deltaELBO=54.119 (0.00044283%), Factors=10
+Iteration 43: time=1.61, ELBO=768784.24, deltaELBO=48.088 (0.00039348%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Brain_37_46_C2.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Brain_37_46_C2.hdf5...
+Processing Brain: 37_46_C3
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=1023 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -14872071.80 
+
+Iteration 1: time=0.79, ELBO=959219.23, deltaELBO=15831291.025 (106.44980229%), Factors=10
+Iteration 2: time=0.78, ELBO=1046940.81, deltaELBO=87721.581 (0.58984102%), Factors=10
+Iteration 3: time=0.78, ELBO=1055102.20, deltaELBO=8161.389 (0.05487728%), Factors=10
+Iteration 4: time=0.78, ELBO=1055881.43, deltaELBO=779.230 (0.00523955%), Factors=10
+Iteration 5: time=0.78, ELBO=1056506.10, deltaELBO=624.674 (0.00420032%), Factors=10
+Iteration 6: time=0.77, ELBO=1057056.61, deltaELBO=550.507 (0.00370162%), Factors=10
+Iteration 7: time=0.78, ELBO=1057551.17, deltaELBO=494.566 (0.00332547%), Factors=10
+Iteration 8: time=0.78, ELBO=1058005.04, deltaELBO=453.870 (0.00305183%), Factors=10
+Iteration 9: time=0.77, ELBO=1058421.72, deltaELBO=416.672 (0.00280171%), Factors=10
+Optimising sigma node...
+Iteration 10: time=31.90, ELBO=1083913.78, deltaELBO=25492.060 (0.17140894%), Factors=10
+Iteration 11: time=2.12, ELBO=1042873.60, deltaELBO=-41040.177 (0.27595467%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=2.12, ELBO=1049320.56, deltaELBO=6446.958 (0.04334943%), Factors=10
+Iteration 13: time=2.11, ELBO=1051282.69, deltaELBO=1962.131 (0.01319340%), Factors=10
+Iteration 14: time=2.08, ELBO=1052400.69, deltaELBO=1118.006 (0.00751749%), Factors=10
+Iteration 15: time=2.09, ELBO=1053175.95, deltaELBO=775.259 (0.00521285%), Factors=10
+Iteration 16: time=2.08, ELBO=1053767.30, deltaELBO=591.341 (0.00397619%), Factors=10
+Iteration 17: time=2.07, ELBO=1054247.47, deltaELBO=480.179 (0.00322873%), Factors=10
+Iteration 18: time=2.09, ELBO=1054653.51, deltaELBO=406.033 (0.00273017%), Factors=10
+Iteration 19: time=2.11, ELBO=1055004.78, deltaELBO=351.275 (0.00236197%), Factors=10
+Optimising sigma node...
+Iteration 20: time=31.97, ELBO=1053800.86, deltaELBO=-1203.926 (0.00809522%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 21: time=1.81, ELBO=1052227.04, deltaELBO=-1573.817 (0.01058237%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.85, ELBO=1052658.66, deltaELBO=431.622 (0.00290223%), Factors=10
+Iteration 23: time=1.82, ELBO=1053020.19, deltaELBO=361.534 (0.00243096%), Factors=10
+Iteration 24: time=1.84, ELBO=1053337.46, deltaELBO=317.261 (0.00213327%), Factors=10
+Iteration 25: time=1.82, ELBO=1053617.77, deltaELBO=280.313 (0.00188483%), Factors=10
+Iteration 26: time=1.86, ELBO=1053864.50, deltaELBO=246.735 (0.00165905%), Factors=10
+Iteration 27: time=1.84, ELBO=1054084.04, deltaELBO=219.537 (0.00147617%), Factors=10
+Iteration 28: time=1.86, ELBO=1054279.78, deltaELBO=195.741 (0.00131617%), Factors=10
+Iteration 29: time=1.85, ELBO=1054454.90, deltaELBO=175.116 (0.00117748%), Factors=10
+Optimising sigma node...
+Iteration 30: time=31.09, ELBO=1056949.04, deltaELBO=2494.143 (0.01677065%), Factors=10
+Iteration 31: time=2.26, ELBO=1056439.74, deltaELBO=-509.298 (0.00342453%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 32: time=2.29, ELBO=1056591.64, deltaELBO=151.901 (0.00102139%), Factors=10
+Iteration 33: time=2.28, ELBO=1056727.92, deltaELBO=136.273 (0.00091630%), Factors=10
+Iteration 34: time=2.37, ELBO=1056850.38, deltaELBO=122.463 (0.00082345%), Factors=10
+Iteration 35: time=2.37, ELBO=1056960.79, deltaELBO=110.407 (0.00074238%), Factors=10
+Iteration 36: time=2.39, ELBO=1057061.63, deltaELBO=100.844 (0.00067808%), Factors=10
+Iteration 37: time=2.38, ELBO=1057151.99, deltaELBO=90.355 (0.00060755%), Factors=10
+Iteration 38: time=2.45, ELBO=1057233.94, deltaELBO=81.949 (0.00055102%), Factors=10
+Iteration 39: time=2.39, ELBO=1057308.17, deltaELBO=74.237 (0.00049917%), Factors=10
+Optimising sigma node...
+Iteration 40: time=35.25, ELBO=1056608.38, deltaELBO=-699.797 (0.00470544%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 41: time=3.72, ELBO=1056482.98, deltaELBO=-125.399 (0.00084319%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 42: time=2.35, ELBO=1056543.85, deltaELBO=60.869 (0.00040929%), Factors=10
+Iteration 43: time=2.33, ELBO=1056599.18, deltaELBO=55.335 (0.00037207%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Brain_37_46_C3.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Brain_37_46_C3.hdf5...
+Processing Liver: 37_38_B2
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=966 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -13568117.22 
+
+Iteration 1: time=0.65, ELBO=521772.45, deltaELBO=14089889.673 (103.84557741%), Factors=10
+Iteration 2: time=0.65, ELBO=554969.67, deltaELBO=33197.222 (0.24467081%), Factors=10
+Iteration 3: time=0.66, ELBO=558771.27, deltaELBO=3801.601 (0.02801863%), Factors=10
+Iteration 4: time=0.65, ELBO=559133.85, deltaELBO=362.577 (0.00267227%), Factors=10
+Iteration 5: time=0.65, ELBO=559316.40, deltaELBO=182.546 (0.00134540%), Factors=10
+Iteration 6: time=0.66, ELBO=559474.11, deltaELBO=157.713 (0.00116238%), Factors=10
+Iteration 7: time=0.66, ELBO=559615.01, deltaELBO=140.897 (0.00103845%), Factors=10
+Iteration 8: time=0.66, ELBO=559744.89, deltaELBO=129.878 (0.00095723%), Factors=10
+Iteration 9: time=0.65, ELBO=559866.33, deltaELBO=121.440 (0.00089504%), Factors=10
+Optimising sigma node...
+Iteration 10: time=12.80, ELBO=572723.63, deltaELBO=12857.304 (0.09476115%), Factors=10
+Iteration 11: time=1.76, ELBO=549359.57, deltaELBO=-23364.056 (0.17219821%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.77, ELBO=552613.30, deltaELBO=3253.728 (0.02398069%), Factors=10
+Iteration 13: time=1.76, ELBO=553569.13, deltaELBO=955.830 (0.00704467%), Factors=10
+Iteration 14: time=1.79, ELBO=554066.82, deltaELBO=497.691 (0.00366809%), Factors=10
+Iteration 15: time=1.80, ELBO=554368.36, deltaELBO=301.536 (0.00222239%), Factors=10
+Iteration 16: time=1.78, ELBO=554570.35, deltaELBO=201.990 (0.00148871%), Factors=10
+Iteration 17: time=1.76, ELBO=554719.34, deltaELBO=148.989 (0.00109808%), Factors=10
+Iteration 18: time=1.77, ELBO=554836.08, deltaELBO=116.739 (0.00086039%), Factors=10
+Iteration 19: time=1.75, ELBO=554933.74, deltaELBO=97.663 (0.00071980%), Factors=10
+Optimising sigma node...
+Iteration 20: time=14.96, ELBO=555042.73, deltaELBO=108.992 (0.00080330%), Factors=10
+Iteration 21: time=1.82, ELBO=553555.60, deltaELBO=-1487.131 (0.01096048%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.78, ELBO=553648.46, deltaELBO=92.855 (0.00068436%), Factors=10
+Iteration 23: time=1.81, ELBO=553720.73, deltaELBO=72.274 (0.00053267%), Factors=10
+Iteration 24: time=1.80, ELBO=553785.36, deltaELBO=64.631 (0.00047634%), Factors=10
+Iteration 25: time=1.78, ELBO=553844.60, deltaELBO=59.237 (0.00043659%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Liver_37_38_B2.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Liver_37_38_B2.hdf5...
+Processing Liver: 37_46_B2
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=533 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -7463282.34 
+
+Iteration 1: time=0.25, ELBO=378896.27, deltaELBO=7842178.608 (105.07680471%), Factors=10
+Iteration 2: time=0.25, ELBO=435977.37, deltaELBO=57081.102 (0.76482571%), Factors=10
+Iteration 3: time=0.25, ELBO=436640.82, deltaELBO=663.448 (0.00888950%), Factors=10
+Iteration 4: time=0.25, ELBO=436736.75, deltaELBO=95.935 (0.00128543%), Factors=10
+Iteration 5: time=0.25, ELBO=436832.99, deltaELBO=96.232 (0.00128940%), Factors=10
+Iteration 6: time=0.24, ELBO=436923.70, deltaELBO=90.716 (0.00121550%), Factors=10
+Iteration 7: time=0.24, ELBO=437010.66, deltaELBO=86.960 (0.00116517%), Factors=10
+Iteration 8: time=0.24, ELBO=437094.59, deltaELBO=83.929 (0.00112456%), Factors=10
+Iteration 9: time=0.24, ELBO=437175.73, deltaELBO=81.143 (0.00108723%), Factors=10
+Optimising sigma node...
+Iteration 10: time=3.49, ELBO=443972.52, deltaELBO=6796.788 (0.09106969%), Factors=10
+Iteration 11: time=0.53, ELBO=426108.51, deltaELBO=-17864.016 (0.23935870%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=0.53, ELBO=428239.27, deltaELBO=2130.760 (0.02854991%), Factors=10
+Iteration 13: time=0.55, ELBO=428773.80, deltaELBO=534.538 (0.00716223%), Factors=10
+Iteration 14: time=0.54, ELBO=429145.52, deltaELBO=371.714 (0.00498057%), Factors=10
+Iteration 15: time=0.54, ELBO=429441.22, deltaELBO=295.697 (0.00396203%), Factors=10
+Iteration 16: time=0.55, ELBO=429677.67, deltaELBO=236.449 (0.00316817%), Factors=10
+Iteration 17: time=0.55, ELBO=429871.59, deltaELBO=193.927 (0.00259841%), Factors=10
+Iteration 18: time=0.55, ELBO=430037.83, deltaELBO=166.241 (0.00222745%), Factors=10
+Iteration 19: time=0.54, ELBO=430188.98, deltaELBO=151.151 (0.00202526%), Factors=10
+Optimising sigma node...
+Iteration 20: time=3.32, ELBO=429143.27, deltaELBO=-1045.713 (0.01401144%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 21: time=0.44, ELBO=426824.96, deltaELBO=-2318.312 (0.03106291%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=0.44, ELBO=426982.31, deltaELBO=157.354 (0.00210837%), Factors=10
+Iteration 23: time=0.44, ELBO=427080.75, deltaELBO=98.441 (0.00131901%), Factors=10
+Iteration 24: time=0.44, ELBO=427144.89, deltaELBO=64.141 (0.00085942%), Factors=10
+Iteration 25: time=0.44, ELBO=427187.75, deltaELBO=42.856 (0.00057422%), Factors=10
+Iteration 26: time=0.45, ELBO=427220.06, deltaELBO=32.315 (0.00043298%), Factors=10
+Iteration 27: time=0.45, ELBO=427246.34, deltaELBO=26.274 (0.00035204%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Warning: Output file out/models/mofa_model_Liver_37_46_B2.hdf5 already exists, it will be replaced
+Saving model in out/models/mofa_model_Liver_37_46_B2.hdf5...
+Processing Kidney: 37_38_B3
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=884 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -12234212.33 
+
+Iteration 1: time=0.56, ELBO=212866.01, deltaELBO=12447078.340 (101.73992411%), Factors=10
+Iteration 2: time=0.55, ELBO=288455.98, deltaELBO=75589.974 (0.61785730%), Factors=10
+Iteration 3: time=0.53, ELBO=299119.62, deltaELBO=10663.634 (0.08716241%), Factors=10
+Iteration 4: time=0.54, ELBO=302652.71, deltaELBO=3533.093 (0.02887880%), Factors=10
+Iteration 5: time=0.55, ELBO=303540.24, deltaELBO=887.526 (0.00725446%), Factors=10
+Iteration 6: time=0.56, ELBO=304328.38, deltaELBO=788.140 (0.00644210%), Factors=10
+Iteration 7: time=0.54, ELBO=305057.64, deltaELBO=729.264 (0.00596085%), Factors=10
+Iteration 8: time=0.57, ELBO=305715.38, deltaELBO=657.741 (0.00537624%), Factors=10
+Iteration 9: time=0.55, ELBO=306293.26, deltaELBO=577.874 (0.00472342%), Factors=10
+Optimising sigma node...
+Iteration 10: time=19.23, ELBO=327327.84, deltaELBO=21034.580 (0.17193244%), Factors=10
+Iteration 11: time=1.48, ELBO=244750.04, deltaELBO=-82577.791 (0.67497432%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.50, ELBO=258163.96, deltaELBO=13413.915 (0.10964266%), Factors=10
+Iteration 13: time=1.49, ELBO=261170.01, deltaELBO=3006.051 (0.02457086%), Factors=10
+Iteration 14: time=1.49, ELBO=262677.47, deltaELBO=1507.464 (0.01232171%), Factors=10
+Iteration 15: time=1.51, ELBO=263686.32, deltaELBO=1008.849 (0.00824613%), Factors=10
+Iteration 16: time=1.53, ELBO=264452.43, deltaELBO=766.102 (0.00626196%), Factors=10
+Iteration 17: time=1.54, ELBO=265075.18, deltaELBO=622.751 (0.00509024%), Factors=10
+Iteration 18: time=1.51, ELBO=265597.88, deltaELBO=522.700 (0.00427245%), Factors=10
+Iteration 19: time=1.53, ELBO=266045.93, deltaELBO=448.049 (0.00366227%), Factors=10
+Optimising sigma node...
+Iteration 20: time=19.06, ELBO=266837.00, deltaELBO=791.072 (0.00646606%), Factors=10
+Iteration 21: time=1.53, ELBO=269204.93, deltaELBO=2367.933 (0.01935501%), Factors=10
+Iteration 22: time=1.50, ELBO=271198.54, deltaELBO=1993.614 (0.01629540%), Factors=10
+Iteration 23: time=1.52, ELBO=276336.37, deltaELBO=5137.821 (0.04199552%), Factors=10
+Iteration 24: time=1.54, ELBO=282879.68, deltaELBO=6543.315 (0.05348375%), Factors=10
+Iteration 25: time=1.53, ELBO=285967.58, deltaELBO=3087.903 (0.02523990%), Factors=10
+Iteration 26: time=1.53, ELBO=287812.60, deltaELBO=1845.019 (0.01508082%), Factors=10
+Iteration 27: time=1.56, ELBO=289211.02, deltaELBO=1398.419 (0.01143039%), Factors=10
+Iteration 28: time=1.52, ELBO=290340.17, deltaELBO=1129.145 (0.00922940%), Factors=10
+Iteration 29: time=1.52, ELBO=291223.35, deltaELBO=883.179 (0.00721893%), Factors=10
+Optimising sigma node...
+Iteration 30: time=39.85, ELBO=294843.26, deltaELBO=3619.919 (0.02958849%), Factors=10
+Iteration 31: time=1.55, ELBO=266875.91, deltaELBO=-27967.355 (0.22859955%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 32: time=1.53, ELBO=269437.18, deltaELBO=2561.274 (0.02093534%), Factors=10
+Iteration 33: time=1.53, ELBO=270434.92, deltaELBO=997.738 (0.00815531%), Factors=10
+Iteration 34: time=1.55, ELBO=270852.18, deltaELBO=417.257 (0.00341057%), Factors=10
+Iteration 35: time=1.53, ELBO=271117.89, deltaELBO=265.710 (0.00217186%), Factors=10
+Iteration 36: time=1.56, ELBO=271319.98, deltaELBO=202.092 (0.00165186%), Factors=10
+Iteration 37: time=1.59, ELBO=271492.92, deltaELBO=172.942 (0.00141359%), Factors=10
+Iteration 38: time=1.58, ELBO=271650.30, deltaELBO=157.377 (0.00128637%), Factors=10
+Iteration 39: time=1.58, ELBO=271798.73, deltaELBO=148.434 (0.00121327%), Factors=10
+Optimising sigma node...
+Iteration 40: time=40.47, ELBO=271953.27, deltaELBO=154.538 (0.00126316%), Factors=10
+Iteration 41: time=1.59, ELBO=272299.80, deltaELBO=346.529 (0.00283246%), Factors=10
+Iteration 42: time=1.61, ELBO=272473.16, deltaELBO=173.362 (0.00141702%), Factors=10
+Iteration 43: time=1.63, ELBO=272647.91, deltaELBO=174.745 (0.00142833%), Factors=10
+Iteration 44: time=1.62, ELBO=272817.31, deltaELBO=169.402 (0.00138466%), Factors=10
+Iteration 45: time=1.66, ELBO=272977.35, deltaELBO=160.037 (0.00130811%), Factors=10
+Iteration 46: time=1.66, ELBO=273121.07, deltaELBO=143.719 (0.00117473%), Factors=10
+Iteration 47: time=1.66, ELBO=273240.74, deltaELBO=119.678 (0.00097822%), Factors=10
+Iteration 48: time=1.65, ELBO=273335.26, deltaELBO=94.516 (0.00077256%), Factors=10
+Iteration 49: time=1.67, ELBO=273409.21, deltaELBO=73.949 (0.00060444%), Factors=10
+Optimising sigma node...
+Iteration 50: time=28.21, ELBO=285234.25, deltaELBO=11825.037 (0.09665549%), Factors=10
+Iteration 51: time=1.70, ELBO=285974.67, deltaELBO=740.426 (0.00605209%), Factors=10
+Iteration 52: time=1.63, ELBO=286150.98, deltaELBO=176.311 (0.00144113%), Factors=10
+Iteration 53: time=1.62, ELBO=286214.17, deltaELBO=63.184 (0.00051645%), Factors=10
+Iteration 54: time=1.58, ELBO=286251.58, deltaELBO=37.415 (0.00030583%), Factors=10
+Iteration 55: time=2.74, ELBO=286281.47, deltaELBO=29.891 (0.00024433%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Saving model in out/models/mofa_model_Kidney_37_38_B3.hdf5...
+Processing Kidney: 37_38_C1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=979 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+Warning: sparseGP should only be used when having a large sample size (>1e3)
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -13468470.99 
+
+Iteration 1: time=0.70, ELBO=-122639.09, deltaELBO=13345831.895 (99.08943569%), Factors=10
+Iteration 2: time=0.70, ELBO=-83488.94, deltaELBO=39150.154 (0.29068002%), Factors=10
+Iteration 3: time=0.71, ELBO=-72216.70, deltaELBO=11272.234 (0.08369350%), Factors=10
+Iteration 4: time=0.71, ELBO=-69082.62, deltaELBO=3134.086 (0.02326980%), Factors=10
+Iteration 5: time=0.70, ELBO=-68358.83, deltaELBO=723.787 (0.00537393%), Factors=10
+Iteration 6: time=0.68, ELBO=-67789.21, deltaELBO=569.618 (0.00422927%), Factors=10
+Iteration 7: time=0.70, ELBO=-67268.30, deltaELBO=520.909 (0.00386762%), Factors=10
+Iteration 8: time=0.68, ELBO=-66788.90, deltaELBO=479.406 (0.00355947%), Factors=10
+Iteration 9: time=0.71, ELBO=-66352.49, deltaELBO=436.407 (0.00324021%), Factors=10
+Optimising sigma node...
+Iteration 10: time=20.52, ELBO=-47091.68, deltaELBO=19260.815 (0.14300669%), Factors=10
+Iteration 11: time=1.84, ELBO=-102429.49, deltaELBO=-55337.812 (0.41086930%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.85, ELBO=-90739.10, deltaELBO=11690.388 (0.08679819%), Factors=10
+Iteration 13: time=1.84, ELBO=-88637.05, deltaELBO=2102.049 (0.01560719%), Factors=10
+Iteration 14: time=1.87, ELBO=-87665.31, deltaELBO=971.737 (0.00721490%), Factors=10
+Iteration 15: time=1.85, ELBO=-87034.94, deltaELBO=630.370 (0.00468034%), Factors=10
+Iteration 16: time=1.83, ELBO=-86561.26, deltaELBO=473.680 (0.00351696%), Factors=10
+Iteration 17: time=1.84, ELBO=-86179.57, deltaELBO=381.696 (0.00283400%), Factors=10
+Iteration 18: time=1.84, ELBO=-85862.63, deltaELBO=316.938 (0.00235319%), Factors=10
+Iteration 19: time=1.85, ELBO=-85593.27, deltaELBO=269.361 (0.00199994%), Factors=10
+Optimising sigma node...
+Iteration 20: time=21.31, ELBO=-85349.78, deltaELBO=243.483 (0.00180780%), Factors=10
+Iteration 21: time=1.75, ELBO=-85585.12, deltaELBO=-235.337 (0.00174732%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.72, ELBO=-85400.30, deltaELBO=184.818 (0.00137223%), Factors=10
+Iteration 23: time=1.73, ELBO=-85257.36, deltaELBO=142.942 (0.00106131%), Factors=10
+Iteration 24: time=1.74, ELBO=-85138.56, deltaELBO=118.804 (0.00088209%), Factors=10
+Iteration 25: time=1.71, ELBO=-85039.04, deltaELBO=99.517 (0.00073889%), Factors=10
+Iteration 26: time=1.73, ELBO=-84954.06, deltaELBO=84.977 (0.00063094%), Factors=10
+Iteration 27: time=1.74, ELBO=-84880.22, deltaELBO=73.840 (0.00054824%), Factors=10
+Iteration 28: time=1.73, ELBO=-84814.68, deltaELBO=65.544 (0.00048664%), Factors=10
+Iteration 29: time=1.76, ELBO=-84755.25, deltaELBO=59.430 (0.00044125%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Saving model in out/models/mofa_model_Kidney_37_38_C1.hdf5...
+Processing Kidney: 37_46_B3
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=1116 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -16096517.29 
+
+Iteration 1: time=0.85, ELBO=388457.91, deltaELBO=16484975.193 (102.41330407%), Factors=10
+Iteration 2: time=0.83, ELBO=467199.87, deltaELBO=78741.961 (0.48918633%), Factors=10
+Iteration 3: time=0.83, ELBO=482080.06, deltaELBO=14880.195 (0.09244357%), Factors=10
+Iteration 4: time=0.88, ELBO=486333.76, deltaELBO=4253.695 (0.02642618%), Factors=10
+Iteration 5: time=0.86, ELBO=487821.89, deltaELBO=1488.134 (0.00924507%), Factors=10
+Iteration 6: time=0.86, ELBO=489039.46, deltaELBO=1217.566 (0.00756416%), Factors=10
+Iteration 7: time=0.86, ELBO=490098.32, deltaELBO=1058.857 (0.00657817%), Factors=10
+Iteration 8: time=0.85, ELBO=491017.65, deltaELBO=919.329 (0.00571136%), Factors=10
+Iteration 9: time=0.87, ELBO=491787.33, deltaELBO=769.686 (0.00478169%), Factors=10
+Optimising sigma node...
+Iteration 10: time=34.04, ELBO=519470.83, deltaELBO=27683.503 (0.17198443%), Factors=10
+Iteration 11: time=2.04, ELBO=431785.72, deltaELBO=-87685.111 (0.54474585%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=2.04, ELBO=443306.14, deltaELBO=11520.413 (0.07157084%), Factors=10
+Iteration 13: time=2.01, ELBO=446829.43, deltaELBO=3523.293 (0.02188854%), Factors=10
+Iteration 14: time=2.06, ELBO=448923.37, deltaELBO=2093.943 (0.01300867%), Factors=10
+Iteration 15: time=2.08, ELBO=450448.14, deltaELBO=1524.770 (0.00947267%), Factors=10
+Iteration 16: time=2.05, ELBO=451640.08, deltaELBO=1191.938 (0.00740494%), Factors=10
+Iteration 17: time=2.00, ELBO=452604.85, deltaELBO=964.771 (0.00599366%), Factors=10
+Iteration 18: time=2.03, ELBO=453404.01, deltaELBO=799.162 (0.00496481%), Factors=10
+Iteration 19: time=2.05, ELBO=454074.65, deltaELBO=670.638 (0.00416635%), Factors=10
+Optimising sigma node...
+Iteration 20: time=33.31, ELBO=454666.04, deltaELBO=591.387 (0.00367401%), Factors=10
+Iteration 21: time=1.99, ELBO=453870.65, deltaELBO=-795.386 (0.00494135%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=2.01, ELBO=454376.24, deltaELBO=505.588 (0.00314098%), Factors=10
+Iteration 23: time=2.01, ELBO=454808.64, deltaELBO=432.401 (0.00268630%), Factors=10
+Iteration 24: time=2.01, ELBO=455184.44, deltaELBO=375.793 (0.00233462%), Factors=10
+Iteration 25: time=2.03, ELBO=455513.77, deltaELBO=329.335 (0.00204600%), Factors=10
+Iteration 26: time=2.01, ELBO=455804.03, deltaELBO=290.260 (0.00180325%), Factors=10
+Iteration 27: time=2.02, ELBO=456061.04, deltaELBO=257.004 (0.00159665%), Factors=10
+Iteration 28: time=2.01, ELBO=456290.11, deltaELBO=229.076 (0.00142314%), Factors=10
+Iteration 29: time=2.03, ELBO=456494.14, deltaELBO=204.032 (0.00126755%), Factors=10
+Optimising sigma node...
+Iteration 30: time=33.69, ELBO=456685.97, deltaELBO=191.826 (0.00119172%), Factors=10
+Iteration 31: time=1.91, ELBO=455159.14, deltaELBO=-1526.826 (0.00948544%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 32: time=1.96, ELBO=455407.77, deltaELBO=248.631 (0.00154463%), Factors=10
+Iteration 33: time=2.08, ELBO=455626.29, deltaELBO=218.521 (0.00135756%), Factors=10
+Iteration 34: time=2.09, ELBO=455818.41, deltaELBO=192.116 (0.00119353%), Factors=10
+Iteration 35: time=2.13, ELBO=455988.80, deltaELBO=170.385 (0.00105852%), Factors=10
+Iteration 36: time=2.06, ELBO=456138.25, deltaELBO=149.459 (0.00092852%), Factors=10
+Iteration 37: time=2.16, ELBO=456272.60, deltaELBO=134.350 (0.00083465%), Factors=10
+Iteration 38: time=2.11, ELBO=456394.35, deltaELBO=121.748 (0.00075636%), Factors=10
+Iteration 39: time=2.06, ELBO=456504.24, deltaELBO=109.890 (0.00068269%), Factors=10
+Optimising sigma node...
+Iteration 40: time=32.62, ELBO=456609.31, deltaELBO=105.068 (0.00065274%), Factors=10
+Iteration 41: time=2.13, ELBO=456748.67, deltaELBO=139.355 (0.00086575%), Factors=10
+Iteration 42: time=2.15, ELBO=456817.17, deltaELBO=68.502 (0.00042557%), Factors=10
+Iteration 43: time=2.12, ELBO=456876.01, deltaELBO=58.841 (0.00036555%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Saving model in out/models/mofa_model_Kidney_37_46_B3.hdf5...
+Processing Kidney: 37_46_C1
+
+        #########################################################
+        ###           __  __  ____  ______                    ### 
+        ###          |  \/  |/ __ \|  ____/\    _             ### 
+        ###          | \  / | |  | | |__ /  \ _| |_           ### 
+        ###          | |\/| | |  | |  __/ /\ \_   _|          ###
+        ###          | |  | | |__| | | / ____ \|_|            ###
+        ###          |_|  |_|\____/|_|/_/    \_\              ###
+        ###                                                   ### 
+        ######################################################### 
+       
+ 
+        
+use_float32 set to True: replacing float64 arrays by float32 arrays to speed up computations...
+
+Loaded view='rna' group='group1' with N=1120 samples and D=2000 features...
+
+
+Model options:
+- Automatic Relevance Determination prior on the factors: False
+- Automatic Relevance Determination prior on the weights: True
+- Spike-and-slab prior on the factors: False
+- Spike-and-slab prior on the weights: True
+Likelihoods:
+- View 0 (rna): gaussian
+
+
+Loaded 2 covariate(s) for each sample...
+
+
+##
+## sparseGP set to True: using sparse Gaussian Process to speed up the training procedure
+##
+
+
+######################################
+## Training the model with seed 2021 ##
+######################################
+
+
+ELBO before training: -15766419.58 
+
+Iteration 1: time=3.21, ELBO=151449.68, deltaELBO=15917869.265 (100.96058386%), Factors=10
+Iteration 2: time=0.83, ELBO=221148.28, deltaELBO=69698.599 (0.44206992%), Factors=10
+Iteration 3: time=0.81, ELBO=236381.71, deltaELBO=15233.431 (0.09661947%), Factors=10
+Iteration 4: time=0.84, ELBO=238552.22, deltaELBO=2170.505 (0.01376663%), Factors=10
+Iteration 5: time=0.83, ELBO=239830.55, deltaELBO=1278.333 (0.00810795%), Factors=10
+Iteration 6: time=0.83, ELBO=240913.39, deltaELBO=1082.845 (0.00686804%), Factors=10
+Iteration 7: time=0.84, ELBO=241842.10, deltaELBO=928.702 (0.00589038%), Factors=10
+Iteration 8: time=0.84, ELBO=242633.56, deltaELBO=791.460 (0.00501991%), Factors=10
+Iteration 9: time=0.85, ELBO=243299.50, deltaELBO=665.939 (0.00422378%), Factors=10
+Optimising sigma node...
+Iteration 10: time=34.73, ELBO=269162.74, deltaELBO=25863.247 (0.16404008%), Factors=10
+Iteration 11: time=1.83, ELBO=185788.67, deltaELBO=-83374.075 (0.52880791%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 12: time=1.81, ELBO=198048.21, deltaELBO=12259.542 (0.07775730%), Factors=10
+Iteration 13: time=1.81, ELBO=201427.18, deltaELBO=3378.970 (0.02143143%), Factors=10
+Iteration 14: time=1.82, ELBO=203352.18, deltaELBO=1925.004 (0.01220952%), Factors=10
+Iteration 15: time=1.80, ELBO=204743.85, deltaELBO=1391.664 (0.00882676%), Factors=10
+Iteration 16: time=1.79, ELBO=205842.01, deltaELBO=1098.157 (0.00696516%), Factors=10
+Iteration 17: time=1.78, ELBO=206743.05, deltaELBO=901.049 (0.00571499%), Factors=10
+Iteration 18: time=1.81, ELBO=207492.74, deltaELBO=749.688 (0.00475496%), Factors=10
+Iteration 19: time=1.83, ELBO=208121.67, deltaELBO=628.931 (0.00398905%), Factors=10
+Optimising sigma node...
+Iteration 20: time=33.34, ELBO=208709.62, deltaELBO=587.943 (0.00372908%), Factors=10
+Iteration 21: time=1.80, ELBO=208487.61, deltaELBO=-222.011 (0.00140812%), Factors=10
+Warning, lower bound is decreasing...
+Iteration 22: time=1.78, ELBO=209081.75, deltaELBO=594.149 (0.00376845%), Factors=10
+Iteration 23: time=1.80, ELBO=209583.04, deltaELBO=501.287 (0.00317946%), Factors=10
+Iteration 24: time=1.80, ELBO=209987.80, deltaELBO=404.756 (0.00256720%), Factors=10
+Iteration 25: time=1.79, ELBO=210328.19, deltaELBO=340.395 (0.00215899%), Factors=10
+Iteration 26: time=1.80, ELBO=210621.00, deltaELBO=292.805 (0.00185714%), Factors=10
+Iteration 27: time=1.82, ELBO=210876.52, deltaELBO=255.524 (0.00162069%), Factors=10
+Iteration 28: time=1.82, ELBO=211102.80, deltaELBO=226.276 (0.00143518%), Factors=10
+Iteration 29: time=1.82, ELBO=211304.14, deltaELBO=201.341 (0.00127703%), Factors=10
+Optimising sigma node...
+Iteration 30: time=32.48, ELBO=211495.31, deltaELBO=191.170 (0.00121251%), Factors=10
+Iteration 31: time=1.84, ELBO=211756.29, deltaELBO=260.987 (0.00165533%), Factors=10
+Iteration 32: time=1.83, ELBO=211935.54, deltaELBO=179.243 (0.00113687%), Factors=10
+Iteration 33: time=1.86, ELBO=212090.11, deltaELBO=154.573 (0.00098040%), Factors=10
+Iteration 34: time=1.85, ELBO=212224.94, deltaELBO=134.826 (0.00085515%), Factors=10
+Iteration 35: time=1.85, ELBO=212345.68, deltaELBO=120.745 (0.00076584%), Factors=10
+Iteration 36: time=1.87, ELBO=212455.37, deltaELBO=109.690 (0.00069572%), Factors=10
+Iteration 37: time=1.82, ELBO=212555.74, deltaELBO=100.369 (0.00063660%), Factors=10
+Iteration 38: time=1.86, ELBO=212650.68, deltaELBO=94.941 (0.00060217%), Factors=10
+Iteration 39: time=1.87, ELBO=212741.98, deltaELBO=91.297 (0.00057906%), Factors=10
+Optimising sigma node...
+Iteration 40: time=32.44, ELBO=212842.59, deltaELBO=100.605 (0.00063810%), Factors=10
+Iteration 41: time=1.84, ELBO=213174.72, deltaELBO=332.139 (0.00210663%), Factors=10
+Iteration 42: time=1.82, ELBO=213271.33, deltaELBO=96.606 (0.00061273%), Factors=10
+Iteration 43: time=1.84, ELBO=213362.98, deltaELBO=91.645 (0.00058127%), Factors=10
+Iteration 44: time=1.85, ELBO=213449.14, deltaELBO=86.163 (0.00054650%), Factors=10
+Iteration 45: time=1.83, ELBO=213527.90, deltaELBO=78.760 (0.00049954%), Factors=10
+Iteration 46: time=1.82, ELBO=213598.56, deltaELBO=70.659 (0.00044816%), Factors=10
+
+Converged!
+
+
+
+#######################
+## Training finished ##
+#######################
+
+
+Saving model in out/models/mofa_model_Kidney_37_46_C1.hdf5...
+2022-07-22 16:24:40: Script finished after 0:30:29.679089.
