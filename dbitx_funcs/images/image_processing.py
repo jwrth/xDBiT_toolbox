@@ -237,7 +237,7 @@ def recalculate_scale(adata, groupby, group, ppm_given=None, spatial_key='spatia
         rot_angle = rotation_angle(upper_spot_px, lower_spot_px)
         return rot_angle, upper_spot_px
 
-def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi',
+def calc_image_param_per_spot(adata, groupby='id', channel_pattern='dapi',
                               fun=np.mean, fun_descriptor='mean', lowres=False,
                               normalize=True
                               ):
@@ -300,7 +300,10 @@ def calc_image_param_per_spot(adata, groupby='well_name', channel_pattern='dapi'
                          int((spot[0] - px_dia / 2)): int((spot[0] + px_dia / 2))]
 
             # apply function to region and record result
-            results_list.append(fun(region))
+            if fun is None:
+                results_list.append(region)
+            else:
+                results_list.append(fun(region))
 
         else:
             # if no unique image was found record NaN
