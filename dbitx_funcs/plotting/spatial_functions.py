@@ -386,30 +386,13 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
     if header is not None:
         plt.suptitle(header, fontsize=headersize, x=header_x, y=header_y)
 
-    if savepath is not None:
-        fig.tight_layout()
-        print("Saving figure to file " + savepath)
-        
-        # create path if it does not exist
-        Path(os.path.dirname(savepath)).mkdir(parents=True, exist_ok=True)
-
-        # save figure
-        plt.savefig(savepath, dpi=dpi_save,
-                    facecolor=save_background, bbox_inches='tight')
-        print("Saved.")
-
-    if save_only:
-        plt.close(fig)
-    elif show:
-        fig.tight_layout()
-        return plt.show()
-    else:
-        return fig, ax
+    save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, show=show, dpi_save=dpi_save, save_background=save_background)
 
 
 def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_cols=4, 
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
-    savepath=None, dpi_save=300, show=True, save_only=False, pd_dataframe=None, normalize_crange_not_for=[], 
+    savepath=None, dpi_save=300, save_only=False, 
+    pd_dataframe=None, normalize_crange_not_for=[], 
     dpi_display=80, header_names=None, 
     crange=None, crange_type='minmax',
     xlim=None, ylim=None,
@@ -524,22 +507,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
                 # remove empty plots
                 axs[i].set_axis_off()
 
-        fig.tight_layout()
-        if savepath is not None:
-            print("Saving figure to file " + savepath)
-
-            # create path if it does not exist
-            Path(os.path.dirname(savepath)).mkdir(parents=True, exist_ok=True)
-
-            # save figure
-            plt.savefig(savepath, dpi=dpi_save, bbox_inches='tight')
-            print("Saved.")
-        if save_only:
-            plt.close(fig)
-        elif show:
-            return plt.show()
-        else:
-            return fig, ax
+        save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
     else:
         # if there is only one group use `spatial_single` function
         spatial_single(adata, keys, raw=raw, layer=layer, groupby=groupby, group=groups[0], show=True,
@@ -689,8 +657,8 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
     else:
         return ax
 
-def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None,
-    range_min=None, range_max=None, 
+def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None, hue=None, 
+    range_min=None, range_max=None, cmap="tab10",
     extra_cats=None,
     pd_dataframe=None,
     #stepsize=0.01, 
@@ -724,6 +692,18 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
 
+    if hue is not None:
+        hue_cats = list(adata.obs[hue].unique())
+        cmap_colors = plt.get_cmap(cmap)
+        color_dict = {a: cmap_colors(i) for i, a in enumerate(hue_cats)}
+
+        if extra_cats is None:
+            extra_cats = [hue]
+        else:
+            extra_cats.append(hue)
+
+        
+
     #if show:
     if not return_data:
         # prepare plotting
@@ -746,6 +726,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     for i, key in (enumerate(tqdm(keys)) if show_progress else enumerate(keys)):
         # select data per group
         groups = adata.obs[groupby].unique()
+        added_to_legend = []
 
         # check if plotting raw data
         X, var, var_names = check_raw(adata, use_raw=use_raw)
@@ -755,6 +736,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             #partial = extract_groups(adata, groupby=groupby, groups=group)
             group_mask = adata.obs[groupby] == group
             group_obs = adata.obs.loc[group_mask, :].copy()
+            if hue is not None:
+                _hue = adata.obs.loc[group_mask, hue][0]
+
+            # hue_data = adata.obs.loc[group_mask, hue].copy()
+            # print(hue_data)
 
             # select only group values from matrix
             group_X = X[group_mask, :]
@@ -836,7 +822,24 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                                     df['conf_upper'],
                                     alpha = 0.2,
                                     color = 'grey')
-                axs[i].plot(df['x'], df['y_pred'], label=group, linewidth=8)
+
+                # determine label variable
+                if hue is not None:
+                    label = _hue if _hue not in added_to_legend else ""
+                    color = color_dict[_hue]
+                else:
+                    label = group
+                    color = None
+                
+                axs[i].plot(df['x'], 
+                    df['y_pred'], 
+                    label=label, 
+                    color=color,
+                    linewidth=8)
+
+                if hue is not None and _hue not in added_to_legend:
+                    added_to_legend.append(_hue)
+
 
         if not return_data:
             if xlabel is None:
@@ -891,7 +894,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 axs[i].set_axis_off()
         if show:
             fig.tight_layout()
-            save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+            save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
         else:
             return fig, axs
 
