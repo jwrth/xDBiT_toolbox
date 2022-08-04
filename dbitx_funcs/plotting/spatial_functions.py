@@ -9,7 +9,7 @@ import seaborn as sns
 import numpy as np
 import warnings
 from ..calculations._calc import dist_points, minDistance
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, minmax_scale
 from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
 from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
@@ -18,6 +18,7 @@ from tqdm import tqdm
 import warnings
 from pathlib import Path
 import os
+from scipy.stats import zscore
 
 # ignore future warnings (suppresses annoying pandas warning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -660,22 +661,19 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
 def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None, hue=None, 
     range_min=None, range_max=None, cmap="tab10",
     extra_cats=None,
-    pd_dataframe=None,
-    #stepsize=0.01, 
+    normalize=False,
     nsteps=100,
     show_progress=False,
-    n_bins=20, use_raw=False,
+    use_raw=False,
     max_cols=4,
-    x_limit_labels=None, 
     xlabel=None,ylabel=None,
-    values_into_title=None, title_suffix='',
-    #ax=None, 
+    #values_into_title=None, title_suffix='', 
+    custom_titles=None,
     legend_fontsize=24, 
-    legend_x=0.5, 
     plot_legend=True,
     xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
     savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
-    dpi_save=300, return_fig_axis=False,
+    dpi_save=300,
     loess=True, **kwargs):
 
     '''
@@ -688,6 +686,13 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             the radial expression and different cell types)
 
     '''
+
+    # check type of input
+    if isinstance(keys, dict):
+        if custom_titles is not None:
+            print("Attention: `custom_titles` was not None and `keys` was dictionary. Titles were retrieved from dictionary.")
+        custom_titles = list(keys.keys())
+        keys = list(keys.values())
 
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
@@ -724,6 +729,8 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
     data_collection = {}
     for i, key in (enumerate(tqdm(keys)) if show_progress else enumerate(keys)):
+        # check if the keys are also grouped
+        keys_grouped = isinstance(key, list)
         # select data per group
         groups = adata.obs[groupby].unique()
         added_to_legend = []
@@ -749,16 +756,33 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 # select x value
                 x = group_obs.loc[:, x_category].values
 
-                if key in var_names:
+                if keys_grouped:
+                    # extract expression values of all keys in the group
+                    idx = var.index.get_indexer(key)
+                    dd = pd.DataFrame(group_X[:, idx], index=x)
+
+                    if normalize:
+                        #dd = dd.apply(minmax_scale, axis=0)
+                        dd = dd.apply(zscore, axis=0)
+
+                    dd = dd.reset_index().melt(id_vars="index") # reshape to get long list of x values
+                    x = dd["index"].values
+                    y = dd["value"].values
+                
+                elif key in var_names:
                     # extract expression values as y
                     idx = var.index.get_loc(key)
                     y = group_X[:, idx].copy()
+
+                    if normalize:
+                        #y = minmax_scale(y)
+                        y = zscore(y)
+
                 elif key in group_obs.columns:
                     y = group_obs.loc[:, key].values.copy()
                 else:
-                    print("Key '{}' not found.".format(key))
+                    print("Key '{}' not found.".format(key))                    
 
-                
                 if loess:
                     # do smooth fitting
                     df = smooth_fit(x, y, 
@@ -847,12 +871,15 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             if ylabel is None:
                 ylabel = "Gene expression"
 
-
-            axs[i].set_title(key, fontsize=title_fontsize)
-            
             axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
             axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
             axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+
+            if custom_titles is None:
+                axs[i].set_title(key, fontsize=title_fontsize)
+            else:
+                assert len(custom_titles) == len(keys), "List of title values has not the same length as list of keys."
+                axs[i].set_title(str(custom_titles[i]), fontsize=title_fontsize)
 
             if plot_legend:
                 axs[i].legend(fontsize=legend_fontsize, 
@@ -862,11 +889,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
             else:
                 axs[i].legend().remove()
 
-            if values_into_title is None:
-                axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
-            else:
-                assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
-                axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
+            # if values_into_title is None:
+            #     axs[i].set_title("{}{}".format(key, title_suffix), fontsize=title_fontsize)
+            # else:
+            #     assert len(values_into_title) == len(keys), "List of title values has not the same length as list of keys."
+            #     axs[i].set_title("{}{}{}".format(key, title_suffix, round(values_into_title[i], 5)), fontsize=title_fontsize)
 
         if return_data:
             # collect data
