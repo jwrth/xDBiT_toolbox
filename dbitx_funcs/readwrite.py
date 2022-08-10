@@ -186,10 +186,13 @@ def secure_save(adata, savepath, overwrite=False):
         adata.write(savepath)
         print("File saved to {}".format(savepath))
 
-def save_and_show_figure(savepath, fig, save_only=False, show=True, dpi_save=300, save_background=None):
+def save_and_show_figure(savepath, fig, save_only=False, show=True, dpi_save=300, save_background=None, tight=True):
     #if fig is not None and axis is not None:
     #    return fig, axis
     #elif savepath is not None:
+    if tight:
+        fig.tight_layout()
+
     if savepath is not None:
         print("Saving figure to file " + savepath)
 
@@ -197,14 +200,12 @@ def save_and_show_figure(savepath, fig, save_only=False, show=True, dpi_save=300
         Path(os.path.dirname(savepath)).mkdir(parents=True, exist_ok=True)
 
         # save figure
-        fig.tight_layout()
         plt.savefig(savepath, dpi=dpi_save,
                     facecolor=save_background, bbox_inches='tight')
         print("Saved.")
     if save_only:
         plt.close(fig)
     elif show:
-        fig.tight_layout()
         return plt.show()
     else:
         return

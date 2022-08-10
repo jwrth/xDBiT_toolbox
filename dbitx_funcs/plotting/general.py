@@ -226,7 +226,7 @@ def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', p
         if colorbar_label is not None:
             clb.set_label(colorbar_label)
 
-    save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+    save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
 
     # if savepath is not None:
     #     print("Saving figure to file " + savepath)
@@ -397,9 +397,7 @@ linewidth=0.5, colormap = 'PRGn', edgecolor = 'k', adjust=False, savepath=None, 
     clb = plt.colorbar(s, cax=cbar_ax, orientation='horizontal')
     clb.set_label('log2(Fold change) {} vs. {}'.format(deg_splits[0], deg_splits[1]))
 
-    save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
-
-
+    save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save, tight=False)
 
 
 def go_barplot(enrichment, max_to_plot=25, max_cols=4, groups=None, name_dict=None, value_to_plot='Enrichment score', libraries=None,
