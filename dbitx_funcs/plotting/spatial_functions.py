@@ -30,7 +30,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             percent=False,
             dpi_save=300,
             obsm_key = 'spatial', plot_pixel=False,
-            spot_size=50, spot_type='s', clb_pad=0.05,
+            spot_size_unit=50, spot_type='s', clb_pad=0.05,
             axis=None, fig=None, show=True,
             patch_style=None, patch_xy=(1000, 1000), patch_radius=1000, patch_color='r',
             xlim=None, ylim=None, oversize=1, dpi_display=80, figsize=(8.2,6),
@@ -179,26 +179,30 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             xmin = x_pixelcoord.min() * scale_factor
             xmax = x_pixelcoord.max() * scale_factor
         else:
-            xmin = x_coord.min()
-            xmax = x_coord.max()
+            # xmin = x_coord.min()
+            # xmax = x_coord.max()
+            xmin = np.min([x_coord.min(), y_coord.min()]) # make sure that result is always a square
+            xmax = np.max([x_coord.max(), y_coord.max()])
 
-        xlim = (xmin - spot_size, xmax + spot_size)
+        xlim = (xmin - spot_size_unit, xmax + spot_size_unit)
     else:
-        xlim[0] -= spot_size
-        xlim[1] += spot_size
+        xlim[0] -= spot_size_unit
+        xlim[1] += spot_size_unit
 
     if ylim is None:
         if plot_pixel:
             ymin = y_pixelcoord.min() * scale_factor
             ymax = y_pixelcoord.max() * scale_factor
         else:
-            ymin = y_coord.min()
-            ymax = y_coord.max()    
+            # ymin = y_coord.min()
+            # ymax = y_coord.max() 
+            ymin = np.min([x_coord.min(), y_coord.min()])
+            ymax = np.max([x_coord.max(), y_coord.max()])
 
-        ylim = (ymin - spot_size, ymax + spot_size)
+        ylim = (ymin - spot_size_unit, ymax + spot_size_unit)
     else:
-        ylim[0] -= spot_size
-        ylim[1] += spot_size
+        ylim[0] -= spot_size_unit
+        ylim[1] += spot_size_unit
 
 
     if axis is None:
@@ -293,9 +297,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         # calculate marker size
         pixels_per_unit = ax.transData.transform(
             [(0, 1), (1, 0)]) - ax.transData.transform((0, 0))
-        #x_ppu = pixels_per_unit[1, 0]
+        # x_ppu = pixels_per_unit[1, 0]
         y_ppu = pixels_per_unit[0, 1]
-        pxs = y_ppu * spot_size * oversize
+        pxs = y_ppu * spot_size_unit * oversize
         size = (72. / fig.dpi * pxs)**2
 
         if color_dict is None:
@@ -394,7 +398,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     spot_size=50, prefix_groups='', palette="tab10", groupheader_fontsize=20,
     savepath=None, dpi_save=300, save_only=False, 
     pd_dataframe=None, normalize_crange_not_for=[], 
-    dpi_display=80, header_names=None, 
+    dpi_display=80, header_names=None,
     crange=None, crange_type='minmax',
     xlim=None, ylim=None,
     **kwargs):
@@ -436,6 +440,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
             max_cols = len(keys)
             n_plots = n_rows * max_cols
             fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
+            fig.tight_layout() # helps to equalize size of subplots. Without the subplots change parameters during plotting which results in differently sized spots.
 
             i = 0
             for row, group in enumerate(groups):
@@ -459,7 +464,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
                     spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
                             group=group, fig=fig, axis=axs[row, col], show=False,
                             xlim=xlim, ylim=ylim, 
-                            spot_size=spot_size, crange=crange_, 
+                            spot_size_unit=spot_size, crange=crange_, 
                             palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
 
             for ax, row in zip(axs[:, 0], groups):
@@ -476,6 +481,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
                 max_cols = n_plots
 
             fig, axs = plt.subplots(n_rows, max_cols, figsize=(7.6 * max_cols, 6 * n_rows), dpi=dpi_display)
+            fig.tight_layout() # helps to equalize size of subplots. Without the subplots change parameters during plotting which results in differently sized spots.
 
             if n_plots > 1:
                 axs = axs.ravel()
@@ -495,7 +501,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
 
                 spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
                         group=group, fig=fig, axis=axs[i], show=False, header_names=header_names,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, crange=crange_, crange_type=crange_type,
+                        xlim=xlim, ylim=ylim, spot_size_unit=spot_size, crange=crange_, crange_type=crange_type,
                         palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
 
                 axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
@@ -512,7 +518,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     else:
         # if there is only one group use `spatial_single` function
         spatial_single(adata, keys, raw=raw, layer=layer, groupby=groupby, group=groups[0], show=True,
-                        xlim=xlim, ylim=ylim, spot_size=spot_size, max_cols=max_cols, header_names=header_names,
+                        xlim=xlim, ylim=ylim, spot_size_unit=spot_size, max_cols=max_cols, header_names=header_names,
                         palette=palette, pd_dataframe=pd_dataframe, crange=crange,
                         savepath=savepath, save_only=save_only, crange_type=crange_type,
                         **kwargs
