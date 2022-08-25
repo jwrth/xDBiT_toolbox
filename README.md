@@ -15,22 +15,19 @@ The pipeline was created in a Linux server environment and the STAR alignment st
 
 xDbit allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object slide.
 
-![layout](https://user-images.githubusercontent.com/76480183/112825485-15c53900-908c-11eb-83d3-89defab76742.png)
-
+![layout](graphics/xdbit_layout.png)
 
 ### Read structure
 
-![read](https://user-images.githubusercontent.com/76480183/112814912-0e982e00-9080-11eb-8ffe-d2c17c4660d8.png)
+![readstructure](graphics/xdbit_read-structure.png)
 
 ### xDbit toolbox pipeline
 
 The xDbit toolbox pipeline inputs the read 1 and read 2 .fastq files from the NGS run and generates a spot x gene matrix which can then be used for further analyses.
 
-![pipeline](https://user-images.githubusercontent.com/76480183/112817236-7e0f1d00-9082-11eb-80c3-2d70ea13b838.png)
-
+![](graphics/pipeline_overview.png)
 
 ## Requirements
-
 
 ### Clone repository
 
