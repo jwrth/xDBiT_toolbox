@@ -1,8 +1,8 @@
-# DbitX_toolbox
+# xDbit_toolbox
 
 This repository contains all code that is necessary to reproduce results shown in the publication ...
 
-This toolbox includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or DbitX experiments.
+This toolbox includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or xDbit experiments.
 It is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
 
 The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox.
@@ -13,7 +13,7 @@ The pipeline was created in a Linux server environment and the STAR alignment st
 
 ### Barcoding layout
 
-DbitX allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object slide.
+xDbit allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object slide.
 
 ![layout](https://user-images.githubusercontent.com/76480183/112825485-15c53900-908c-11eb-83d3-89defab76742.png)
 
@@ -22,9 +22,9 @@ DbitX allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object
 
 ![read](https://user-images.githubusercontent.com/76480183/112814912-0e982e00-9080-11eb-8ffe-d2c17c4660d8.png)
 
-### DbitX toolbox pipeline
+### xDbit toolbox pipeline
 
-The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NGS run and generates a spot x gene matrix which can then be used for further analyses.
+The xDbit toolbox pipeline inputs the read 1 and read 2 .fastq files from the NGS run and generates a spot x gene matrix which can then be used for further analyses.
 
 ![pipeline](https://user-images.githubusercontent.com/76480183/112817236-7e0f1d00-9082-11eb-80c3-2d70ea13b838.png)
 
@@ -35,10 +35,10 @@ The DbitX toolbox pipeline inputs the read 1 and read 2 .fastq files from the NG
 ### Clone repository
 
 ```
-git clone https://github.com/jwrth/DbitX_toolbox.git
+git clone https://github.com/jwrth/xDbit_toolbox.git
 
 # make drop seq toolbox executable
-cd /path/to/repo/DbitX_toolbox
+cd /path/to/repo/xDbit_toolbox
 chmod u=rwx,g=r,o=r ./external_tools/Drop-seq_tools-2.1.0/*
 ```
 
@@ -49,11 +49,11 @@ chmod u=rwx,g=r,o=r ./external_tools/Drop-seq_tools-2.1.0/*
 conda env create -f environment.yml python=3
 
 # activate environment
-conda activate dbitx_toolbox
+conda activate xdbit_toolbox
 
 # to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
 conda install -c anaconda ipykernel
-python3 -m ipykernel install --user --name=dbitx_toolbox_kernel
+python3 -m ipykernel install --user --name=xdbit_toolbox_kernel
 ```
 
 ### Samtools
