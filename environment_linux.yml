@@ -1,4 +1,4 @@
-name: spatial
+name: xdbit
 channels:
   - conda-forge
   - bioconda
@@ -151,4 +151,3 @@ dependencies:
     - zarr==2.10.3
     - zope-event==4.5.0
     - zope-interface==5.4.0
-prefix: /home/dkokotek/anaconda3/envs/spatial
