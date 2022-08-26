@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# This is a script to process DbitX reads. It is a modified version of \
+# This is a script to process xDbit reads. It is a modified version of \
 # Drop-seq_alignment.sh provided alongside of  Dropseqtools from Steve McCarroll's lab.
 # Also the code is based on work with a Copyright by Rebekka Wegmann (Snijderlab, ETH Zurich, 2019) which has been published in following GitHub repository: 
 # https://github.com/RebekkaWegmann/splitseq_toolbox
@@ -49,7 +49,7 @@ progname=`basename $0`
 splitseq_root=$(dirname $0)
 barcode_dir=$splitseq_root/data/barcode_lists
 jobs=1
-mode=DbitX
+mode=xDbit
 
 
 function usage () {
@@ -71,7 +71,7 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -a                  : String matching algorithm (hamming or levenshtein). Default: hamming.
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
--m                  : Mode. "DbitX" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
+-m                  : Mode. "xDbit" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
 EOF
 }
 
@@ -173,7 +173,7 @@ else
 fi
 
 echo ${mode}
-if [[ ${mode} == "DbitX" ]]
+if [[ ${mode} == "xDbit" ]]
 then
     min_lengths="35:94"
     multiwell=1
@@ -182,7 +182,7 @@ then
     min_lengths="35:56"
     multiwell=0
 else
-    echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'DbitX'/'Dbit-seq')"
+    echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'xDbit'/'Dbit-seq')"
     exit 1
 fi
 
@@ -230,7 +230,7 @@ filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTG
 -o ${outdir}/R1_filtered.fastq.gz -p ${outdir}/R2_filtered.fastq.gz ${r1} ${r2}"
 
 # generate .bam file
-generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=DbitXpipe TMP_DIR=${tmpdir}"
+generate_bam="java -jar ${picard_jar} FastqToSam F1=${outdir}/R1_filtered.fastq.gz F2=${outdir}/R2_filtered.fastq.gz O=${outdir}/unmapped.bam SM=xDbitpipe TMP_DIR=${tmpdir}"
 
 ## Stage 1: pre-alignment tag
 # Extract UMI (Bases 1-10 on Read 2)
@@ -264,7 +264,7 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${outdir}/polyA_trimmin
 split_bam="bash ${splitseq_root}/src/splitbam.sh ${tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${splitseq_root}/src/DbitX_barcode_filtering.py --mode ${mode} -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
+filter_barcodes="python ${splitseq_root}/src/xDbit_barcode_filtering.py --mode ${mode} -t ${tmpdir} -d ${outdir} -n ${estimated_num_cells} \
 -b ${barcode_dir} ${multithreading}"
 
 # add header and merge all bam files for alignment

@@ -1,7 +1,7 @@
   #!/usr/bin/env python
 
 '''
-Script to run DbitX pipeline on multiple batches.
+Script to run xDbit pipeline on multiple batches.
 
 Usage:
 
@@ -15,7 +15,7 @@ Usage:
         - mode
 
 Command for single analysis:
-nohup bash /home/jwirth/projects/DbitX_toolbox/DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
+nohup bash /home/jwirth/projects/xDbit_toolbox/xDbit_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
 -r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/barcodes_legend.csv -n 2000 -m Dbit-seq -j 1 
 ../37_30_A2_S2_R1_001.fastq ../37_30_A2_S2_R2_001.fastq &
 
@@ -29,7 +29,7 @@ from datetime import datetime
 import time
 import numpy as np
 
-print("Starting DbitX pipeline batch processing...", flush=True)
+print("Starting xDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 

@@ -6,9 +6,21 @@ Input formats: `.fastq` or `.fastq.gz`
 
 Output format: `txt.gz`
 
+## Create conda environment
+
+```
+# create environment from file
+conda env create -f path/to/ReadsToCounts_environment.yml
+
+# activate environment
+conda activate ReadsToCounts
+```
+
 ## Preparation of raw sequencing reads
 
 ### Demultiplexing
+
+It is important to use the `--no-lane-splitting` option here.
 
 ```
 nohup bcl2fastq --runfolder-dir 220111_A00623_0449_BHN3G2DRXY/ --sample-sheet 220111_A00623_0449_BHN3G2DRXY/SampleSheet_HN3G2DRXY.csv --no-lane-splitting --minimum-trimmed-read-length=8 --mask-short-adapter-reads=8 --ignore-missing-positions --ignore-missing-controls --ignore-missing-filter --ignore-missing-bcls -r 20 -w 20 -p 40 &> nohup_demult.out &
@@ -25,6 +37,33 @@ cd /path/to/fastqs
 
 # run FastQC in background
 nohup fastqc -t 40 <fastq_folders>/*fastq.gz &> nohup_fastqc.out &
+```
+
+#### Summarize results with MultiQC
+
+Documentation: https://multiqc.info/
+
+```
+# run multiqc after FastQC analysis
+multiqc <fastq_folders>/
+```
+
+## Create STAR metadata
+
+Example for human genome:
+
+```
+# download and unzip reference genome and annotation file from ensembl
+wget ftp://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+wget ftp://ftp.ensembl.org/pub/release-100/gtf/homo_sapiens/Homo_sapiens.GRCh38.100.gtf.gz
+gzip -d Homo_sapiens.GRCh38.100.gtf.gz
+gzip -d Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+
+
+# run metadata script
+./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh \
+-s Homo_sapiens -n Hs_metadata -r Homo_sapiens.GRCh38.dna.primary_assembly.fa -g Homo_sapiens.GRCh38.100.gtf \
+-d ./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0
 ```
 
 ## Prepare barcode to coordinate assignment
@@ -84,28 +123,81 @@ Structure of the file:
 - ``string_matching_algorithm``: Method used to calculate the distance between read sequence and barcodes. Allows `hamming` or `levenshtein`.
 - ``X/Y/Z_maxdist``: Maximum distance between read and barcode being allowed to be considered a match.
 
+### Fill empty barcode legend file
 
-#### Summarize results with MultiQC
+In this step a script is used to merge well-to-coordinate and well-to-barcode information to get barcode-to-coordinate information, which is required for the pipeline.
 
-Documentation: https://multiqc.info/
+The script uses all `.csv` files it finds under `path/to/well_coord_assignments`
 
 ```
-# run multiqc after FastQC analysis
-multiqc <fastq_folders>/
+# fill the empty barcodes_legend'
+python /home/hpc/johannes.wirth/projects/DbitX_toolbox/ReadsToCounts/src/fill_barcode_legend.py path/to/barcodes_legend_empty.csv path/to/well_coord_assignments/
+```
+The output is saved into the input folder.
+
+## Run ReadsToCounts pipeline
+
+### Prepare batch parameter file
+
+The pipeline can process multiple datasets in parallel. All required information is summarized in a batch parameter file.
+
+An example for the batch parameter file is provided here: `./batch_parameters.csv`. Each row of the spreadsheet represent one sample.
+
+Description of all mandatory parameters:
+- ``batch``: Number of batch in which this sample should be processed. Allows integers starting from 1. How many samples can be run in one batch depends mainly on the RAM provided.
+- ``fastq_R1/fastq_R2``: Path to fastq file of read 1 or read 2, respectively.
+- ``legend``: Path to filled barcode legend file.
+- ``STAR_genome``: Path to directory with STAR genome.
+- ``STAR_fasta``: Path to STAR metadata `.fasta`
+- ``expected_n_spots``: Expected number of spots. This is important to accelerate the calculation of certain QC outputs during analysis.
+- ``mode``: Allows `xDbit` and `Dbit-seq`.
+	- `xDbit`: Pipeline takes the Z barcode into account.
+	- `Dbit-seq`: Pipeline ignores Z barcode.
+- ``pipeline_dir``: Path to `xDbit_pipeline.sh` file.
+
+
+### Run pipeline
+
+```
+# activate environment
+conda activate ReadsToCounts
+
+# go to working directory
+cd path/to/working-directory
+
+# run batch process in background
+nohup python path/to/xDbit_run_batch.py path/to/batch_parameter.csv & # output is printed to nohup.out
+```
+
+All output and temporary files are saved into folders `out`/`tmp` in the base directory of the `fastq_R1` path that was provided in the batch parameters file. Output generated during the pipeline is writtein into the log file `pipeline_{}.out` in the same folder.
+
+### Test run for use on HPC server in Meier lab
+
+```
+cd /path/to/repo/DbitX_toolbox/
+cd test_files/
+
+# create barcode .csv file
+python ../src/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
+
+# activate environment
+conda activate dbitx_toolbox
+
+# run test run
+nohup bash ../DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ -r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ./barcodes_legend.csv -n 2300 -m DbitX -j 1 ./r1_100k.fastq ./r2_100k.fastq &
 ```
 
 # Installation of tools needed for processing of raw reads and ReadsToCounts
 
-## Quality control
-### FastQC
+## FastQC
 
 `conda install -c bioconda fastqc`
 
-### MultiQC
+## MultiQC
 
 `pip install multiqc`
 
-### Samtools
+## Samtools
 Download and instructions from: https://www.htslib.org/download/
 
 ```
@@ -133,18 +225,18 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-### Cutadapt (gets already installed with the environment)
+## Cutadapt (gets already installed with the environment)
 ```
 # install or upgrade cutadapt
 conda activate dbitx_toolbox
 python3 -m pip install --user --upgrade cutadapt
 ```
 
-### STAR aligner
+## STAR aligner
 
 Manual on: https://github.com/alexdobin/STAR
 
-#### Installation
+### Installation
 ```
 # Get latest STAR source from releases
 wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz
@@ -164,140 +256,14 @@ export PATH=$PATH:/path/to/software/STAR/STAR-2.7.Xa/bin/Linux_x86_64/
 # export PATH=$PATH:/home/hpc/meier/software/STAR/STAR-2.7.4a/bin/Linux_x86_64/
 ```
 
-### Drop-seq toolbox
+## Drop-seq toolbox
 
 This toolbox is based on the Drop-seq toolbox 2.1.0. The toolbox is included in this repository so it will be downloaded when cloning it.
 
-Just the same it could be downloaded here:
+Alternatively, it could be downloaded from here:
 https://github.com/broadinstitute/Drop-seq/releases/tag/v2.1.0
 
-## Usage
-
-
-### Create STAR metadata
-
-Example for human genome:
-
-```
-# download and unzip reference genome and annotation file from ensembl
-wget ftp://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
-wget ftp://ftp.ensembl.org/pub/release-100/gtf/homo_sapiens/Homo_sapiens.GRCh38.100.gtf.gz
-gzip -d Homo_sapiens.GRCh38.100.gtf.gz
-gzip -d Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
-
-
-# run metadata script
-./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh \
--s Homo_sapiens -n Hs_metadata -r Homo_sapiens.GRCh38.dna.primary_assembly.fa -g Homo_sapiens.GRCh38.100.gtf \
--d ./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0
-```
-
-### Create barcode legend file
-
-#### 1. Distribution of barcodes in wells
-
-The `barcode_legend_empty.csv` file links barcode sequences to the well positions and three columns `X`, `Y`, and (optionally) `Z` which correspond to the dimensions that were barcoded in the experiment. Mandatory columns here are `WellPosition`, `Barcode`, `X`, `Y`. `Z` only if three barcoding rounds were applied.
-
-| Row | Column | WellPosition | Name      | Barcode  | X | Y | Z |
-|-----|--------|--------------|-----------|----------|---|---|---|
-| A   | 1      | A1           | Round1_01 | AACGTGAT |   |   |   |
-| B   | 1      | B1           | Round1_02 | AAACATCG |   |   |   |
-| C   | 1      | C1           | Round1_03 | ATGCCTAA |   |   |   |
-| D   | 1      | D1           | Round1_04 | AGTGGTCA |   |   |   |
-
-#### 2. Assignment of well position to spatial coordinate
-
-The `well_coord_assignment.csv` file contains three pairs of columns which assign well positions to spatial coordinates as shown in the following table.
-
-| X_Coord | X_WellPosition | Y_Coord | Y_WellPosition | Z_Coord | Z_WellPosition |
-|---------|----------------|---------|----------------|---------|----------------|
-| 49      |                | 0       |                | 0       | A1             |
-| 48      | B1             | 1       | B1             | 0       | C4             |
-| 47      | C1             | 2       | C1             | 0       | D6             |
-| 46      | D1             | 3       | D1             | 0       | F6             |
-
-#### 3. Filling of the barcode legend file
-
-To fill the columns `X`, `Y` (, `Z`) run following python script. The output is saved as `barcodes_legend.csv` to the input folder.
-
-```
-# fill barcode legend file
-python /path/to/script/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
-```
-
-Examples for the .csv files can be find in the folder `/barcodes/`
-
-### Run pipeline
-
-```
-# activate environment
-conda activate dbitx_toolbox
-
-# run pipeline
-nohup bash /path/to/script/DbitX_pipeline.sh -g <GenomeDir> -r <ReferenceFasta> \
--b <BarcodeFile> -n <ExpectedNumberOfCells> -m <RunMode> -j <jobs> r1.fastq r2.fastq &
-```
-
-### Test run for use on HPC server in Meier lab
-
-```
-cd /path/to/repo/DbitX_toolbox/
-cd test_files/
-
-# create barcode .csv file
-python ../src/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
-
-# activate environment
-conda activate dbitx_toolbox
-
-# run test run
-nohup bash ../DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ -r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ./barcodes_legend.csv -n 2300 -m DbitX -j 1 ./r1_100k.fastq ./r2_100k.fastq &
-```
-
-## Supplementary notes
-
-### Generate fastq files from .bcl files
-
-If the sequencer did not generate fastq files one can use bcl2fastq to generate the fastq files.
-```
-# run bcl2fastq without splitting the lanes
-nohup /usr/local/bin/bcl2fastq --runfolder-dir 201130_NB552024_0025_AHG3GMAFX2/ --no-lane-splitting -r 20 -p 20 &
-```
-
-### Quality control using FastQC
-
-FastQC is an R package which performs a basic quality control on a sequencing run. Following code was used to run FastQC:
-```
-########################################
-# Script to run FastQC
-########################################
-
-# set working directory for this notebook
-setwd(<working_directory>)
-
-# library
-# install.packages("fastqcr")
-library("fastqcr")
-
-# How to install and update FastQC in case it's not installed yet
-# fastqc_install()
-
-## Quality Control with FastQC
-
-fq_dir <- "<Fastq_directory>"
-qc_dir <- paste(fq_dir, "qc", sep = "/") 
-
-# run fastqc
-fastqc(fq.dir = fq_dir,
-       qc.dir = qc_dir,
-       threads = 4)
-
-#############
-# HTML results are saved in output directory and can be viewed via filezilla
-#############
-```
-
-For installation see: https://cran.r-project.org/web/packages/fastqcr/readme/README.html
+# Supplementary notes
 
 ### Create test files
 

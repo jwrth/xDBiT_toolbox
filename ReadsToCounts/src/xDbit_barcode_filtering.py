@@ -6,7 +6,7 @@ This is to process Split-seq reads after tagging the bam file with cellular and 
 Input: BAM file with reads that have been filtered, polyA and SMART adapter trimmed, and tagged with the following:
     - XX: x-coordinate
     - XY: y-coordinate
-    - (OPTIONAL) XZ: z-coordinate (well coordinate in DbitX)
+    - (OPTIONAL) XZ: z-coordinate (well coordinate in xDbit)
     - XM: molecular barcode (UMI)
 
 Algorithm:
@@ -298,7 +298,7 @@ if __name__ == '__main__':
     parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
     parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
     parser.add_argument('-m', action='store_true', help="Use multithreading?")
-    parser.add_argument('--mode', action='store', default='DbitX', help="Which mode? DbitX or Dbit-seq?")
+    parser.add_argument('--mode', action='store', default='xDbit', help="Which mode? xDbit or Dbit-seq?")
 
     ## Start timing
     t_start = datetime.now()
@@ -329,11 +329,11 @@ if __name__ == '__main__':
     # check out mode
     if mode == 'Dbit-seq':
         coord_names = ['X', 'Y']
-    elif mode == 'DbitX':
+    elif mode == 'xDbit':
         coord_names = ['X', 'Y', 'Z']
     else:
         # exit script
-        sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
+        sys.exit('{} is no valid mode ["xDbit", "Dbit-seq"]'.format(mode))
         
     ## Import barcode legend and extract information
     #barcode_legend = pd.read_csv(glob.glob(os.path.join(bc_dir,"*barcodes_legend*.csv"))[0])

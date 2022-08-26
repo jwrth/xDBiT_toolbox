@@ -1,4 +1,4 @@
-name: dbitx_toolbox
+name: ReadsToCounts
 channels:
   - anaconda
   - conda-forge
@@ -61,4 +61,3 @@ dependencies:
     - python-levenshtein==0.12.2
     - pytz==2021.1
     - tqdm==4.59.0
-prefix: /home/jwirth/anaconda3/envs/dbitx_toolbox
