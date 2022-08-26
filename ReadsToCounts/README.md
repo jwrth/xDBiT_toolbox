@@ -1,4 +1,109 @@
-# Installation of tools needed for ReadsToCounts
+# ReadsToCounts pipeline
+
+This pipeline transforms raw NGS sequencing reads from xDbit experiments into count matrices.
+
+Input formats: `.fastq` or `.fastq.gz`
+
+Output format: `txt.gz`
+
+## Preparation of raw sequencing reads
+
+### Demultiplexing
+
+```
+nohup bcl2fastq --runfolder-dir 220111_A00623_0449_BHN3G2DRXY/ --sample-sheet 220111_A00623_0449_BHN3G2DRXY/SampleSheet_HN3G2DRXY.csv --no-lane-splitting --minimum-trimmed-read-length=8 --mask-short-adapter-reads=8 --ignore-missing-positions --ignore-missing-controls --ignore-missing-filter --ignore-missing-bcls -r 20 -w 20 -p 40 &> nohup_demult.out &
+```
+
+### Quality control
+
+#### FastQC analysis
+
+Documentation: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+
+```
+cd /path/to/fastqs
+
+# run FastQC in background
+nohup fastqc -t 40 <fastq_folders>/*fastq.gz &> nohup_fastqc.out &
+```
+
+## Prepare barcode to coordinate assignment
+
+The xDbit sequencing reads have following structure:
+![read-structure](../graphics/xdbit_read-structure.png)
+
+Each barcode on the read lies at a predetermined position relative to the beginning of the read and corresponds to a specific coordinate. In order to assign each read a specific X-, Y-, and if used Z-coordinate, the pipeline requires information about the barcode-to-coordinate assignents.
+
+Two types of files are used to provide this information:
+
+1. Well-to-coordinate information for each of the nine xDbit samples in `.csv` format
+2. Barcode-to-well information in `barcode_legend_empty.csv` file.
+
+Those two files are used to fill the empty barcode legend file with all information required by the pipeline.
+
+The following section gives a more detailed overview of the file structure discussed above.
+
+### 1. Well-to-coordinate assignment file
+
+Examples of the files can be found under `./barcodes/well_coord_assignments/`
+
+Each of the nine files has following structure:
+| X_Coord | X_WellPosition | Y_Coord | Y_WellPosition | Z_Coord | Z_WellPosition |
+|---------|----------------|---------|----------------|---------|----------------|
+| 37      |                | 0       |                | 0       | A1             |
+| 36      | B3             | 1       | B1             | 0       | C4             |
+| 35      | C3             | 2       | C1             | 0       | D6             |
+| 34      | D3             | 3       | D1             | 0       | F6             |
+| 33      | A4             | 4       | A2             |         |                |
+| …       | …              | …       | …              |         |                |
+
+- ``X_Coord``: X-coordinate/column in the xDbit grid
+- ``X_WellPosition``: Well position in barcoding well plate of the respective ligation round. Needs to correspond to the labels in the barcode legend file.
+- ``Y_Coord``: Y-coordinate/row in xDbit grid
+- ``Y_WellPosition``: Well position in barcoding well plate of the respective ligation round. needs to correspond to the labels in the barcode legend file.
+- ``Z_Coord``: Sample ID.
+- ``Z_WellPosition``: Well position of barcodes used for the RevT-indexing of this sample.
+
+### 2. Barcode-to-well assignment file
+
+Example can be found in `./barcodes/barcodes_legend_empty.csv`
+
+Structure of the file:
+| Row | Column | WellPosition | Name      | Barcode  | X | Y | Z | string_matching_algorithm | X_maxdist | Y_maxdist | Z_maxdist |
+|-----|--------|--------------|-----------|----------|---|---|---|---------------------------|-----------|-----------|-----------|
+| A   | 1      | A1           | Round1_01 | AACGTGAT |   |   |   | levenshtein               | 1         | 1         | 3         |
+| B   | 1      | B1           | Round1_02 | AAACATCG |   |   |   |                           |           |           |           |
+| C   | 1      | C1           | Round1_03 | ATGCCTAA |   |   |   |                           |           |           |           |
+| D   | 1      | D1           | Round1_04 | AGTGGTCA |   |   |   |                           |           |           |           |
+| E   | 1      | E1           | Round1_05 | ACCACTGT |   |   |   |                           |           |           |           |
+| ... | ...    | ...          | ...       | ...      |   |   |   |                           |           |           |           |
+
+- ``WellPosition``: Well position in barcoding well plates. Assumes that both ligation rounds use the same set of barcodes with the same positions in the well plates.
+- ``Barcode``: Barcode in this well position.
+- ``X/Y/Z``: Filled by `./src/fill_barcode_legend.py` script.
+- ``string_matching_algorithm``: Method used to calculate the distance between read sequence and barcodes. Allows `hamming` or `levenshtein`.
+- ``X/Y/Z_maxdist``: Maximum distance between read and barcode being allowed to be considered a match.
+
+
+#### Summarize results with MultiQC
+
+Documentation: https://multiqc.info/
+
+```
+# run multiqc after FastQC analysis
+multiqc <fastq_folders>/
+```
+
+# Installation of tools needed for processing of raw reads and ReadsToCounts
+
+## Quality control
+### FastQC
+
+`conda install -c bioconda fastqc`
+
+### MultiQC
+
+`pip install multiqc`
 
 ### Samtools
 Download and instructions from: https://www.htslib.org/download/
