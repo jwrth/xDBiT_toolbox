@@ -13,4 +13,3 @@ dependencies:
   - scanpy
   - leidenalg
   - gprofiler-official
-prefix: D:\Users\johannes.wirth\Anaconda3\envs\CountsToAnndata
