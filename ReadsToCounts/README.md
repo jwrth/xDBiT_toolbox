@@ -6,7 +6,11 @@ Input formats: `.fastq` or `.fastq.gz`
 
 Output format: `txt.gz`
 
-## Create conda environment
+# Get started
+
+## Installation
+
+### Create conda environment
 
 ```
 # create environment from file
@@ -26,9 +30,9 @@ It is important to use the `--no-lane-splitting` option here.
 nohup bcl2fastq --runfolder-dir 220111_A00623_0449_BHN3G2DRXY/ --sample-sheet 220111_A00623_0449_BHN3G2DRXY/SampleSheet_HN3G2DRXY.csv --no-lane-splitting --minimum-trimmed-read-length=8 --mask-short-adapter-reads=8 --ignore-missing-positions --ignore-missing-controls --ignore-missing-filter --ignore-missing-bcls -r 20 -w 20 -p 40 &> nohup_demult.out &
 ```
 
-### Quality control
+## Quality control
 
-#### FastQC analysis
+### FastQC analysis
 
 Documentation: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/
 
@@ -39,7 +43,7 @@ cd /path/to/fastqs
 nohup fastqc -t 40 <fastq_folders>/*fastq.gz &> nohup_fastqc.out &
 ```
 
-#### Summarize results with MultiQC
+### Summarize results with MultiQC
 
 Documentation: https://multiqc.info/
 
@@ -48,7 +52,9 @@ Documentation: https://multiqc.info/
 multiqc <fastq_folders>/
 ```
 
-## Create STAR metadata
+## Prepare alignment: 
+
+### Download genome
 
 Example for human genome:
 
@@ -58,8 +64,10 @@ wget ftp://ftp.ensembl.org/pub/release-100/fasta/homo_sapiens/dna/Homo_sapiens.G
 wget ftp://ftp.ensembl.org/pub/release-100/gtf/homo_sapiens/Homo_sapiens.GRCh38.100.gtf.gz
 gzip -d Homo_sapiens.GRCh38.100.gtf.gz
 gzip -d Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+```
 
-
+### Create STAR metadata
+```
 # run metadata script
 ./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh \
 -s Homo_sapiens -n Hs_metadata -r Homo_sapiens.GRCh38.dna.primary_assembly.fa -g Homo_sapiens.GRCh38.100.gtf \
@@ -236,7 +244,6 @@ python3 -m pip install --user --upgrade cutadapt
 
 Manual on: https://github.com/alexdobin/STAR
 
-### Installation
 ```
 # Get latest STAR source from releases
 wget https://github.com/alexdobin/STAR/archive/2.7.8a.tar.gz

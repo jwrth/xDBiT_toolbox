@@ -28,7 +28,7 @@ class SelectionWindow:
 
         self.root = Tk()
         self.root.title('CountsToAnndata')
-        self.root.geometry("400x180")
+        self.root.geometry("400x200")
         self.root.option_add("*font", "Calibri 10")
 
         self.home = os.path.expanduser("~") # get home directory
@@ -74,7 +74,7 @@ class SelectionWindow:
 
         # set 8bit conversion checkbutton
         self.labelText4 = StringVar()
-        self.labelText4.set("Convert to 8bit:")
+        self.labelText4.set("Convert images to 8-bit:")
         self.labelDir4 = Label(self.root, textvariable=self.labelText4)
         self.labelDir4.grid(row=4, column=0)
 
@@ -86,19 +86,19 @@ class SelectionWindow:
         self.labelText5 = StringVar()
         self.labelText5.set("Perspective transformation (else affine):")
         self.labelDir5 = Label(self.root, textvariable=self.labelText5)
-        self.labelDir5.grid(row=4, column=0)
+        self.labelDir5.grid(row=5, column=0)
 
         self.perspect_entry = IntVar(value=False)
         self.checkbutton2 = Checkbutton(self.root, variable=self.perspect_entry, onvalue=True, offvalue=False)
-        self.checkbutton2.grid(row=4, column=1)
+        self.checkbutton2.grid(row=5, column=1)
 
         # set cancel button to exit script
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
-        self.cancel.grid(row=5,column=1)
+        self.cancel.grid(row=6,column=1)
 
         # set okay button to continue script
         self.okay = Button(self.root, text="Okay", command=self.closewindow)
-        self.okay.grid(row=5,column=0)
+        self.okay.grid(row=6,column=0)
 
         # key bindings
         self.root.bind("<Return>", func=self.closewindow)
@@ -605,6 +605,28 @@ class CountsToAnndata():
             plt.close(fig)
         else:
             plt.show()
+
+def boolean_input(message, default):
+    '''
+    Convert user input into a boolean value if it is one of the following inputs:
+    - "True"/"False"
+    - "TRUE"/"FALSE"
+    - "true"/"false"
+    - "T"/"F"
+    - "t"/"f"
+    '''
+
+    while True:
+        # prompt input window and convert input to lower case and strip spaces
+        user_input = input(message).lower().strip()
+        if user_input in ["true", "t"]:
+            return True
+        elif user_input in ["false", "f"]:
+            return False
+        elif user_input == "":
+            return default
+        else:
+            print("Error: Input must be True or False.")
                 
 #######
 ## Protocol start
@@ -630,13 +652,24 @@ if __name__ == "__main__":
         ppmalign = float(selection.ppmalign) if len(selection.ppmalign) > 0 else None
 
     except tkinter.TclError:
+        # input settings file
         settings_file = input("Enter path to parameters .csv file: ")
+        
+        # limit image size during registration to reduce required RAM
         maxpx = int(input("Enter maximum pixel width for registration: "))
 
-    #settings_file = "C:\\Users\\Johannes\\Documents\\homeoffice\\37_48\\CountsToAnndata\\37_48_CoA_param_withvertices_20220402_test.csv"
-    settings_file = settings_file.strip('"')
+        # get input about resolutions
+        ppmhq = input("Resolution HQ image [µm/px]:")
+        ppmhq = float(ppmhq) if len(ppmhq) > 0 else None
+        ppmalign = input("Resolution alignment image [µm/px]:")
+        ppmalign = float(ppmalign) if len(ppmalign) > 0 else None
+
+        # get input about transformations
+        convert = boolean_input("Convert images to 8-bit? [t]/f", default=True)
+        perspective_transform = boolean_input("Perspective transformation (else affine)? [t]/f", default=True)
     
     # read and check input file
+    settings_file = settings_file.strip('"')
     coa = CountsToAnndata()
     coa.ReadAndCheckSettings(settings_file=settings_file)
 

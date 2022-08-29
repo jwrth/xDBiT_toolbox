@@ -32,15 +32,22 @@ xDbit allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object
 
 ![readstructure](graphics/xdbit_read-structure.png)
 
-## xDbit toolbox pipeline
-
-The xDbit toolbox pipeline inputs the read 1 and read 2 .fastq files from the NGS run and generates a spot x gene matrix which can then be used for further analyses.
+## xDbit toolbox preprocessing pipeline
 
 ![](graphics/pipeline_overview.png)
 
-# Installation
+The preprocessing pipeline of the xDbit toolbox consists of two steps to convert raw sequencing reads into a spot/gene count matrix with aligned images:
 
-## Clone repository
+1. **ReadsToCounts**
+2. **CountsToAnndata**
+
+Both pipelines and more detailed instructions can be found in the folders `./ReadsToCounts/` and `./CountsToAnndata/`, respectively.
+
+
+# Get started
+## Installation
+
+### Clone repository
 
 ```
 git clone https://github.com/jwrth/xDbit_toolbox.git
@@ -50,7 +57,7 @@ cd /path/to/repo/xDbit_toolbox
 chmod u=rwx,g=r,o=r ./ReadsToCounts/external_tools/Drop-seq_tools-2.1.0/*
 ```
 
-## Install python environment
+### Install python environment
 
 ```
 # install environment from file depending on OS
@@ -66,7 +73,7 @@ conda install -c anaconda ipykernel
 python3 -m ipykernel install --user --name=xdbit_kernel
 ```
 
-# Get started
+## Use toolbox as python module
 
 To load the `xDbit_toolbox` as module run following code.
 
