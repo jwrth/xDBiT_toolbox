@@ -14,7 +14,7 @@ Output format: `txt.gz`
 
 ```
 # create environment from file
-conda env create -f path/to/ReadsToCounts_environment.yml
+conda env create -f ./ReadsToCounts.yml
 
 # activate environment
 conda activate ReadsToCounts
