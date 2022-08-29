@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# This is a script to process xDbit reads. It is a modified version of
-# Drop-seq_alignment.sh provided alongside of  Dropseqtools from Steve McCarroll's lab.
+# This is a script to process xDbit reads. It is a modified version of the
+# Drop-seq_alignment.sh provided alongside of Dropseqtools from Steve McCarroll's lab.
 # Also the code is based on work with a Copyright by Rebekka Wegmann (Snijderlab, ETH Zurich, 2019) which has been published in following GitHub repository: 
 # https://github.com/RebekkaWegmann/splitseq_toolbox
 #
