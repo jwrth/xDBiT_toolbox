@@ -7,8 +7,6 @@ It involves the following steps:
   2. Addition of experimental parameters to dataset.
   3. (Optional) Registration of hiqh-quality images with alignment image using SIFT algorithm.
 
-
-
 *CountsToAnndata* has been tested on Windows and Linux.
 
 # Get started
@@ -63,9 +61,9 @@ If the window cannot be opened, all inputs can be entered in the input prompt.
 
 ### Alignment marker selection and image registration.
 
-To align spatial transcriptome and image data, alignment markers were introduced in xDbit. The selection of the vertices of those markers is done semi-automatically and requires some manual selection. The *CountsToAnndata* pipeline invokes a *napari* window, in which you can mark the vertices with points using the tool box provided by *napari*. The selection should look as demonstrated in the following image:
+To align spatial transcriptome and image data, alignment markers were introduced in xDbit. The selection of the vertices of those markers is done semi-automatically and requires some manual selection. The *CountsToAnndata* pipeline invokes a *napari* window, in which you can mark the vertices with points using the tool box provided by *napari*. The selection can be done as described in following example:
 
-![alignment marker demo](../graphics/xDbit_align_markers_demo.png)
+![napari](../graphics/napari_align_markers_demo.png)
 
 After doing the marker selection for all datasets provided in the settings file, the pipeline saves a settings file with coordinates of the vertices added to the columns `vertices_x` and `vertices_y`.
 

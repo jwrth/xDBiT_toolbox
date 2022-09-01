@@ -5,9 +5,7 @@ This repository contains all code that is necessary to reproduce results shown i
 Further, it includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or xDbit experiments.
 This part is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
 
-The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox.
-
-The pipeline was created in a Linux server environment and the STAR alignment step requires more than 30 GB RAM.
+If you have questions or suggestions, please feel free to open an issue or contact me directly.
 
 # Publication
 
@@ -45,6 +43,10 @@ Both pipelines and more detailed instructions can be found in the folders `./Rea
 
 
 # Get started
+
+## Requirements
+
+The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox. It was created in a Linux server environment and the STAR alignment step requires more than 30 GB RAM.
 ## Installation
 
 ### Clone repository
