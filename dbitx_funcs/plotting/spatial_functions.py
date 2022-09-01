@@ -287,7 +287,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         else:
             plot_name = header_names[i]
             ax.set_title(plot_name, fontsize=header_fontsize, fontweight='bold')
-        
+
         ax.invert_yaxis()
         ax.grid(False)
         ax.set_aspect(1)
@@ -685,6 +685,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     use_raw=False,
     max_cols=4,
     xlabel=None,ylabel=None,
+    vline=None, hline=None,
     #values_into_title=None, title_suffix='', 
     custom_titles=None,
     legend_fontsize=24, 
@@ -882,6 +883,18 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 if hue is not None and _hue not in added_to_legend:
                     added_to_legend.append(_hue)
 
+        # optionally add vertical or horizontal lines to plot
+        if vline is not None:
+            vline = [vline] if isinstance(vline, int) or isinstance(vline, float) else list(vline)
+            
+            for v in vline:
+                axs[i].axvline(x=v, ymin=0, ymax=1, c='k', linewidth=4, linestyle='dashed')
+
+        if hline is not None:
+            hline = [hline] if isinstance(hline, int) or isinstance(hline, float) else list(hline)
+            
+            for h in hline:
+                axs[i].axhline(y=h, xmin=0, xmax=1, c='k', linewidth=4, linestyle='dashed')
 
         if not return_data:
             if xlabel is None:

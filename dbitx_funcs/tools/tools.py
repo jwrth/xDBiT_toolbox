@@ -34,6 +34,12 @@ def rotatePoint(origin, point, angle, radians=False):
 
 
 def get_nrows_maxcols(keys, max_cols):
+    '''
+    Determine optimal number of rows and columns for `plt.subplot` based on
+    list of keys [`keys`] and maximum number of columns [`max_cols`].
+
+    Returns: `n_plots`, `n_rows`, `max_cols`
+    '''
 
     n_plots = len(keys)
     if n_plots > max_cols:
