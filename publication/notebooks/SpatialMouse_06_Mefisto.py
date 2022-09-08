@@ -10,7 +10,7 @@ module_path = os.path.abspath("../../")
 if module_path not in sys.path:
     sys.path.append(module_path)
 
-import dbitx_funcs as db
+import xdbit_funcs as db
 
 import scanpy as sc
 import matplotlib.pyplot as plt
