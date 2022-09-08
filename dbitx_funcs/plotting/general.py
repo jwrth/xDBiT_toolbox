@@ -611,7 +611,7 @@ savepath=None, save_only=False, show=True, dpi_save=300):
 
     fig.tight_layout()
 
-    save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+    save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save, fig=fig)
 
 
 def go_network(enrichment, color_key=None, groups=None,

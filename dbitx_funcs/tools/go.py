@@ -12,7 +12,7 @@ from ..utils import SpeciesToID, find_between
 
 class GOEnrichment():
     def __init__(self):
-        self.result = {}
+        self.results = {}
     
     def prepare_enrichment(self, adata: AnnData = None, key: str = None, key_added: str = None, 
             #uns_key_added: str = 'enrichment', return_df: bool = True, 
@@ -43,27 +43,51 @@ class GOEnrichment():
         return deg, groups, key_added
 
     def gprofiler(self, adata: AnnData = None, key: str = None, top_n: int = 300, organism: str = None, target_genes: List = None, key_added: str = None, 
-        uns_key_added: str = 'gprofiler_enrichment', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
+        uns_key_added: str = 'gprofiler', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
         **kwargs: Any):
+        '''
+        Performs GO term enrichment analysis using the gprofiler web resource.
 
-        deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        sortby=sortby, 
-                        )
+        Input can be one of the following two options:
+            1. adata with respective key for `adata.uns[key]`
+            2. List or dictionary of genes as target_genes. With a dictionary multiple queries can be started in parallel, assuming that the keys
+                are the name of the query and the values are the respective lists of genes. `key` can be specified to save the results under a specific name
+                under self.result['gprofiler'][key].
+        '''
+        from_adata = False
+        if adata is not None:
+            deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
+                            sortby=sortby, 
+                            )
+            from_adata = True
+        elif isinstance(target_genes, dict):
+            # retrieve query names
+            groups = list(target_genes.keys())
+        elif isinstance(target_genes, list):
+            groups = ['query'] # set default name of query
+            target_genes = {'query': target_genes}
+        else:
+            raise ValueError("`adata` is None and `target_genes` is neither a dictionary or a list.")
+
+        if key_added is None:
+            key_added = 'foo'
         
         if organism is None:
             raise ValueError("`organism` not specified. Needs gprofiler naming conventions, e.g. `mmusculus`")
 
         enrichment_dict = {}
         for i, group in enumerate(groups):
-            if key is not None:
-                #target_genes = deg.xs(group).names.tolist()
-                target_genes = deg.query('group == "{}"'.format(group)).names.tolist()
+            if from_adata:
+                #genes = deg.xs(group).names.tolist()
+                genes = deg.query('group == "{}"'.format(group)).names.tolist()
+            else:
+                genes = list(target_genes[group])
             
             if top_n is not None:
-                target_genes = target_genes[:top_n]
+                genes = genes[:top_n]
 
             gp = GProfiler(return_dataframe=True)
-            e = gp.profile(organism=organism, query=target_genes, no_evidences=False)
+            e = gp.profile(organism=organism, query=genes, no_evidences=False)
             
             # calc -log(p_value)
             e['Enrichment score'] = [-np.log10(elem) for elem in e.p_value]
@@ -79,14 +103,15 @@ class GOEnrichment():
         enrichment.rename(columns={'recall': 'Gene ratio'}, inplace=True)
 
         # save in class
-        if not "gprofiler" in self.result:
-            self.result["gprofiler"] = {}
+        if not uns_key_added in self.results:
+            self.results[uns_key_added] = {}
         
-        self.result["gprofiler"][key] = enrichment
+        self.results[uns_key_added][key_added] = enrichment
 
+        # save in adata
         if return_df:
             return enrichment
-        else:
+        elif from_adata:
             if uns_key_added in adata.uns:
                 adata.uns[uns_key_added][key_added] = enrichment
             else:
@@ -94,14 +119,40 @@ class GOEnrichment():
                 adata.uns[uns_key_added][key_added] = enrichment
 
     
-    def stringdb(self, adata: AnnData = None, key: str = None, top_n: int = 300, organism: str = None, target_genes: List = None, key_added: str = None, 
-        uns_key_added: str = 'stringdb_enrichment', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
+    def stringdb(self, adata: AnnData = None, key: str = None, top_n: int = 300, 
+        organism: str = None, target_genes: List = None, key_added: str = None, 
+        uns_key_added: str = 'stringdb', return_df: bool = True, 
+        sortby: str = 'pvals_adj', ascending: bool = True,
         **kwargs: Any):
 
-        deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added,
-                        sortby=sortby, 
-                        #ascending=ascending
-                        )
+        '''
+        Performs GO term enrichment analysis using the gprofiler web resource.
+
+        Input can be one of the following two options:
+            1. adata with respective key for `adata.uns[key]`
+            2. List or dictionary of genes as target_genes. With a dictionary multiple queries can be started in parallel, assuming that the keys
+                are the name of the query and the values are the respective lists of genes. `key` can be specified to save the results under a specific name
+                under self.result['gprofiler'][key].
+        '''
+
+        from_adata = False
+        if adata is not None:
+            deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added,
+                            sortby=sortby, 
+                            #ascending=ascending
+                            )
+            from_adata = True
+        elif isinstance(target_genes, dict):
+            # retrieve query names
+            groups = list(target_genes.keys())
+        elif isinstance(target_genes, list):
+            groups = ['query'] # set default name of query
+            target_genes = {'query': target_genes}
+        else:
+            raise ValueError("`adata` is None and `target_genes` is neither a dictionary or a list.")
+
+        if key_added is None:
+            key_added = 'foo'
 
         if organism is None:
             raise ValueError("`organism` not specified. Needs to gprofiler naming conventions, e.g. `mmusculus`")
@@ -109,16 +160,16 @@ class GOEnrichment():
         enrichment_dict = {}
         for i, group in enumerate(groups):
             #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
-            if key is not None:
-                #target_genes = deg.xs(group).names.tolist()
-
-                target_genes = deg.query('group == "{}"'.format(group)).names.tolist()
+            if from_adata:
+                genes = deg.query('group == "{}"'.format(group)).names.tolist()
+            else:
+                genes = list(target_genes[group])
             
             if top_n is not None:
-                target_genes = target_genes[:top_n]
+                genes = genes[:top_n]
 
             sdb = StringDB()
-            sdb.call_stringdb_enrichment(genes=target_genes, species=organism)
+            sdb.call_stringdb_enrichment(genes=genes, species=organism)
             e = sdb.result
 
             ## modify data to fit into further analysis
@@ -145,14 +196,14 @@ class GOEnrichment():
         enrichment.rename(columns={'recall': 'Gene ratio'}, inplace=True)
 
         # save in class
-        if not "stringdb" in self.result:
-            self.result["stringdb"] = {}
+        if not uns_key_added in self.results:
+            self.results[uns_key_added] = {}
             
-        self.result["stringdb"][key] = enrichment
+        self.results[uns_key_added][key_added] = enrichment
 
         if return_df:
             return enrichment
-        else:
+        elif from_adata:
             if uns_key_added in adata.uns:
                 adata.uns[uns_key_added][key_added] = enrichment
             else:
@@ -197,10 +248,10 @@ class GOEnrichment():
         enrichment.rename(columns={'Gene_set': 'source'}, inplace=True)
 
         # save in class
-        if not "enrichr" in self.result:
-            self.result["enrichr"] = {}
+        if not "enrichr" in self.results:
+            self.results["enrichr"] = {}
 
-        self.result["enrichr"][key] = enrichment
+        self.results["enrichr"][key] = enrichment
 
         if return_df:
             return enrichment
@@ -268,7 +319,8 @@ class StringDB:
             "term": "native"
             }, inplace=True)
 
-        # calculate enrichment score        
+        # calculate enrichment score
+
         self.result['Enrichment score'] = [-np.log10(elem) for elem in self.result["fdr"]]
         self.result["Gene ratio"] = [a/b for a,b in zip(self.result["number_of_genes"], self.result["number_of_genes_in_background"])]
 
