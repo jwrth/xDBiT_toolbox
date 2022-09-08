@@ -256,3 +256,44 @@ def center_of_mass(values, weights):
     else:
         com = np.nan
     return com
+
+def cohens_d(a, b, paired=False, correct_small_sample_size=True):
+    '''
+    Function to calculate the Cohen's D measure of effect sizes.
+
+    Function with correction was adapted from:
+    https://www.statisticshowto.com/probability-and-statistics/statistics-definitions/cohens-d/
+
+    To allow measurement for different sample sizes following sources were used:
+    https://stackoverflow.com/questions/21532471/how-to-calculate-cohens-d-in-python
+    https://en.wikipedia.org/wiki/Effect_size#Cohen's_d
+
+    For paired samples following websites were used:
+    https://www.datanovia.com/en/lessons/t-test-effect-size-using-cohens-d-measure/
+    The results were tested here: https://statistikguru.de/rechner/cohens-d-gepaarter-t-test.html
+    '''
+    if not paired:
+        # calculate parameters
+        mean1 = np.mean(a)
+        mean2 = np.mean(b)
+        std1 = np.std(a, ddof=1)
+        std2 = np.std(b, ddof=1)
+        n1 = len(a)
+        n2 = len(b)
+        dof = n1 + n2 - 2 # degrees of freedom
+        SDpool = np.sqrt(((n1-1) * std1**2 + (n2 - 1) * std2**2) / dof) # pooled standard deviations
+
+        d = (mean1 - mean2) / SDpool
+
+        n = np.min([n1, n2])
+        if correct_small_sample_size and n < 50:
+            # correct for small sample size
+            corr_factor = ((n - 3) / (n-2.25)) * np.sqrt((n - 2) / n)
+            d *= corr_factor
+
+    else:
+        assert len(a) == len(b), "For paired testing the size of both samples needs to be equal."
+        diff = np.array(a) - np.array(b)
+        d = np.mean(diff) / np.std(diff)
+        
+    return d
