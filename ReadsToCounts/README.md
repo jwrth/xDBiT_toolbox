@@ -6,9 +6,20 @@ Input formats: `.fastq` or `.fastq.gz`
 
 Output format: `txt.gz`
 
-# Get started
+## Contents
 
-## Installation
+1. [Installation of pipeline](#installation-of-pipeline)
+2. [Test run](#test-run)
+3. [Preparations](#preparations)
+4. [Run ReadsToCounts pipeline](#run-readstocounts-pipeline)
+5. [Installation of external tools](#installation-of-external-tools)
+
+# Installation of pipeline
+## Requirements
+
+`ReadsToCounts` was tested on a Linux machine and the genome alignment steps using [STAR](https://github.com/alexdobin/STAR) require >30 GB RAM.
+
+Installation of external tools is described [here](#installation-of-external-tools).
 
 ### Create conda environment
 
@@ -20,7 +31,7 @@ conda env create -f ./ReadsToCounts.yml
 conda activate ReadsToCounts
 ```
 
-## Test run
+# Test run
 
 To test whether the installation worked and the ReadsToCounts pipeline works on your device, it can be run without the alignment steps as follows. Settings for the test run are read from `./batch_parameters.csv`.
 
@@ -33,6 +44,7 @@ The test run creates a `nohup.out` file in the current directory and for each ba
 
 If the log file does not show any errors and the pipeline runs to the end all necessary packages beside the STAR alignment software is installed and all files, except for the STAR alignment files, are correctly formatted.
 
+# Preparations
 ## Preparation of raw sequencing reads
 
 ### Demultiplexing
@@ -65,7 +77,7 @@ Documentation: https://multiqc.info/
 multiqc <fastq_folders>/
 ```
 
-## Prepare alignment: 
+## Prepare alignment
 
 ### Download genome
 
@@ -82,9 +94,9 @@ gzip -d Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
 ### Create STAR metadata
 ```
 # run metadata script
-./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh \
+./path/to/xDbit_toolbox/external_tools/Drop-seq_tools-2.1.0/create_Drop-seq_reference_metadata.sh \
 -s Homo_sapiens -n Hs_metadata -r Homo_sapiens.GRCh38.dna.primary_assembly.fa -g Homo_sapiens.GRCh38.100.gtf \
--d ./path/to/DbitX_toolbox/external_tools/Drop-seq_tools-2.1.0
+-d ./path/to/xDbit_toolbox/external_tools/Drop-seq_tools-2.1.0
 ```
 
 ## Prepare barcode to coordinate assignment
@@ -156,9 +168,9 @@ python ./src/fill_barcode_legend.py path/to/barcodes_legend_empty.csv path/to/we
 ```
 The output is saved into the input folder.
 
-## Run ReadsToCounts pipeline
+# Run ReadsToCounts pipeline
 
-### Prepare batch parameter file
+## Prepare batch parameter file
 
 The pipeline can process multiple datasets in parallel. All required information is summarized in a batch parameter file.
 
@@ -177,7 +189,7 @@ Description of all mandatory parameters:
 - ``pipeline_dir``: Path to `xDbit_pipeline.sh` file.
 
 
-### Run pipeline
+## Run pipeline
 
 ```
 # activate environment
@@ -192,23 +204,7 @@ nohup python path/to/xDbit_run_batch.py --batch_file path/to/batch_parameter.csv
 
 All output and temporary files are saved into folders `out`/`tmp` in the base directory of the `fastq_R1` path that was provided in the batch parameters file. Output generated during the pipeline is writtein into the log file `pipeline_{}.out` in the same folder.
 
-### Test run for use on HPC server in Meier lab
-
-```
-cd /path/to/repo/DbitX_toolbox/
-cd test_files/
-
-# create barcode .csv file
-python ../src/fill_barcode_legend.py well_coord_assignment.csv barcodes_legend_empty.csv
-
-# activate environment
-conda activate dbitx_toolbox
-
-# run test run
-nohup bash ../DbitX_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ -r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ./barcodes_legend.csv -n 2300 -m DbitX -j 1 ./r1_100k.fastq ./r2_100k.fastq &
-```
-
-# Installation of tools needed for processing of raw reads and ReadsToCounts
+# Installation of external tools
 
 ## FastQC
 
@@ -246,10 +242,10 @@ Use samtools for example with following command to show the head of a .bam file:
 samtools view file.bam | head
 ```
 
-## Cutadapt (gets already installed with the environment)
+## Cutadapt
 ```
 # install or upgrade cutadapt
-conda activate dbitx_toolbox
+conda activate ReadsToCounts
 python3 -m pip install --user --upgrade cutadapt
 ```
 

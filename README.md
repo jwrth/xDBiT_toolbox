@@ -1,23 +1,21 @@
 # xDbit_toolbox
 
-This repository contains all code that is necessary to reproduce results shown in the publication ...
+This repository contains all code that is necessary to reproduce results shown in the preprint https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1.
 
 Further, it includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or xDbit experiments.
-This part is based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
+This part is partially based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
 
 If you have questions or suggestions, please feel free to open an issue or contact me directly.
 
-# Publication
+## Contents
 
-## Title: Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+1. [Introduction](#introduction)
 
-## Abstract
+2. [Get started](#get-started)
 
-In this study, we present a multiplexed version of deterministic barcoding in tissue (xDbit) to acquire spatially resolved transcriptomes of nine tissue sections in parallel. New microfluidic chips were developed to spatially encode mRNAs over a total tissue area of 1.17 cm2 with spots of 50 µm×50 µm. Optimization of the biochemical protocol increased read and gene counts per spot by one order of magnitude compared with previous reports. Furthermore, the introduction of alignment markers allows seamless registration of images and spatial transcriptomic spot coordinates. Together with technological advances, we provide an open-source computational pipeline to transform raw sequencing data from xDbit experiments into the AnnData format. The functionality of xDbit was demonstrated by the acquisition of 18 spatially resolved transcriptomic datasets from five different murine organs, including cerebellum, liver, kidney, spleen, and heart. Factor analysis and deconvolution of xDbit spatial transcriptomes allowed for in-depth characterization of the murine kidney.
+3. [Preprint](#preprint)
 
-## Analysis
-
-All notebooks of the analyses performed in the publication can be found under `/publication/notebooks/`
+All Jupyter notebooks of the analyses performed in the publication can be found [here](`/publication/notebooks/`).
 
 # Introduction
 ## Barcoding layout
@@ -36,11 +34,10 @@ xDbit allows the spatial barcoding (X, Y) of 9 tissue sections (Z) on one object
 
 The preprocessing pipeline of the xDbit toolbox consists of two steps to convert raw sequencing reads into a spot/gene count matrix with aligned images:
 
-1. **ReadsToCounts**
-2. **CountsToAnndata**
+1. [**ReadsToCounts**](./ReadsToCounts/)
+2. [**CountsToAnndata**](./CountsToAnndata/)
 
-Both pipelines and more detailed instructions can be found in the folders `./ReadsToCounts/` and `./CountsToAnndata/`, respectively.
-
+Both pipelines and more detailed instructions can be found in the linked folders.
 
 # Get started
 
@@ -91,3 +88,10 @@ if module_path not in sys.path:
 
 import xdbit_funcs as db
 ```
+# Preprint
+
+## Title: Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+
+## Abstract
+
+In this study, we present a multiplexed version of deterministic barcoding in tissue (xDbit) to acquire spatially resolved transcriptomes of nine tissue sections in parallel. New microfluidic chips were developed to spatially encode mRNAs over a total tissue area of 1.17 cm2 with spots of 50 µm×50 µm. Optimization of the biochemical protocol increased read and gene counts per spot by one order of magnitude compared with previous reports. Furthermore, the introduction of alignment markers allows seamless registration of images and spatial transcriptomic spot coordinates. Together with technological advances, we provide an open-source computational pipeline to transform raw sequencing data from xDbit experiments into the AnnData format. The functionality of xDbit was demonstrated by the acquisition of 18 spatially resolved transcriptomic datasets from five different murine organs, including cerebellum, liver, kidney, spleen, and heart. Factor analysis and deconvolution of xDbit spatial transcriptomes allowed for in-depth characterization of the murine kidney.
