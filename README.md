@@ -15,7 +15,7 @@ If you have questions or suggestions, please feel free to open an issue or conta
 
 3. [Preprint](#preprint)
 
-All Jupyter notebooks of the analyses performed in the publication can be found [here](`./publication/notebooks/`).
+All Jupyter notebooks of the analyses performed in the publication can be found [here](./publication/notebooks/).
 
 # Introduction
 ## Barcoding layout
