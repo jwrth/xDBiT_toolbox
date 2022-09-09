@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 from glob import glob
 from datetime import datetime
+import argparse
 
 class SelectionWindow:
 
@@ -54,7 +55,7 @@ class SelectionWindow:
 
         # set HQ image resolution selection selection
         self.labelText2 = StringVar()
-        self.labelText2.set("Resolution HQ image [µm/px]:")
+        self.labelText2.set("Resolution HQ image [px/µm]:")
         self.labelDir2 = Label(self.root, textvariable=self.labelText2)
         self.labelDir2.grid(row=2, column=0)
 
@@ -64,7 +65,7 @@ class SelectionWindow:
 
         # set alignment image resolution selection selection
         self.labelText3 = StringVar()
-        self.labelText3.set("Resolution alignment image [µm/px]:")
+        self.labelText3.set("Resolution alignment image [px/µm]:")
         self.labelDir3 = Label(self.root, textvariable=self.labelText3)
         self.labelDir3.grid(row=3, column=0)
 
@@ -635,38 +636,56 @@ def boolean_input(message, default):
 if __name__ == "__main__":
 
     #####
+    # Parse arguments
+    #####
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--test_run", action='store_true', help="Perform test run with test files provided in xDbit toolbox repository.")
+    args = parser.parse_args()
+
+    test_run = args.test_run
+
+    #####
     # Selection window
     #####
 
     # open selection window
-    try:
-        selection = SelectionWindow()
-        selection.root.mainloop()
+    if not test_run:
+        try:
+            selection = SelectionWindow()
+            selection.root.mainloop()
 
-        # read input of selection window
-        settings_file = selection.settings_file
-        maxpx = int(selection.maxpx)
-        convert = bool(selection.convert)
-        perspective_transform = bool(selection.perspect)
-        ppmhq = float(selection.ppmhq) if len(selection.ppmhq) > 0 else None
-        ppmalign = float(selection.ppmalign) if len(selection.ppmalign) > 0 else None
+            # read input of selection window
+            settings_file = selection.settings_file
+            maxpx = int(selection.maxpx)
+            convert = bool(selection.convert)
+            perspective_transform = bool(selection.perspect)
+            ppmhq = float(selection.ppmhq) if len(selection.ppmhq) > 0 else None
+            ppmalign = float(selection.ppmalign) if len(selection.ppmalign) > 0 else None
 
-    except tkinter.TclError:
-        # input settings file
-        settings_file = input("Enter path to parameters .csv file: ")
-        
-        # limit image size during registration to reduce required RAM
-        maxpx = int(input("Enter maximum pixel width for registration: "))
+        except tkinter.TclError:
+            # input settings file
+            settings_file = input("Enter path to parameters .csv file: ")
+            
+            # limit image size during registration to reduce required RAM
+            maxpx = int(input("Enter maximum pixel width for registration: "))
 
-        # get input about resolutions
-        ppmhq = input("Resolution HQ image [µm/px]:")
-        ppmhq = float(ppmhq) if len(ppmhq) > 0 else None
-        ppmalign = input("Resolution alignment image [µm/px]:")
-        ppmalign = float(ppmalign) if len(ppmalign) > 0 else None
+            # get input about resolutions
+            ppmhq = input("Resolution HQ image [px/µm]:")
+            ppmhq = float(ppmhq) if len(ppmhq) > 0 else None
+            ppmalign = input("Resolution alignment image [px/µm]:")
+            ppmalign = float(ppmalign) if len(ppmalign) > 0 else None
 
-        # get input about transformations
-        convert = boolean_input("Convert images to 8-bit? [t]/f", default=True)
-        perspective_transform = boolean_input("Perspective transformation (else affine)? [t]/f", default=True)
+            # get input about transformations
+            convert = boolean_input("Convert images to 8-bit? [t]/f", default=True)
+            perspective_transform = boolean_input("Perspective transformation (else affine)? [t]/f", default=True)
+    else:
+        settings_file = "./test_files/test_params.csv"
+        maxpx = 4000
+        ppmhq = 80.96
+        ppmalign = 40.462
+        convert = True
+        perspective_transform = False
     
     # read and check input file
     settings_file = settings_file.strip('"')
@@ -685,7 +704,7 @@ if __name__ == "__main__":
     if module_path not in sys.path:
         sys.path.append(module_path)
 
-    import dbitx_funcs as db
+    import xdbit_funcs as db
 
     import matplotlib.pyplot as plt
     from pathlib import Path
@@ -701,6 +720,13 @@ if __name__ == "__main__":
     coa.ProcessDatasets(
         maxpx_before_reg=maxpx, to_8bit=convert,
         ppmhq=ppmhq, ppmalign=ppmalign, perspective_transform=perspective_transform)
+
+    if test_run:
+        import scanpy as sc
+        adata = sc.read("./test_files/anndata/Exp_ID_A1_hqimages.h5ad")
+        results_image = "./test_files/test_run_result.png"
+        db.pl.spatial(adata, keys=['Actb'], groupby="id", image_key='dapi', savepath=results_image)
+        print("Save results example of test run into {}".format(results_image))
 
     print("{} : Script finished.".format(
             f"{datetime.now():%Y-%m-%d %H:%M:%S}"), 
