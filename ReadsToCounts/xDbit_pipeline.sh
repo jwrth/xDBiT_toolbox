@@ -50,6 +50,7 @@ splitseq_root=$(dirname $0)
 barcode_dir=$splitseq_root/data/barcode_lists
 jobs=1
 mode=xDbit
+exclude_align=0
 
 
 function usage () {
@@ -72,6 +73,7 @@ Perform Split-seq tagging, barcode filtering, alignment and digital expression m
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
 -m                  : Mode. "xDbit" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
+-x <exclude_align>  : Excludes the alignment steps for testing purposes.
 EOF
 }
 
@@ -118,7 +120,7 @@ function show_time () {
 }
 
 #getopts parses input options. Options followed by a : expect an input argument. The : at the very beginning prevents standard error messages.
-while getopts ":d:t:o:pg:r:es:c::n:b:a:j:lm:" options; do
+while getopts ":d:t:o:pg:r:es:c::n:b:a:j:lm:x" options; do
   case $options in
     d ) dropseq_root=$OPTARG;;
     t ) tmpdir=$OPTARG;;
@@ -134,6 +136,7 @@ while getopts ":d:t:o:pg:r:es:c::n:b:a:j:lm:" options; do
     j ) jobs=$OPTARG;;
     l ) clear=1;;
     m ) mode=$OPTARG;;
+    x ) exclude_align=1;;
     h ) usage
           exit 1;;
     \? ) usage
@@ -336,6 +339,16 @@ fi
 
 # Stage 4
 $echo_prefix $sam_to_fastq FASTQ=$tmpdir/unaligned_tagged_BC_filtered.fastq
+
+if (($exclude_align == 1))
+then
+    echo
+    echo ">>>TEST MODE<<<"
+    echo "Info: exclude_align flag added. All steps starting from the alignment are only printed to the output."
+    echo
+    echo_prefix="echo"
+fi
+
 $echo_prefix $star_align --readFilesIn $tmpdir/unaligned_tagged_BC_filtered.fastq
 files_to_delete="$files_to_delete $tmpdir/unaligned_tagged_BC_filtered.fastq"
 # Stage 5
@@ -356,13 +369,16 @@ $echo_prefix $dge_with_introns
 # collect RNAseq metrics with PICARD
 rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${outdir}/gene_function_tagged.bam O=${outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
 $echo_prefix $rnaseq_metrics
+
+# generate output about run time
 end_time=`date +%s`
 run_time=`expr $end_time - $start_time`
 total_time=`show_time $run_time`
-echo "Split-seq pipeline finished in ${total_time}"
+echo
+echo "xDbit pipeline finished in ${total_time}"
 
 if (($clear == 1 ))
 then
-    echo "Delete temporary files." 
+    echo "\n Delete temporary files." 
     $echo_prefix rm $files_to_delete
 fi

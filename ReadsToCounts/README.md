@@ -20,6 +20,19 @@ conda env create -f ./ReadsToCounts.yml
 conda activate ReadsToCounts
 ```
 
+## Test run
+
+To test whether the installation worked and the ReadsToCounts pipeline works on your device, it can be run without the alignment steps as follows. Settings for the test run are read from `./batch_parameters.csv`.
+
+```
+# test run
+nohup python xDbit_run_batch.py --skip_align --batch_file batch_parameters.csv &
+```
+
+The test run creates a `nohup.out` file in the current directory and for each batch specified in `./batch_parameters.csv` a log file in `./test_files/pipeline_batch{n}_{date}.out`. To check the test files one can use `cat` or `tail -f` to follow the addition of output in real time.
+
+If the log file does not show any errors and the pipeline runs to the end all necessary packages beside the STAR alignment software is installed and all files, except for the STAR alignment files, are correctly formatted.
+
 ## Preparation of raw sequencing reads
 
 ### Demultiplexing
@@ -139,7 +152,7 @@ The script uses all `.csv` files it finds under `path/to/well_coord_assignments`
 
 ```
 # fill the empty barcodes_legend'
-python /home/hpc/johannes.wirth/projects/DbitX_toolbox/ReadsToCounts/src/fill_barcode_legend.py path/to/barcodes_legend_empty.csv path/to/well_coord_assignments/
+python ./src/fill_barcode_legend.py path/to/barcodes_legend_empty.csv path/to/well_coord_assignments/
 ```
 The output is saved into the input folder.
 
@@ -174,7 +187,7 @@ conda activate ReadsToCounts
 cd path/to/working-directory
 
 # run batch process in background
-nohup python path/to/xDbit_run_batch.py path/to/batch_parameter.csv & # output is printed to nohup.out
+nohup python path/to/xDbit_run_batch.py --batch_file path/to/batch_parameter.csv & # output is printed to nohup.out
 ```
 
 All output and temporary files are saved into folders `out`/`tmp` in the base directory of the `fastq_R1` path that was provided in the batch parameters file. Output generated during the pipeline is writtein into the log file `pipeline_{}.out` in the same folder.

@@ -1,17 +1,15 @@
 name: ReadsToCounts
 channels:
-  - conda-forge
   - bioconda
   - anaconda
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
   - backcall=0.2.0
-  - c-ares=1.18.1
   - ca-certificates=2022.3.18
   - certifi=2021.10.8
-  - curl=7.82.0
   - dbus=1.13.18
   - decorator=4.4.2
   - expat=2.4.4
@@ -27,18 +25,12 @@ dependencies:
   - jedi=0.18.0
   - jupyter_client=6.1.7
   - jupyter_core=4.7.1
-  - krb5=1.19.2
   - ld_impl_linux-64=2.35.1
-  - libcurl=7.82.0
-  - libedit=3.1.20210714
-  - libev=4.33
   - libffi=3.3
   - libgcc-ng=9.3.0
   - libgomp=9.3.0
-  - libnghttp2=1.46.0
   - libpng=1.6.37
   - libsodium=1.0.18
-  - libssh2=1.10.0
   - libstdcxx-ng=9.3.0
   - libuuid=1.0.3
   - libxcb=1.14
@@ -78,4 +70,3 @@ dependencies:
     - numpy==1.22.3
     - pandas==1.4.2
     - pytz==2022.1
-    - pysam==0.19.1

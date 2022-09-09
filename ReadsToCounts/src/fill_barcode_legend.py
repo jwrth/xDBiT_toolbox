@@ -63,7 +63,7 @@ assignment_files = sys.argv[2:]
 
 # set other parameters
 prefix_to_remove = "well_coord_assignment_"
-output_dir = "barcode_legend"
+output_dir = os.path.join(os.path.dirname(legend_file), "barcode_legend")
 
 # create output directory
 os.makedirs(output_dir, exist_ok=True)

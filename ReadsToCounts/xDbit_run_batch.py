@@ -28,13 +28,23 @@ import sys
 from datetime import datetime
 import time
 import numpy as np
+import argparse
 
 print("Starting xDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
-print("Reading batch parameters from {}".format(sys.argv[1]))
-settings = pd.read_csv(sys.argv[1])
+# Parse arguments
+print("Parse arguments")
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--batch_file", help="Batch file with all parameters for xDbit batch processing.")
+parser.add_argument("-s", "--skip_align", action='store_true', help="Skip alignment steps for testing.")
+parser.add_argument("-c", "--clear_tmp", help="Clear files in temporary directory after pipeline is finished.")
+parser.add_argument("-e", "--echo", help="Print all commands to output instead of executing them.")
+args = parser.parse_args()
+
+print("Reading batch parameters from {}".format(args.batch_file))
+settings = pd.read_csv(args.batch_file)
 
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
@@ -54,7 +64,7 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["fastq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
+        log_dir = join(dirname(s["fastq_R1"]), "pipeline_batch{}_{}.out".format(b, f"{datetime.now():%Y_%m_%d}"))
         out_dir = join(dirname(s["fastq_R1"]), "out")
         tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
 
@@ -72,10 +82,19 @@ for b in batch_numbers:
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
-        "-l", # clear tmp files after finishing the script
         #"-e", # for testing
-        s["fastq_R1"], s["fastq_R2"]]
-        )
+        ])
+
+        # add other options
+        if args.skip_align:
+            commands[0].append("-x")
+        if args.clear_tmp:
+            commands[0].append("-l")
+        if args.echo:
+            commands[0].append("-e")
+
+        # add files to command
+        commands = [commands[0] + [s["fastq_R1"], s["fastq_R2"]]]
 
         log_dirs.append(log_dir)
 
