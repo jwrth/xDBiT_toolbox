@@ -90,7 +90,9 @@ import xdbit_funcs as db
 ```
 # Preprint
 
-## Title: Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+## Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+
+Preprint available on [BioRxiv](https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1).
 
 ## Abstract
 
