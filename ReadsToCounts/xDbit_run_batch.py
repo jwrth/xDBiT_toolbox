@@ -68,9 +68,9 @@ for b in batch_numbers:
         out_dir = join(dirname(s["fastq_R1"]), "out")
         tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
 
-        print("Writing log to {}".format(log_dir), flush=True)
-        print("Output directory: {}".format(out_dir), flush=True)
-        print("Temp directory: {}".format(tmp_dir), flush=True)
+        print("\tWriting log to {}".format(log_dir), flush=True)
+        print("\tOutput directory: {}".format(out_dir), flush=True)
+        print("\tTemp directory: {}".format(tmp_dir), flush=True)
 
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 

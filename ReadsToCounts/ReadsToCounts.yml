@@ -57,6 +57,7 @@ dependencies:
   - pygments=2.7.1
   - python=3.9.2
   - python-dateutil=2.8.1
+  - python-levenshtein=0.12.2
   - python_abi=3.9
   - pyzmq=22.0.3
   - readline=8.0
@@ -79,3 +80,7 @@ dependencies:
     - pandas==1.4.2
     - pytz==2022.1
     - pysam==0.19.1
+    - h5py==3.7.0
+    - matplotlib==3.5.3
+    - tqdm==4.64.1
+    - cutadapt==4.1
