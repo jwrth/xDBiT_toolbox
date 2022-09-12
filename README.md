@@ -43,7 +43,9 @@ Both pipelines and more detailed instructions can be found in the linked folders
 
 ## Requirements
 
-The pipeline uses a bash script, custom Python scripts, and many tools from the Drop-seq toolbox (Mc Caroll lab, Harvard Medical school) as well as Picard (Broad institute), which are all included in this toolbox. It was created in a Linux server environment and the STAR alignment step requires more than 30 GB RAM.
+Installed [Anaconda](https://docs.anaconda.com/anaconda/install/) or Miniconda Python distribution.
+
+Further, the pipeline uses a bash script, custom Python scripts, and many tools from the [Drop-seq toolbox](https://github.com/broadinstitute/Drop-seq/releases) (Mc Caroll lab, Harvard Medical school) as well as [Picard](https://broadinstitute.github.io/picard/) (Broad institute), which are all included in this toolbox. It was created in a Linux server environment and the [STAR](https://github.com/alexdobin/STAR) alignment step requires more than 30 GB RAM.
 ## Installation
 
 ### Clone repository
@@ -90,7 +92,9 @@ import xdbit_funcs as db
 ```
 # Preprint
 
-## Title: Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+## Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
+
+Preprint available on [BioRxiv](https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1).
 
 ## Abstract
 

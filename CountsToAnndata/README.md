@@ -9,17 +9,44 @@ It involves the following steps:
 
 *CountsToAnndata* has been tested on Windows and Linux.
 
-# Get started
-## Installation of environment
+## Contents
 
+1. [Installation of pipeline](#installation-of-environment)
+2. [Test run](#test-run)
+3. [Preparations](#preparations)
+4. [Run pipeline](#run-pipeline)
+
+# Installation of pipeline
+
+## Requirements
+
+The `CountsToAnndata` pipeline with pop-up windows for inputs has been tested on Windows only. The pipeline without pop-up window has been tested on both Windows and Linux systems.
+
+## Create conda environment
+
+For `CountsToAnndata` the standard `xdbit` environment can be used.
 ```
 # create environment
-conda env create -f CountsToAnndata.yml
+conda env create -f ../environment_xdbit.yml
 
 # activate environment
-conda activate CountsToAnndata
+conda activate xdbit
+```
+# Test run
+
+```
+# navigate to CountsToAnndata directory
+cd path/to/xDbit_toolbox/CountsToAnndata
+
+# start test run
+python CountsToAnndata.py --test_run
 ```
 
+The test run generates an image in `./test_files/test_run_result.png` which should look like following result:
+
+<img src=../graphics/test_run_result.png width="200">
+
+# Preparations
 ## Settings files structure
 
 An example settings file can be found in `./CountsToAnndata_params.csv`
@@ -42,24 +69,24 @@ It consists of one `.csv` file with two parts
 
 | >directories | experiment_id | unique_id | organism  | main_dir                                                             | input_transcriptome                                              | align_images                                           | hq_images                                           | output_dir   | vertices_x | vertices_y | age   | organ  |   |   |   |
 |--------------|---------------|-----------|-----------|----------------------------------------------------------------------|------------------------------------------------------------------|--------------------------------------------------------|-----------------------------------------------------|--------------|------------|------------|-------|--------|---|---|---|
-|              | 37_30         | A1        | mmusculus | Z:\Daten\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30 | data\raw_matrices\wells\A1\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=6* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=6* | data\anndata |            |            | young | kidney |   |   |   |
-|              | 37_30         | A2        | mmusculus | Z:\Daten\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30 | data\raw_matrices\wells\A2\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=7* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=7* | data\anndata |            |            | young | kidney |   |   |   |
-|              | 37_30         | A3        | mmusculus | Z:\Daten\01 HPC\03 Team Meier\08_Projects\37_Spatial_Barcoding\37_30 | data\raw_matrices\wells\A3\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=8* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=8* | data\anndata |            |            | young | brain  |   |   |   |
+|              | 37_30         | A1        | mmusculus | path\to\main_dir | data\raw_matrices\wells\A1\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=6* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=6* | data\anndata |            |            | young | kidney |   |   |   |
+|              | 37_30         | A2        | mmusculus | path\to\main_dir | data\raw_matrices\wells\A2\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=7* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=7* | data\anndata |            |            | young | kidney |   |   |   |
+|              | 37_30         | A3        | mmusculus | path\to\main_dir | data\raw_matrices\wells\A3\DGE_matrix_with_introns_min100.txt.gz | data\alignimages\37_30_10X_13x10_20%\B=0\Stitched\S=8* | data\hdimages\37_30_10X_13x10_20%\B=0\Stitched\S=8* | data\anndata |            |            | young | brain  |   |   |   |
 
-## Run pipeline
+# Run pipeline
 
 ```
 python `./CountsToAnndata.py`
 ```
 
-### Input window
+## Input window
 
 The pipeline invokes following input window: 
 ![Input window](../graphics/CountsToAnndata_inputwindow.png)
 
-If the window cannot be opened, all inputs can be entered in the input prompt.
+If the window cannot be opened, all inputs can be entered via command line.
 
-### Alignment marker selection and image registration.
+## Alignment marker selection and image registration.
 
 To align spatial transcriptome and image data, alignment markers were introduced in xDbit. The selection of the vertices of those markers is done semi-automatically and requires some manual selection. The *CountsToAnndata* pipeline invokes a *napari* window, in which you can mark the vertices with points using the tool box provided by *napari*. The selection can be done as described in following example:
 
@@ -69,7 +96,7 @@ After doing the marker selection for all datasets provided in the settings file,
 
 If HQ images are given to the pipeline in the column `hq_images` of the settings file, the pipeline uses the SIFT algorithm (https://doi.org/10.1023/B:VISI.0000029664.99615.94) to register alignment image and HQ image based on the dapi channel. 
 
-### Output
+## Output
 
 The output is saved into the directory selected in the `output_dir` column in the settings file.
 
