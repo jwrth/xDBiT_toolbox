@@ -283,7 +283,10 @@ def cohens_d(a, b, paired=False, correct_small_sample_size=True):
         dof = n1 + n2 - 2 # degrees of freedom
         SDpool = np.sqrt(((n1-1) * std1**2 + (n2 - 1) * std2**2) / dof) # pooled standard deviations
 
-        d = (mean1 - mean2) / SDpool
+        if SDpool == 0:
+            d = np.nan
+        else:
+            d = (mean1 - mean2) / SDpool
 
         n = np.min([n1, n2])
         if correct_small_sample_size and n < 50:
