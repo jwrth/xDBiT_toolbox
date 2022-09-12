@@ -23,12 +23,14 @@ It involves the following steps:
 The `CountsToAnndata` pipeline with pop-up windows for inputs has been tested on Windows only. The pipeline without pop-up window has been tested on both Windows and Linux systems.
 
 ## Create conda environment
+
+For `CountsToAnndata` the standard `xdbit` environment can be used.
 ```
 # create environment
-conda env create -f CountsToAnndata.yml
+conda env create -f ../environment_xdbit.yml
 
 # activate environment
-conda activate CountsToAnndata
+conda activate xdbit
 ```
 # Test run
 
