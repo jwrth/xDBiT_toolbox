@@ -40,8 +40,8 @@ reference=
 pipeline=0
 clear=0
 echo_prefix=
-dbitx_root=$(dirname $0)/../
-dropseq_root=${dbitx_root}/external_tools/Drop-seq_tools-2.1.0
+readstocounts_root=$(dirname $0)/../../
+dropseq_root=${readstocounts_root}/external_tools/Drop-seq_tools-2.1.0
 star_executable=STAR
 cutadapt_executable=cutadapt
 estimated_num_cells=500
@@ -295,14 +295,14 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${rna_outdir}/polyA_tri
 
 ## Stage 3: Filter barcodes
 # split bam files for multiplexing
-split_bam="bash ${dbitx_root}/src/splitbam.sh ${rna_tmpdir}/tmp_split ${jobs}"
+split_bam="bash ${readstocounts_root}/src/splitbam.sh ${rna_tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${dbitx_root}/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} \
+filter_barcodes="python ${readstocounts_root}/devs/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} \
 -b ${barcode_file} ${multithreading}"
 
 # add header and merge all bam files for alignment
-merge_filtered_bam="bash ${dbitx_root}/src/mergebam.sh ${rna_tmpdir}/tmp_split ${tagged_unmapped_bam}"
+merge_filtered_bam="bash ${readstocounts_root}/src/mergebam.sh ${rna_tmpdir}/tmp_split ${tagged_unmapped_bam}"
 
 # Stage 4: alignment
 sam_to_fastq="java -Xmx500m -jar ${picard_jar} SamToFastq INPUT=${tagged_unmapped_bam} TMP_DIR=${rna_tmpdir}"
@@ -465,7 +465,7 @@ then
 	## Stage 3: Filter barcodes
 
 	# filter each split file
-	filter_barcodes="python ${dbitx_root}/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
+	filter_barcodes="python ${readstocounts_root}/devs/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
 	-n ${estimated_num_cells} -b ${barcode_file} ${multithreading} \
 	-f ${feature_file} -r ${rna_dge}"
 
