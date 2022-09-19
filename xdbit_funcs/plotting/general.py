@@ -484,7 +484,7 @@ savepath=None, save_only=False, show=True, dpi_save=300):
 
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
 
-def go_dotplot(enrichment, color_key=None, groups=None, 
+def go_dotplot(enrichment, color_key=None, size_key=None, groups=None, 
 max_to_plot=25, max_cols=4, cmap='viridis', cmin=None, cmax=None,
 ax_label_size=16, markersize=240, figsize=(8,6), xtick_label_size=16, ytick_label_size=16,
 clb_label_size=16, clb_tick_label_size=16, clb_pos=None, clb_norm=False,
@@ -561,12 +561,20 @@ savepath=None, save_only=False, show=True, dpi_save=300):
                 color = df[color_key]
             else:
                 color = 'k'
+
+            if size_key is not None:
+                markersize=df[size_key]*5
             
             # introduce line breaks if the names are too long
             df[name_key] = [textwrap.fill(elem, width=max_line_length, break_long_words=True) for elem in df[name_key]]
 
             # plotting
-            s = axs[i].scatter(df[value_to_plot], df[name_key], c=color, cmap=cmap, s=markersize, edgecolors='k')
+            s = axs[i].scatter(df[value_to_plot], df[name_key], 
+                c=color, cmap=cmap, 
+                s=markersize, 
+                edgecolors='k')
+
+
             
             axs[i].invert_yaxis()
             axs[i].set_title("{}\n{}".format(group, libraries), fontsize=title_size)
@@ -594,6 +602,17 @@ savepath=None, save_only=False, show=True, dpi_save=300):
                         clb.ax.tick_params(labelsize=clb_tick_label_size)
                         if clb_norm:
                             clb.mappable.set_clim(cmin, cmax)
+
+            if size_key is not None:
+                kw = dict(prop="sizes", num=5,
+                    #color=s.cmap(0.7), 
+                    #fmt="$ {x:.2f}",
+                    #func=lambda s: np.sqrt(s/.3)/3
+                    #func=lambda s: np.sqrt(s)
+                    )
+                size_legend = axs[i].legend(*s.legend_elements(**kw, alpha=0.6), 
+                                    #markerscale=0.5,
+                                    loc="lower right", title=size_key)
 
 
         else:
