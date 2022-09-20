@@ -185,7 +185,8 @@ class GOEnrichment():
             # e["Gene ratio"] = [a/b for a,b in zip(e["number_of_genes"], e["number_of_genes_in_background"])]
             
             # sort by p_value
-            e.sort_values('Enrichment score', inplace=True, ascending=False)
+            if 'Enrichment score' in e.columns:
+                e.sort_values('Enrichment score', inplace=True, ascending=False)
             
             # collect data
             enrichment_dict[group] = e
@@ -321,8 +322,9 @@ class StringDB:
 
         # calculate enrichment score
 
-        self.result['Enrichment score'] = [-np.log10(elem) for elem in self.result["fdr"]]
-        self.result["Gene ratio"] = [a/b for a,b in zip(self.result["number_of_genes"], self.result["number_of_genes_in_background"])]
+        if "fdr" in self.result.columns:
+            self.result['Enrichment score'] = [-np.log10(elem) for elem in self.result["fdr"]]
+            self.result["Gene ratio"] = [a/b for a,b in zip(self.result["number_of_genes"], self.result["number_of_genes_in_background"])]
 
         if self.return_results:
             return self.result

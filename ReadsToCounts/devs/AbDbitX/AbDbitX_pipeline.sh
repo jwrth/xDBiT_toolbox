@@ -521,4 +521,6 @@ then
     $echo_prefix rm $files_to_delete
 fi
 
-echo "This is the end, beautiful friend..."
+echo "This is the end, beautiful friend"
+echo "This is the end, my only friend"
+echo "The end."
