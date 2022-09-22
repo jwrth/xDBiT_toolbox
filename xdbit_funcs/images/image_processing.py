@@ -138,10 +138,12 @@ def multi_grayscale_to_rgb(r=None, g=None, b=None, bit_type="8bit", lowers=[None
 
     return rgb
 
-def convert_to_8bit(img):
+def convert_to_8bit(img, save_mem=True):
     '''
     Convert numpy array image to 8bit.
     '''
+    if save_mem:
+        img = np.float16(img)
     img = (img / img.max()) * 255
     img = np.uint8(img)
     return img
