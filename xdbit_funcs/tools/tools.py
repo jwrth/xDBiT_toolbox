@@ -208,3 +208,19 @@ def read_rna_metrics(rnametrics_files, data_names=None):
 
     return df
 
+def difference_sets(d, target_key):
+    '''
+    Find unique set of elements of one set to multiple other sets.
+    The sets are expected to be in a dictionary `d` and `target_key`
+    indicates which of the sets is compared against all others.
+    '''
+    
+    # select set which is compared against all others
+    a = set(d[target_key])
+    compare_keys = [elem for elem in d.keys() if elem != target_key]
+    
+    # compare against all other sets
+    for k in compare_keys:
+        a.difference_update(d[k])
+        
+    return a

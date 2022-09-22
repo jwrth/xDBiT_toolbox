@@ -484,11 +484,12 @@ savepath=None, save_only=False, show=True, dpi_save=300):
 
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
 
-def go_dotplot(enrichment, color_key=None, size_key=None, groups=None, 
+def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
+fig=None, axis=None,
 max_to_plot=25, max_cols=4, cmap='viridis', cmin=None, cmax=None,
 ax_label_size=16, markersize=240, figsize=(8,6), xtick_label_size=16, ytick_label_size=16,
 clb_label_size=16, clb_tick_label_size=16, clb_pos=None, clb_norm=False,
-title_size=16, max_line_length=25,
+title_size=16, max_line_length=25, custom_headers=None,
 value_to_plot='Enrichment score', sortby=None, name_key='name', libraries=None, ascending=False,
 savepath=None, save_only=False, show=True, dpi_save=300):
 
@@ -504,6 +505,10 @@ savepath=None, save_only=False, show=True, dpi_save=300):
             return
     else:
         groups = extracted_groups
+
+    # check possible custom headers
+    if custom_headers is not None:
+        custom_headers = [custom_headers] if isinstance(custom_headers, str) else list(custom_headers)
 
     # check for libraries
     if libraries is None:
@@ -545,9 +550,16 @@ savepath=None, save_only=False, show=True, dpi_save=300):
             cmin = None
 
     # Plotting
-    n_plots, n_rows, n_cols = get_nrows_maxcols(groups, max_cols=max_cols)
+    if axis is None:
+        n_plots, n_rows, n_cols = get_nrows_maxcols(groups, max_cols=max_cols)
+        fig, axs = plt.subplots(n_rows, n_cols, figsize=(figsize[0]*n_cols, figsize[1]*n_rows))
+        
+    else:
+        assert len(groups) == 1, "Enrichment dataframe contains more than one group in first index level 0."
+        axs = axis
+        n_plots = 1
+        show = False
 
-    fig, axs = plt.subplots(n_rows, n_cols, figsize=(figsize[0]*n_cols, figsize[1]*n_rows))
     axs = axs.ravel() if n_plots > 1 else [axs]
 
     for i, group in enumerate(sorted(groups)):
@@ -574,10 +586,13 @@ savepath=None, save_only=False, show=True, dpi_save=300):
                 s=markersize, 
                 edgecolors='k')
 
-
+            if custom_headers is None:
+                axs[i].set_title("{}\n{}".format(group, libraries), fontsize=title_size)
+            else:
+                axs[i].set_title(custom_headers[i], fontsize=title_size)
             
             axs[i].invert_yaxis()
-            axs[i].set_title("{}\n{}".format(group, libraries), fontsize=title_size)
+            
             axs[i].set_xlabel(value_to_plot, fontsize=ax_label_size)
             axs[i].tick_params(axis='x', which='major', labelsize=xtick_label_size)
             axs[i].tick_params(axis='y', which='major', labelsize=ytick_label_size)
@@ -623,14 +638,18 @@ savepath=None, save_only=False, show=True, dpi_save=300):
             axs[i].set_axis_off()
 
     # check if there are empty plots remaining
-    while i < n_rows * n_cols - 1:
-        i += 1
-        # remove empty plots
-        axs[i].set_axis_off()
+    if n_plots > 1:
+        while i < n_rows * n_cols - 1:
+            i += 1
+            # remove empty plots
+            axs[i].set_axis_off()
 
-    fig.tight_layout()
+        fig.tight_layout()
 
-    save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save, fig=fig)
+    if show:
+        save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save, fig=fig)
+    else:
+        return fig, axs
 
 
 def go_network(enrichment, color_key=None, groups=None,
