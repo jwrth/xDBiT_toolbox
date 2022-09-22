@@ -61,7 +61,7 @@ It consists of one `.csv` file with two parts
 |             | frame                      | 100                      |   | `frame`: width in µm of the frame that is left around the dataset.                                                    |
 |             | align_images:align_channel | C01                      |   | `align_images:align_channel`: string pattern for files containing the   images of the alignment channel.              |
 |             | align_images:dapi_channel  | C03                      |   | `align_images:dapi_channel`: string pattern for files containing the   images of the DAPI channel.                    |
-|             | hq_images:channel_names    | C00 C01 C02 C03          |   | `hq_images:channel_names`: space-separated list of string patterns for   files containing a channel of the hq images. |
+|             | hq_images:channel_names    | C00 C01 C02 C03*          |   | `hq_images:channel_names`: space-separated list of string patterns for   files containing a channel of the hq images. Indicate the registration channel which is used to do the SIFT registration with "*". Usually, this is the DAPI channel.|
 |             | hq_images:channel_labels   | bf align phalloidin dapi |   | `hq_images:channel_labels`: space-separated list of names for the   channels of the hq images.                        |
 |             |                            |                          |   | `organism` needs to fit into gprofiler naming convention, e.g. mmusculus   or hsapiens                                |
 
