@@ -61,10 +61,8 @@ chmod u=rwx,g=r,o=r ./ReadsToCounts/external_tools/Drop-seq_tools-2.1.0/*
 ### Install python environment
 
 ```
-# install environment from file depending on OS
-conda env create -f environment_linux.yml python=3
-# or
-conda env create -f environment_win.yml python=3
+# install environment from file
+conda env create -f environment_xdbit.yml python=3
 
 # activate environment
 conda activate xdbit
