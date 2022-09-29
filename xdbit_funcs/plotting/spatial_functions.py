@@ -885,16 +885,26 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
         # optionally add vertical or horizontal lines to plot
         if vline is not None:
-            vline = [vline] if isinstance(vline, int) or isinstance(vline, float) else list(vline)
+            if isinstance(vline, dict):
+                linecolors = list(vline.keys())
+                vline = list(vline.values())
+            else:
+                vline = [vline] if isinstance(vline, int) or isinstance(vline, float) else list(vline)
+                linecolors = ['k'] * len(vline)
             
-            for v in vline:
-                axs[i].axvline(x=v, ymin=0, ymax=1, c='k', linewidth=4, linestyle='dashed')
+            for c, v in zip(linecolors, vline):
+                axs[i].axvline(x=v, ymin=0, ymax=1, c=c, linewidth=4, linestyle='dashed')
 
         if hline is not None:
-            hline = [hline] if isinstance(hline, int) or isinstance(hline, float) else list(hline)
+            if isinstance(hline, dict):
+                linecolors = list(hline.keys())
+                hline = list(hline.values())
+            else:
+                hline = [hline] if isinstance(hline, int) or isinstance(hline, float) else list(hline)
+                linecolors = ['k'] * len(hline)
             
-            for h in hline:
-                axs[i].axhline(y=h, xmin=0, xmax=1, c='k', linewidth=4, linestyle='dashed')
+            for c, h in zip(linecolors, hline):
+                axs[i].axhline(y=h, xmin=0, xmax=1, c=c, linewidth=4, linestyle='dashed')
 
         if not return_data:
             if xlabel is None:
