@@ -17,6 +17,7 @@ def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
     xtick_label_size=16, ytick_label_size=16,
     clb_label_size=16, clb_tick_label_size=16, clb_pos=None, clb_norm=False,
     title_size=16, max_line_length=25, custom_headers=None,
+    max_name_length=60,
     value_to_plot='Enrichment score', 
     sortby=None, sort=True,
     name_key='name', libraries=None, ascending=False,
@@ -66,8 +67,9 @@ def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
         enrichment = enrichment.groupby(level=0).head(max_to_plot)
 
     # Prepare names for plotting
-    # Shorten name and add GO term name if too short 
-    enrichment[name_key] = ["{}...({})".format(n[:60], go) if len(n)>60 else n for go, n in zip(enrichment['native'], enrichment[name_key])]
+    # Shorten name and add GO term name if too short
+    if max_name_length is not None:
+        enrichment[name_key] = ["{}...({})".format(n[:max_name_length], go) if len(n)>max_name_length else n for go, n in zip(enrichment['native'], enrichment[name_key])]
     # Insert line breaks if sentence too long
     enrichment[name_key] = [nth_repl_all(elem, ' ', '\n', 5) for elem in enrichment[name_key]]
 

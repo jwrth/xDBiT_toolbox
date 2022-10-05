@@ -42,8 +42,11 @@ class GOEnrichment():
 
         return deg, groups, key_added
 
-    def gprofiler(self, adata: AnnData = None, key: str = None, top_n: int = 300, organism: str = None, target_genes: List = None, key_added: str = None, 
-        uns_key_added: str = 'gprofiler', return_df: bool = True, sortby: str = 'pvals_adj', ascending: bool = True,
+    def gprofiler(self, adata: AnnData = None, key: str = None, top_n: int = 300, 
+        organism: str = None, target_genes: List = None, key_added: str = None, 
+        uns_key_added: str = 'gprofiler', return_df: bool = True, 
+        sortby: str = 'pvals_adj', 
+        #ascending: bool = True,
         **kwargs: Any):
         '''
         Performs GO term enrichment analysis using the gprofiler web resource.
@@ -63,7 +66,7 @@ class GOEnrichment():
         elif isinstance(target_genes, dict):
             # retrieve query names
             groups = list(target_genes.keys())
-        elif isinstance(target_genes, list):
+        elif isinstance(target_genes, (list, np.ndarray)):
             groups = ['query'] # set default name of query
             target_genes = {'query': target_genes}
         else:
@@ -117,22 +120,22 @@ class GOEnrichment():
             else:
                 adata.uns[uns_key_added] = {}
                 adata.uns[uns_key_added][key_added] = enrichment
-
     
     def stringdb(self, adata: AnnData = None, key: str = None, top_n: int = 300, 
         organism: str = None, target_genes: List = None, key_added: str = None, 
         uns_key_added: str = 'stringdb', return_df: bool = True, 
-        sortby: str = 'pvals_adj', ascending: bool = True,
+        sortby: str = 'pvals_adj', 
+        #ascending: bool = True,
         **kwargs: Any):
 
         '''
-        Performs GO term enrichment analysis using the gprofiler web resource.
+        Performs GO term enrichment analysis using the stringdb web resource.
 
         Input can be one of the following two options:
             1. adata with respective key for `adata.uns[key]`
             2. List or dictionary of genes as target_genes. With a dictionary multiple queries can be started in parallel, assuming that the keys
                 are the name of the query and the values are the respective lists of genes. `key` can be specified to save the results under a specific name
-                under self.result['gprofiler'][key].
+                under self.result['stringdb'][key].
         '''
 
         from_adata = False
@@ -145,7 +148,7 @@ class GOEnrichment():
         elif isinstance(target_genes, dict):
             # retrieve query names
             groups = list(target_genes.keys())
-        elif isinstance(target_genes, list):
+        elif isinstance(target_genes, (list, np.ndarray)):
             groups = ['query'] # set default name of query
             target_genes = {'query': target_genes}
         else:
@@ -177,7 +180,8 @@ class GOEnrichment():
             e.rename(columns={
                 "category": "source",
                 "description": "name",
-                "term": "native"
+                "term": "native",
+                "inputGenes": "intersections"
             }, inplace=True)
 
             ## add new categories
@@ -211,33 +215,80 @@ class GOEnrichment():
                 adata.uns[uns_key_added] = {}
                 adata.uns[uns_key_added][key_added] = enrichment
 
-    def enrichr(self, adata=None, key=None, top_n=300, organism=None, target_genes=None, key_added=None, 
-        enrichr_libraries='GO_Biological_Process_2018', outdir=None, no_plot=True,
-        uns_key_added='enrichment', return_df=True, sortby='pvals_adj', ascending=True,
-        **kwargs):
+    def enrichr(self, adata: AnnData = None, key: str = None, top_n: int = 300, 
+        organism: str = None, target_genes: List = None, key_added: str = None, 
+        enrichr_libraries: str = 'GO_Biological_Process_2018', 
+        outdir: str = None, no_plot: bool = True,
+        uns_key_added: str = 'enrichr', return_df: bool = True, 
+        sortby: str = 'pvals_adj', 
+        #ascending: bool = True,
+        **kwargs: Any):
+
+        '''
+        Performs GO term enrichment analysis using the enrichr web resource.
+
+        Input can be one of the following two options:
+            1. adata with respective key for `adata.uns[key]`
+            2. List or dictionary of genes as target_genes. With a dictionary multiple queries can be started in parallel, assuming that the keys
+                are the name of the query and the values are the respective lists of genes. `key` can be specified to save the results under a specific name
+                under self.result['enrichr'][key].
+
+        Parameters
+        ----------
+        organism : str
+            Examples for possible species are `mouse` and `human`. For more informations see https://maayanlab.cloud/Enrichr/.
+        enrichr_libraries : str
+            To find all possible library names for a specific organism, use `gseapy.get_library_name(organism="mouse")`.
+        
+        '''
 
         import gseapy
 
-        deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added, 
-                        sortby=sortby, ascending=ascending)
+        from_adata = False
+        if adata is not None:
+            deg, groups, key_added = self.prepare_enrichment(adata=adata, key=key, key_added=key_added,
+                            sortby=sortby, 
+                            #ascending=ascending
+                            )
+            from_adata = True
+        elif isinstance(target_genes, dict):
+            # retrieve query names
+            groups = list(target_genes.keys())
+        elif isinstance(target_genes, (list, np.ndarray)):
+            groups = ['query'] # set default name of query
+            target_genes = {'query': target_genes}
+        else:
+            raise ValueError("`adata` is None and `target_genes` is neither a dictionary or a list.")
+
+        if key_added is None:
+            key_added = 'foo'
 
         if organism is None:
             raise ValueError("`organism` not specified. Needs to have one of the following values: `mmusculus`, `hsapiens` or `dmelanogaster`")
 
         enrichment_dict = {}
         for i, group in enumerate(groups):
-            target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
+            #target_genes = deg.xs((group, 'up'), level=(0,1)).names.tolist()
+            if from_adata:
+                genes = deg.query('group == "{}"'.format(group)).names.tolist()
+            else:
+                genes = list(target_genes[group])
 
             if top_n is not None:
-                target_genes = target_genes[:top_n]
+                genes = genes[:top_n]
 
-            e = gseapy.enrichr(gene_list=target_genes, gene_sets=enrichr_libraries, organism=organism, outdir=outdir, no_plot=no_plot, **kwargs).results
+            e = gseapy.enrichr(gene_list=genes, gene_sets=enrichr_libraries, 
+                        organism=organism, outdir=outdir, no_plot=no_plot, 
+                        **kwargs).results
             
             # calc -log(p_value)
             e['Enrichment score'] = [-np.log10(elem) for elem in e['Adjusted P-value']]
             
             # sort by p_value
-            e.sort_values('Adjusted P-value', inplace=True)
+            e.sort_values('Enrichment score', inplace=True, ascending=False)
+
+            # calculate gene ratio
+            e['Gene ratio'] = [int(elem.split("/")[0]) / int(elem.split("/")[1]) for elem in e['Overlap']]
             
             # collect data
             enrichment_dict[group] = e
@@ -245,24 +296,34 @@ class GOEnrichment():
         enrichment = pd.concat(enrichment_dict)
 
         # rename column headers
-        enrichment.rename(columns={'Term': 'name'}, inplace=True)
-        enrichment.rename(columns={'Gene_set': 'source'}, inplace=True)
+        enrichment.rename(columns={
+            'Term': 'name',
+            'Gene_set': 'source',
+            'Genes': 'intersections'
+            }, inplace=True)
+
+        # transform intersections into list
+        enrichment['intersections'] = [elem.split(";") for elem in enrichment['intersections']]
+        
+        # separate human-readable name from GO ID
+        enrichment['native'] = [elem.split(" (")[1].rstrip(")") if " (GO" in elem else np.nan for elem in enrichment['name']]
+        enrichment['name'] = [elem.split(" (")[0] if " (GO" in elem else elem for elem in enrichment['name']]
 
         # save in class
-        if not "enrichr" in self.results:
-            self.results["enrichr"] = {}
+        if not uns_key_added in self.results:
+            self.results[uns_key_added] = {}
+        
+        self.results[uns_key_added][key_added] = enrichment
 
-        self.results["enrichr"][key] = enrichment
-
+        # save in adata
         if return_df:
             return enrichment
-        else:
+        elif from_adata:
             if uns_key_added in adata.uns:
                 adata.uns[uns_key_added][key_added] = enrichment
             else:
                 adata.uns[uns_key_added] = {}
                 adata.uns[uns_key_added][key_added] = enrichment
-
 
 class StringDB:
     def __init__(self, return_results: bool = True):
