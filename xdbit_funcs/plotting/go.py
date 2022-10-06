@@ -95,7 +95,7 @@ def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
 
     axs = axs.ravel() if n_plots > 1 else [axs]
 
-    for i, group in enumerate(sorted(groups)):
+    for i, group in enumerate(groups):
         if group in enrichment.index.unique(level=0):
             # select data
             df = enrichment.xs(group).copy()
