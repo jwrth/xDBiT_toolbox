@@ -18,9 +18,9 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     # convert groups into list
     groups = [groups] if isinstance(groups, str) else list(groups)
 
-    if type(adata) == anndata._core.anndata.AnnData:
+    if type(adata) == anndata.AnnData:
         anndata_object = True
-    elif type(adata) == pd.core.frame.DataFrame:
+    elif type(adata) == pd.DataFrame:
         anndata_object = False
         extract_uns = False
     else:
