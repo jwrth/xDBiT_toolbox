@@ -3,3 +3,4 @@ from .image_processing import *
 from .segment import *
 from .features import *
 from .registration import *
+from .container import *
