@@ -4,3 +4,5 @@ from .segment import *
 from .features import *
 from .registration import *
 from .container import *
+from .napari import *
+
