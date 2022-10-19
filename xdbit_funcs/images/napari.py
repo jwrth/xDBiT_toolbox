@@ -73,9 +73,10 @@ def interactive(adata, images, genes, channel_axis=2, channel_names=None, scaleb
     napari.run()
     return viewer
 
-def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=0.7):
+def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
     '''
     Convert shape selection in napari into RGB by additive blending.
+    Code from: https://forum.image.sc/t/saving-image-from-napari/50379
     '''
     # get shape and image layers
     shapelays = {elem.name: elem for elem in viewer.layers if isinstance(elem, napari.layers.shapes.Shapes)}
@@ -112,19 +113,14 @@ def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=0.7):
                 # do additive blending
                 blended = blended + colormapped
 
-        # # clip to range [0...255]
-        # blended = blended / blended.max() * 255
-        # blended = blended.astype(np.uint8)
-
-        blended[..., 3] = 1 # set alpha channel to 1
-        #blended[:, 3] = 1 # set alpha channel to 1
+        blended[..., 3] = alpha # set alpha channel to 1
 
         # collect results in list
         blended_results.append(blended)
     
     return blended_results
 
-def view_rgbs(results, max_cols=4, **kwargs):
+def view_rgbs(results, max_cols=4, min=None, max=None):
     '''
     Function to plot results from `napari_to_rgb()`.
     '''
@@ -136,7 +132,9 @@ def view_rgbs(results, max_cols=4, **kwargs):
     axs = [axs] if nplots == 1 else axs
 
     for i, im in enumerate(results):
-        axs[i].imshow(im, **kwargs)
+        if min is not None or max is not None:
+            im = np.clip(im, a_min=min, a_max=max)
+        axs[i].imshow(im)
 
     fig.tight_layout()
     plt.show()
