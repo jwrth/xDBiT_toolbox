@@ -5,4 +5,4 @@ from .features import *
 from .registration import *
 from .container import *
 from .napari import *
-
+from .zarr import *

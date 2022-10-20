@@ -392,3 +392,29 @@ def replace_images(adata, image_adata, spatial_key="spatial", inplace=True, verb
     if not inplace:
         return adata_
 
+def get_images_from_adata(adata, groupby, group, hires=False):
+    '''
+    Extract images from adata.
+    '''
+    
+    if hires:
+        res_key = 'hires'
+    else:
+        res_key = 'lowres'
+    
+    if groupby is not None:
+        # get subset
+        adata = extract_groups(adata, groupby=groupby, groups=group, extract_uns=True)
+    
+    # get keys
+    keys = list(adata.uns['spatial'].keys())
+    
+    imgs = {}
+    for key in keys:
+        # get image and channel name
+        channel = key.split("-")[1]
+        img = adata.uns['spatial'][key]['images'][res_key]
+        
+        # collect images in dictionary
+        imgs[channel] = img
+    return imgs

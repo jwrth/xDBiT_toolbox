@@ -155,7 +155,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             if 'scalefactors' in first_entry:
                 image_metadata = first_entry['scalefactors']
                 pixel_per_um = image_metadata["pixel_per_um"]
-                scale_factor = image_metadata['tissue_hires_scalef']                  
+                scale_factor = image_metadata['tissue_hires_scalef']
             else:
                 print("pixel_per_um scalefactor not found. Plotted pixel coordinates instead.")
         else:

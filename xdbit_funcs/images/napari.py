@@ -82,7 +82,11 @@ def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
     shapelays = {elem.name: elem for elem in viewer.layers if isinstance(elem, napari.layers.shapes.Shapes)}
     imlays = {elem.name: elem for elem in viewer.layers if isinstance(elem, napari.layers.image.Image)}
 
-    blended_results = []
+    blended_results = {
+        "images": [],
+        "xlims": [],
+        "ylims": []
+    }
     for shape in shapelays[shape_layer_name].data:
         # get x and y limits
         ylim = (int(np.min(shape[:, 0])), int(np.max(shape[:, 0])))
@@ -116,7 +120,9 @@ def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
         blended[..., 3] = alpha # set alpha channel to 1
 
         # collect results in list
-        blended_results.append(blended)
+        blended_results['images'].append(blended)
+        blended_results['xlims'].append(xlim)
+        blended_results['ylims'].append(ylim)
     
     return blended_results
 
@@ -124,7 +130,6 @@ def view_rgbs(results, max_cols=4, min=None, max=None):
     '''
     Function to plot results from `napari_to_rgb()`.
     '''
-
     # plotting
     nplots, nrows, ncols = get_nrows_maxcols(results, max_cols=max_cols)
     fig, axs = plt.subplots(nrows, ncols, figsize=(8*ncols, 6*nrows))
@@ -135,6 +140,7 @@ def view_rgbs(results, max_cols=4, min=None, max=None):
         if min is not None or max is not None:
             im = np.clip(im, a_min=min, a_max=max)
         axs[i].imshow(im)
+        axs[i].set_title(i)
 
     fig.tight_layout()
     plt.show()
