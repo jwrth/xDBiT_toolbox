@@ -40,7 +40,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             header_x=0.5, header_y=0.98, header_fontsize=20,
             crange=None, crange_type='minmax', colorbar=True, clb_title=None,
             cmap_center=None,
-            save_only=False, savepath=None, save_background=None, 
+            origin_zero=True, # whether to start axes ticks at 0
+            margin=True, # whether to leave margin of one spot width around the plot
+            save_only=False, savepath=None, save_background=None,
             verbose=True):
 
     if isinstance(pd_dataframe, pd.DataFrame):
@@ -108,7 +110,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         
         image_metadata = adata.uns['spatial'][image_key]['scalefactors']
 
-        pixel_per_um = image_metadata["pixel_per_um"]
+        pixel_per_um = image_metadata["pixel_per_um_real"]
         if lowres:
             if 'lowres' in adata.uns['spatial'][image_key]['images'].keys():
                 image = adata.uns['spatial'][image_key]['images']['lowres']
@@ -154,7 +156,8 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             # extract image metadata if possible
             if 'scalefactors' in first_entry:
                 image_metadata = first_entry['scalefactors']
-                pixel_per_um = image_metadata["pixel_per_um"]
+                print(image_metadata)
+                pixel_per_um = image_metadata["pixel_per_um_real"]
                 scale_factor = image_metadata['tissue_hires_scalef']
             else:
                 print("pixel_per_um scalefactor not found. Plotted pixel coordinates instead.")
@@ -162,18 +165,21 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             print("No key `spatial` in adata.uns. Therefore pixel_per_um scalefactor could not be found. Plotted pixel coordinates instead.") if verbose else None
 
     # extract x and y pixel coordinates and convert to micrometer
-    x_pixelcoord = adata.obsm[obsm_key][:, 0]
-    y_pixelcoord = adata.obsm[obsm_key][:, 1]
+    x_pixelcoord = adata.obsm[obsm_key][:, 0].copy()
+    y_pixelcoord = adata.obsm[obsm_key][:, 1].copy()
     x_coord = x_pixelcoord / pixel_per_um
     y_coord = y_pixelcoord / pixel_per_um
 
 
     # shift coordinates that they start at (0,0)
-    x_offset = x_coord.min()
-    y_offset = y_coord.min()
-    x_coord -= x_offset
-    y_coord -= y_offset
-
+    if origin_zero:
+        x_offset = x_coord.min()
+        y_offset = y_coord.min()
+        x_coord -= x_offset
+        y_coord -= y_offset
+    else:
+        x_offset = y_offset = 0
+    
     if xlim is None:
         if plot_pixel:
             xmin = x_pixelcoord.min() * scale_factor
@@ -185,7 +191,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             xmax = np.max([x_coord.max(), y_coord.max()])
 
         xlim = (xmin - spot_size_unit, xmax + spot_size_unit)
-    else:
+    elif margin:
         xlim[0] -= spot_size_unit
         xlim[1] += spot_size_unit
 
@@ -200,10 +206,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             ymax = np.max([x_coord.max(), y_coord.max()])
 
         ylim = (ymin - spot_size_unit, ymax + spot_size_unit)
-    else:
+    elif margin:
         ylim[0] -= spot_size_unit
         ylim[1] += spot_size_unit
-
 
     if axis is None:
         n_plots = len(keys)
@@ -427,12 +432,15 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     if len(keys) > 1:
         multikeys = True
 
-    if groups is None:
-        groups = list(adata.obs[groupby].unique())
+    if groupby is None:
+        groups = [None]
     else:
-        groups = [groups] if isinstance(groups, str) else list(groups)
-    if len(groups) > 1:
-        multigroups = True
+        if groups is None:
+            groups = list(adata.obs[groupby].unique())
+        else:
+            groups = [groups] if isinstance(groups, str) else list(groups)
+        if len(groups) > 1:
+            multigroups = True
 
     if header_names is not None:
         assert len(header_names) == len(keys)
@@ -446,6 +454,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
                 use_raw=raw, layer=layer, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe, ctype=crange_type) if key not in normalize_crange_not_for else None for key in keys}
+
     if multigroups:
         if multikeys:
             n_rows = len(groups)
