@@ -1,7 +1,5 @@
 import napari
 import numpy as np
-import matplotlib.pyplot as plt
-from ..tools import get_nrows_maxcols
 
 def interactive(adata, images, genes, 
                 channel_axis=2, 
@@ -20,10 +18,7 @@ def interactive(adata, images, genes,
     res = scalefactors['resolution']
 
     # collect metadata
-    meta = {
-        "pixel_per_um_real": ppm,
-        "resolution": res
-    }
+    meta = scalefactors.copy()
 
     if channel_names is None:
         channel_names = ["ch" + str(i) for i in range(images.shape[channel_axis])] # set default channel names
@@ -142,21 +137,5 @@ def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
     
     return blended_results
 
-def view_rgbs(results, max_cols=4, min=None, max=None):
-    '''
-    Function to plot results from `napari_to_rgb()`.
-    '''
-    # plotting
-    nplots, nrows, ncols = get_nrows_maxcols(results, max_cols=max_cols)
-    fig, axs = plt.subplots(nrows, ncols, figsize=(8*ncols, 6*nrows))
 
-    axs = [axs] if nplots == 1 else axs
 
-    for i, im in enumerate(results):
-        if min is not None or max is not None:
-            im = np.clip(im, a_min=min, a_max=max)
-        axs[i].imshow(im)
-        axs[i].set_title(i)
-
-    fig.tight_layout()
-    plt.show()
