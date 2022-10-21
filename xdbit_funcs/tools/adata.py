@@ -76,11 +76,12 @@ def extract_groups(adata, groupby, groups=None, extract_uns=False, uns_key='spat
                 adata.uns[uns_key] = new_uns
 
         if strip:
-            # remove all annotations but .var, .obs and .obsm
-            del adata.uns
-            del adata.varm
-            del adata.layers
-            del adata.obsp
+            # remove annotations in .uns and obsp
+            stores = [adata.uns, adata.obsp]
+            for s in stores:
+                keys = list(s.keys())
+                for k in keys:
+                    del s[k]
         
         if return_mask:
             return adata, mask

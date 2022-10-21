@@ -3,7 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ..tools import get_nrows_maxcols
 
-def interactive(adata, images, genes, channel_axis=2, channel_names=None, scalebar=True, spatial_key='spatial'):
+def interactive(adata, images, genes, 
+                channel_axis=2, 
+                channel_names=None, 
+                scalebar=True, 
+                spatial_key='spatial', 
+                return_meta=False
+                ):
     '''
     Interactive viewer for xDbit data using napari.
     '''
@@ -12,6 +18,12 @@ def interactive(adata, images, genes, channel_axis=2, channel_names=None, scaleb
     scalefactors = adata.uns['spatial'][keys[0]]['scalefactors']
     ppm = scalefactors['pixel_per_um_real']
     res = scalefactors['resolution']
+
+    # collect metadata
+    meta = {
+        "pixel_per_um_real": ppm,
+        "resolution": res
+    }
 
     if channel_names is None:
         channel_names = ["ch" + str(i) for i in range(images.shape[channel_axis])] # set default channel names
@@ -71,7 +83,11 @@ def interactive(adata, images, genes, channel_axis=2, channel_names=None, scaleb
     viewer.scale_bar.unit = unit
 
     napari.run()
-    return viewer
+
+    if return_meta:
+        return viewer, meta
+    else:
+        return viewer
 
 def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
     '''
