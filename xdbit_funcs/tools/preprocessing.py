@@ -31,7 +31,7 @@ def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spat
     sample_info.columns = ['x', 'y', 'total_counts']
     sample_info.index = index_names
 
-    spatialde_sum = OrderedDict()
+    spatialde_sum = dict()
 
     if normalize:
         print("Normalize counts...")
