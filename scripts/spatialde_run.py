@@ -18,7 +18,7 @@ if __name__ == '__main__':
     groupby = input("Enter groupby variable (e.g. id): ")
 
     # generate results file
-    results_file = input_file.split(".")[0] + "_spatialde.h5ad"
+    results_file = input_file.rsplit(".", 1)[0] + "_spatialde.h5ad"
 
     # generate tmp directory
     dir = os.path.dirname(input_file)
