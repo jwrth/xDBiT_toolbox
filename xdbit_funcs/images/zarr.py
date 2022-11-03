@@ -1,6 +1,7 @@
 import dask.array as da
 from numcodecs import Blosc
 from pathlib import Path
+import numpy as np
 
 def save_to_zarr(img, url, chunk_size=(1000, 1000), compressor='custom', cname='zstd', clevel=1, shuffle=Blosc.BITSHUFFLE, overwrite=False):
     '''
@@ -18,7 +19,15 @@ def save_to_zarr(img, url, chunk_size=(1000, 1000), compressor='custom', cname='
             for buffers with itemsize 1, and byte-shuffle will be used otherwise. The default is SHUFFLE.
     
     '''
+    # Check type of input img
+    if isinstance(img, np.ndarray):
+        # create dask array
+        img = da.from_array(img, chunks=chunk_size)
+    elif not isinstance(img, da.Array):
+        raise TypeError("Unknown file type. Dask array or numpy array are allowed.")
+    
     # make sure that parent directory of url exists
+    url = Path(url)
     url.parent.mkdir(parents=True, exist_ok=True)
     
     # compression settings   
@@ -27,11 +36,8 @@ def save_to_zarr(img, url, chunk_size=(1000, 1000), compressor='custom', cname='
     elif compressor == 'default':
         compressor = 'default'
     
-    # create dask array
-    darray = da.from_array(img, chunks=chunk_size, name='test')
-    
     # save array
-    darray.to_zarr(url=url, compressor=compressor, overwrite=overwrite)
+    img.to_zarr(url=url, compressor=compressor, overwrite=overwrite)
     
 def load_zarr_dir(directory):
     '''
