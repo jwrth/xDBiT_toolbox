@@ -168,7 +168,7 @@ def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
         else:
             #print('No significant results for selected libraries {} in group {}'.format(libraries, group))
             axs[i].set_title("{}\n{}".format(group, libraries), fontsize=12, fontweight='bold')
-            axs[i].text(0.5,0.5, 'No significant results for\nselected libraries {} in group {}'.format(libraries, group), 
+            axs[i].text(0.5,0.5, 'No significant results for selected\nlibraries {}\nin group {}'.format(libraries, group), 
                         va='center', ha='center', fontsize=20)
             axs[i].set_axis_off()
 
