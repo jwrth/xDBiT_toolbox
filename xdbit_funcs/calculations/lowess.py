@@ -46,7 +46,7 @@ class lowess:
         self.y = y
         self.fitted = False
         
-    def predict(self, newdata, stderror=False, verbose=False, **kwargs):
+    def predict(self, newdata, stderror=False, verbose=False, K=100, **kwargs):
         # make sure the fit() function was run before
         assert self.fitted, "Values have not been fitted yet. Run .fit() first."
         
@@ -60,7 +60,7 @@ class lowess:
                                             fill_value='extrapolate')(newdata)
         
         if stderror:
-            self.calc_stderror(newdata, **kwargs)
+            self.calc_stderror(newdata, K=K, **kwargs)
         else:
             self.stderr = None
             self.bootstrap_result = None
@@ -86,7 +86,7 @@ class lowess:
             - https://stackoverflow.com/questions/28242593/correct-way-to-obtain-confidence-interval-with-scipy
         '''        
         # calculate confidence interval using bootstrapping approach
-        self.bootstrap_result = np.stack([self.bootstrap(self.x, self.y, newdata, sample_frac=sample_frac) for k in range(K)]).T
+        self.bootstrap_result = np.stack([self.bootstrap(self.x, self.y, newdata, sample_frac=sample_frac, **kwargs) for k in range(K)]).T
         
         # calc mean and stderr of smooths
         self.stderr = np.nanstd(self.bootstrap_result, axis=1, ddof=0) # OR std

@@ -699,9 +699,9 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
     savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
     dpi_save=300,
-    loess=True, 
-    custom_lowess=False,
-    stderr=True, 
+    smooth=True, 
+    method='lowess',
+    stderr=False, 
     **kwargs):
 
     '''
@@ -724,7 +724,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
-
+    
     if hue is not None:
         hue_cats = list(adata.obs[hue].unique())
         cmap_colors = plt.get_cmap(cmap)
@@ -811,11 +811,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 else:
                     print("Key '{}' not found.".format(key))                    
 
-                if loess:
+                if smooth:
                     # do smooth fitting
                     df = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
-                                nsteps=nsteps, custom_lowess=custom_lowess, stderr=stderr, **kwargs)
+                                nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                 else:
                     # set up dataframe without smooth fitting
                     df = pd.DataFrame({"x": x, "y_pred": y})
@@ -841,10 +841,10 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     y = group_X[split_mask, idx].copy()
 
                     # do smooth fitting
-                    if loess:
+                    if smooth:
                         df_split = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
-                                nsteps=nsteps)
+                                nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                     else:
                         # set up dataframe without smooth fitting
                         df = pd.DataFrame({"x": x, "y_pred": y})
