@@ -2,22 +2,19 @@ from lib2to3.pytree import convert
 from matplotlib import pyplot as plt
 from matplotlib import patches, colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import matplotlib.ticker as mticker
 import math
 import pandas as pd
 import seaborn as sns
 import numpy as np
 import warnings
 from ..calculations._calc import dist_points, minDistance
-from sklearn.preprocessing import MinMaxScaler, minmax_scale
+from sklearn.preprocessing import MinMaxScaler
 from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
 from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
-from ..images import set_histogram, convert_to_8bit
+from ..images import set_histogram
 from tqdm import tqdm
 import warnings
-from pathlib import Path
-import os
 from scipy.stats import zscore
 
 # ignore future warnings (suppresses annoying pandas warning)
@@ -702,7 +699,10 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
     savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
     dpi_save=300,
-    loess=True, **kwargs):
+    loess=True, 
+    custom_lowess=False,
+    stderr=True, 
+    **kwargs):
 
     '''
     Plot the expression of a gene as a function of an observation value (e.g. the automatic expression histology value 
@@ -815,7 +815,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     # do smooth fitting
                     df = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
-                                nsteps=nsteps)
+                                nsteps=nsteps, custom_lowess=custom_lowess, stderr=stderr, **kwargs)
                 else:
                     # set up dataframe without smooth fitting
                     df = pd.DataFrame({"x": x, "y_pred": y})

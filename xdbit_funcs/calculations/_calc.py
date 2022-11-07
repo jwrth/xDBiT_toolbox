@@ -5,6 +5,8 @@ from scipy.spatial import distance as dist
 #from sympy import lowergamma
 from ..exceptions import ModuleNotFoundOnWindows
 from typing import Optional, Tuple, Union, List, Dict, Any
+from .lowess import lowess
+from warnings import warn
 
 
 def minDistance(A, B, E) :
@@ -164,7 +166,9 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     min: Optional[float] = None, 
     max: Optional[float] = None,
     #stepsize: Optional[float] = None,
-    nsteps: Optional[float] = None
+    nsteps: Optional[float] = None,
+    custom_lowess=False,
+    stderr=True
     ):
 
     """Smooth curve using loess
@@ -188,10 +192,14 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     From: https://github.com/almaan/ST-mLiver
     """
-    try:
-        from skmisc.loess import loess
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundOnWindows(e)
+
+    if not custom_lowess:
+        try:
+            from skmisc.loess import loess
+        except ModuleNotFoundError as e:
+            #raise ModuleNotFoundOnWindows(e)
+            warn('`skmisc.loess` package not found. Used custom lowess impolementation instead.')
+            custom_lowess = True
 
     # sort x values
     srt = np.argsort(xs)
@@ -209,7 +217,10 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     ys = ys[keep]
 
     # generate loess class object
-    ls = loess(xs, ys)
+    if custom_lowess:
+        ls = lowess(xs, ys)
+    else:
+        ls = loess(xs, ys)
 
     # fit loess class to data
     ls.fit()
@@ -224,20 +235,27 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     # predict on data
     pred =  ls.predict(xs_pred,
-                       stderror=True)
+                       stderror=stderr)
     # get predicted values
     ys_hat = pred.values
-    # get standard error
-    stderr = pred.stderr
-    conf = pred.confidence()
-
+    
+    if stderr:
+        # get standard error
+        stderr = pred.stderr
+        conf = pred.confidence()
+        lower = conf.lower
+        upper = conf.upper
+    else:
+        lower = np.nan
+        upper = np.nan
+        
     df = pd.DataFrame({
         'x': xs_pred,
         #'y': ys,
         'y_pred': ys_hat,
         'std': stderr,
-        'conf_lower': conf.lower,
-        'conf_upper': conf.upper
+        'conf_lower': lower,
+        'conf_upper': upper
     })
 
     #return (xs,ys,ys_hat,stderr)

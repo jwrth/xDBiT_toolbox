@@ -8,4 +8,3 @@ class ModuleNotFoundOnWindows(ModuleNotFoundError):
         self.message = f"\n{exception.name} is not installed. " \
                        "This package could be problematic to install on Windows."
         super().__init__(self.message)
-

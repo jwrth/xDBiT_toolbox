@@ -1,4 +1,3 @@
-import napari
 import numpy as np
 
 def interactive(adata, images, genes, 
@@ -11,6 +10,8 @@ def interactive(adata, images, genes,
     '''
     Interactive viewer for xDbit data using napari.
     '''
+    import napari
+    
     # get information on the image scale
     keys = list(adata.uns['spatial'].keys())
     scalefactors = adata.uns['spatial'][keys[0]]['scalefactors']
