@@ -7,7 +7,7 @@ import anndata
 from .tools import decode_list, check_list
 
 
-def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial', uns_exclusion_pattern=None, 
+def extract_groups(adata, groupby, groups=None, extract_uns=False, uns_key='spatial', uns_exclusion_pattern=None, 
     return_mask=False, strip=False):
 
     '''
@@ -16,13 +16,15 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     '''
 
     # convert groups into list
-    groups = [groups] if isinstance(groups, str) else list(groups)
+    if groups is not None:
+        groups = [groups] if isinstance(groups, str) else list(groups)
 
-    if type(adata) == anndata._core.anndata.AnnData:
+    if type(adata) == anndata.AnnData:
         anndata_object = True
-    elif type(adata) == pd.core.frame.DataFrame:
+    elif type(adata) == pd.DataFrame:
         anndata_object = False
         extract_uns = False
+        strip = False
     else:
         raise ValueError("Unknown type of input object.")
     
@@ -32,14 +34,22 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
     else:
         obs = adata
 
+    # check if filtering is wanted
+    filtering = True
+    if groupby is None:
+        filtering = False
+
     # # check if we want to filter `.uns`
     # if uns_exclusion_pattern is not None:
     #     extract_uns = True
 
-    if groupby in obs.columns:
+    if groupby in obs.columns or not filtering:
 
         # create filtering mask for groups
-        mask = obs[groupby].isin(groups).values
+        if groupby is None:
+            mask = np.full(len(adata), True) # no filtering
+        else:
+            mask = obs[groupby].isin(groups).values
 
         # filter dataframe or anndata object
         if anndata_object:
@@ -50,7 +60,7 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
         if len(adata) == 0:
             print("Subset variables '{}' not in groupby '{}'. Object not returned.".format(groups, groupby))
             return
-        else:
+        elif filtering:
             # check if all groups are in groupby category
             groups_found = [group for group in groups if group in obs[groupby].unique()]
             groups_notfound = [group for group in groups if group not in groups_found]
@@ -65,17 +75,18 @@ def extract_groups(adata, groupby, groups, extract_uns=False, uns_key='spatial',
                     new_uns = {key:value for (key,value) in new_uns.items() if uns_exclusion_pattern not in key}
                 adata.uns[uns_key] = new_uns
 
-            if strip:
-                # remove all annotations but .var, .obs and .obsm
-                del adata.uns
-                del adata.varm
-                del adata.layers
-                del adata.obsp
-            
-            if return_mask:
-                return adata, mask
-            else:
-                return adata
+        if strip:
+            # remove annotations in .uns and obsp
+            stores = [adata.uns, adata.obsp]
+            for s in stores:
+                keys = list(s.keys())
+                for k in keys:
+                    del s[k]
+        
+        if return_mask:
+            return adata, mask
+        else:
+            return adata
     
     else:
         print("Subset category '{}' not found".format(groupby))
@@ -382,3 +393,29 @@ def replace_images(adata, image_adata, spatial_key="spatial", inplace=True, verb
     if not inplace:
         return adata_
 
+def get_images_from_adata(adata, groupby, group, hires=False):
+    '''
+    Extract images from adata.
+    '''
+    
+    if hires:
+        res_key = 'hires'
+    else:
+        res_key = 'lowres'
+    
+    if groupby is not None:
+        # get subset
+        adata = extract_groups(adata, groupby=groupby, groups=group, extract_uns=True)
+    
+    # get keys
+    keys = list(adata.uns['spatial'].keys())
+    
+    imgs = {}
+    for key in keys:
+        # get image and channel name
+        channel = key.split("-")[1]
+        img = adata.uns['spatial'][key]['images'][res_key]
+        
+        # collect images in dictionary
+        imgs[channel] = img
+    return imgs

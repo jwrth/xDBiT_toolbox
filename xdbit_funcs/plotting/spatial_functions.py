@@ -2,22 +2,19 @@ from lib2to3.pytree import convert
 from matplotlib import pyplot as plt
 from matplotlib import patches, colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import matplotlib.ticker as mticker
 import math
 import pandas as pd
 import seaborn as sns
 import numpy as np
 import warnings
 from ..calculations._calc import dist_points, minDistance
-from sklearn.preprocessing import MinMaxScaler, minmax_scale
+from sklearn.preprocessing import MinMaxScaler
 from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
 from ..calculations import smooth_fit
 from ..readwrite import save_and_show_figure
-from ..images import set_histogram, convert_to_8bit
+from ..images import set_histogram
 from tqdm import tqdm
 import warnings
-from pathlib import Path
-import os
 from scipy.stats import zscore
 
 # ignore future warnings (suppresses annoying pandas warning)
@@ -40,7 +37,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             header_x=0.5, header_y=0.98, header_fontsize=20,
             crange=None, crange_type='minmax', colorbar=True, clb_title=None,
             cmap_center=None,
-            save_only=False, savepath=None, save_background=None, 
+            origin_zero=True, # whether to start axes ticks at 0
+            margin=True, # whether to leave margin of one spot width around the plot
+            save_only=False, savepath=None, save_background=None,
             verbose=True):
 
     if isinstance(pd_dataframe, pd.DataFrame):
@@ -108,7 +107,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
         
         image_metadata = adata.uns['spatial'][image_key]['scalefactors']
 
-        pixel_per_um = image_metadata["pixel_per_um"]
+        pixel_per_um = image_metadata["pixel_per_um_real"]
         if lowres:
             if 'lowres' in adata.uns['spatial'][image_key]['images'].keys():
                 image = adata.uns['spatial'][image_key]['images']['lowres']
@@ -154,26 +153,30 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             # extract image metadata if possible
             if 'scalefactors' in first_entry:
                 image_metadata = first_entry['scalefactors']
-                pixel_per_um = image_metadata["pixel_per_um"]
-                scale_factor = image_metadata['tissue_hires_scalef']                  
+                print(image_metadata)
+                pixel_per_um = image_metadata["pixel_per_um_real"]
+                scale_factor = image_metadata['tissue_hires_scalef']
             else:
                 print("pixel_per_um scalefactor not found. Plotted pixel coordinates instead.")
         else:
             print("No key `spatial` in adata.uns. Therefore pixel_per_um scalefactor could not be found. Plotted pixel coordinates instead.") if verbose else None
 
     # extract x and y pixel coordinates and convert to micrometer
-    x_pixelcoord = adata.obsm[obsm_key][:, 0]
-    y_pixelcoord = adata.obsm[obsm_key][:, 1]
+    x_pixelcoord = adata.obsm[obsm_key][:, 0].copy()
+    y_pixelcoord = adata.obsm[obsm_key][:, 1].copy()
     x_coord = x_pixelcoord / pixel_per_um
     y_coord = y_pixelcoord / pixel_per_um
 
 
     # shift coordinates that they start at (0,0)
-    x_offset = x_coord.min()
-    y_offset = y_coord.min()
-    x_coord -= x_offset
-    y_coord -= y_offset
-
+    if origin_zero:
+        x_offset = x_coord.min()
+        y_offset = y_coord.min()
+        x_coord -= x_offset
+        y_coord -= y_offset
+    else:
+        x_offset = y_offset = 0
+    
     if xlim is None:
         if plot_pixel:
             xmin = x_pixelcoord.min() * scale_factor
@@ -185,7 +188,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             xmax = np.max([x_coord.max(), y_coord.max()])
 
         xlim = (xmin - spot_size_unit, xmax + spot_size_unit)
-    else:
+    elif margin:
         xlim[0] -= spot_size_unit
         xlim[1] += spot_size_unit
 
@@ -200,10 +203,9 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             ymax = np.max([x_coord.max(), y_coord.max()])
 
         ylim = (ymin - spot_size_unit, ymax + spot_size_unit)
-    else:
+    elif margin:
         ylim[0] -= spot_size_unit
         ylim[1] += spot_size_unit
-
 
     if axis is None:
         n_plots = len(keys)
@@ -427,12 +429,15 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     if len(keys) > 1:
         multikeys = True
 
-    if groups is None:
-        groups = list(adata.obs[groupby].unique())
+    if groupby is None:
+        groups = [None]
     else:
-        groups = [groups] if isinstance(groups, str) else list(groups)
-    if len(groups) > 1:
-        multigroups = True
+        if groups is None:
+            groups = list(adata.obs[groupby].unique())
+        else:
+            groups = [groups] if isinstance(groups, str) else list(groups)
+        if len(groups) > 1:
+            multigroups = True
 
     if header_names is not None:
         assert len(header_names) == len(keys)
@@ -446,6 +451,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
     # determine the color range for each key
     crange_per_key_dict = {key: get_crange(adata, groupby, groups, key, 
                 use_raw=raw, layer=layer, data_in_dataframe=data_in_dataframe, pd_dataframe=pd_dataframe, ctype=crange_type) if key not in normalize_crange_not_for else None for key in keys}
+
     if multigroups:
         if multikeys:
             n_rows = len(groups)
@@ -693,7 +699,10 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
     xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
     savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
     dpi_save=300,
-    loess=True, **kwargs):
+    smooth=True, 
+    method='lowess',
+    stderr=False, 
+    **kwargs):
 
     '''
     Plot the expression of a gene as a function of an observation value (e.g. the automatic expression histology value 
@@ -715,7 +724,7 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
 
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
-
+    
     if hue is not None:
         hue_cats = list(adata.obs[hue].unique())
         cmap_colors = plt.get_cmap(cmap)
@@ -802,11 +811,11 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                 else:
                     print("Key '{}' not found.".format(key))                    
 
-                if loess:
+                if smooth:
                     # do smooth fitting
                     df = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
-                                nsteps=nsteps)
+                                nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                 else:
                     # set up dataframe without smooth fitting
                     df = pd.DataFrame({"x": x, "y_pred": y})
@@ -832,10 +841,10 @@ def expression_along_observation_value(adata, keys, x_category, groupby, splitby
                     y = group_X[split_mask, idx].copy()
 
                     # do smooth fitting
-                    if loess:
+                    if smooth:
                         df_split = smooth_fit(x, y, 
                                 min=range_min, max=range_max,
-                                nsteps=nsteps)
+                                nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                     else:
                         # set up dataframe without smooth fitting
                         df = pd.DataFrame({"x": x, "y_pred": y})

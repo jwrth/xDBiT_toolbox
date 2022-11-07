@@ -18,7 +18,7 @@ if __name__ == '__main__':
     groupby = input("Enter groupby variable (e.g. id): ")
 
     # generate results file
-    results_file = input_file.split(".")[0] + "_spatialde.h5ad"
+    results_file = input_file.rsplit(".", 1)[0] + "_spatialde.h5ad"
 
     # generate tmp directory
     dir = os.path.dirname(input_file)
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     if module_path not in sys.path:
         sys.path.append(module_path)
 
-    import dbitx_funcs as db
+    import xdbit_funcs as db
     import scanpy as sc
 
     # start processing
@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
         # remove images in subset to decrease memory consumption
         print("{}: Remove images from subset...".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}"), flush=True)
-        subset = db.tl.remove_images(adata=subset)
+        db.tl.remove_images(adata=subset)
         
         # run spatialde on subset
         db.tl.spatialde_run(subset, run=True, normalize=False, use_raw=False, output_name=key_name)

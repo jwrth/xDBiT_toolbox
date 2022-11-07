@@ -3,8 +3,10 @@ import pandas as pd
 from math import sqrt
 from scipy.spatial import distance as dist
 #from sympy import lowergamma
-from ..exceptions import ModuleNotFoundOnWindows
+from ..exceptions import ModuleNotFoundOnWindows, ImportErrorLoess
 from typing import Optional, Tuple, Union, List, Dict, Any
+from .lowess import lowess
+from warnings import warn
 
 
 def minDistance(A, B, E) :
@@ -164,7 +166,10 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     min: Optional[float] = None, 
     max: Optional[float] = None,
     #stepsize: Optional[float] = None,
-    nsteps: Optional[float] = None
+    nsteps: Optional[float] = None,
+    method: str = True,
+    stderr: bool = True,
+    K: int = 100
     ):
 
     """Smooth curve using loess
@@ -177,8 +182,23 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
         x values
     ys : np.ndarray
         y values
-    dist_thrs : float
-        exclude (x,y) tuples where x > dist_thrs
+    min: Optional[float]
+        exclude (x,y) tuples were x < min
+    max: Optional[float]
+        exclude (x,y) tuples were x > max
+    nsteps = Optional[float]
+        Number of steps x is divided into for the prediction.
+    method: str
+        Which method to use for the smoothing. Options: "loess" or "lowess".
+        "loess": Uses `skmisc.loess`. This is not implemented for Windows.
+        "lowess": Uses `statsmodels.nonparametric.smoothers_lowess.sm_lowess` which is available on all tested platforms.
+    stderr: bool
+        Whether to calculate standard deviation of the prediction. Depends on the method used:
+        "loess": Standard deviation returned by package is used.
+        "lowess" Bootstrapping is used to estimate a confidence interval.
+    K: int
+        Only needed for `method="lowess"`. Determines number of bootstrapping cycles.
+    
     Returns:
     -------
     A tuple with included x and y-values (xs',ys'), as well
@@ -188,10 +208,25 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     From: https://github.com/almaan/ST-mLiver
     """
-    try:
-        from skmisc.loess import loess
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundOnWindows(e)
+    
+    # check method
+    if method == "loess":
+        loess = True
+    elif method == "lowess":
+        loess = False
+    else:
+        raise ValueError('Invalid `method`. Expected is one of: ["loess", "lowess"')
+
+    if loess:
+        try:
+            from skmisc.loess import loess
+            
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundOnWindows(e)
+
+        except ImportError as e:
+            #warn('{}`skmisc.loess` package not found. Used custom lowess impolementation instead.'.format(e))
+            raise ImportErrorLoess(e)
 
     # sort x values
     srt = np.argsort(xs)
@@ -209,7 +244,10 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     ys = ys[keep]
 
     # generate loess class object
-    ls = loess(xs, ys)
+    if loess:
+        ls = loess(xs, ys)
+    else:
+        ls = lowess(xs, ys)      
 
     # fit loess class to data
     ls.fit()
@@ -224,20 +262,27 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     # predict on data
     pred =  ls.predict(xs_pred,
-                       stderror=True)
+                       stderror=stderr, K=K)
     # get predicted values
     ys_hat = pred.values
-    # get standard error
-    stderr = pred.stderr
-    conf = pred.confidence()
-
+    
+    if stderr:
+        # get standard error
+        stderr = pred.stderr
+        conf = pred.confidence()
+        lower = conf.lower
+        upper = conf.upper
+    else:
+        lower = np.nan
+        upper = np.nan
+        
     df = pd.DataFrame({
         'x': xs_pred,
         #'y': ys,
         'y_pred': ys_hat,
         'std': stderr,
-        'conf_lower': conf.lower,
-        'conf_upper': conf.upper
+        'conf_lower': lower,
+        'conf_upper': upper
     })
 
     #return (xs,ys,ys_hat,stderr)

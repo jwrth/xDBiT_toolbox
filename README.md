@@ -69,7 +69,7 @@ conda activate xdbit
 
 # to access parts of the pipeline in a Jupyter notebook install a kernel for this environment
 conda install -c anaconda ipykernel
-python3 -m ipykernel install --user --name=xdbit_kernel
+python -m ipykernel install --user --name xdbit --display-name "xdbit_kernel"
 ```
 
 ## Use toolbox as python module

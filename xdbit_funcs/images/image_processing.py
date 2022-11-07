@@ -319,3 +319,9 @@ def calc_image_param_per_spot(adata, groupby='id', channel_pattern='dapi',
 
     if normalize:
         adata.obs[obshead + '_norm'] = adata.obs[[groupby, obshead]].groupby(groupby).transform(minmax_scale)
+        
+def crop_center(image, center, width):
+    '''
+    Crop image from given center and width.
+    '''
+    return image[int(center[0] - width/2): int(center[0] + width/2), int(center[1] - width/2): int(center[1] + width/2)]
