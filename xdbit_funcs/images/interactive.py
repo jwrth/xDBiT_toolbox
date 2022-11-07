@@ -90,6 +90,8 @@ def napari_to_rgb(viewer, shape_layer_name="Shapes", alpha=1):
     Convert shape selection in napari into RGB by additive blending.
     Code from: https://forum.image.sc/t/saving-image-from-napari/50379
     '''
+    import napari
+    
     # get shape and image layers
     shapelays = {elem.name: elem for elem in viewer.layers if isinstance(elem, napari.layers.shapes.Shapes)}
     imlays = {elem.name: elem for elem in viewer.layers if isinstance(elem, napari.layers.image.Image)}
