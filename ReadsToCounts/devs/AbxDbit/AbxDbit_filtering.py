@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-This is to process AbDbitX reads after tagging the bam file with cellular and molecular barcodes.
+This is to process AbxDbit reads after tagging the bam file with cellular and molecular barcodes.
 
 Input: BAM file with reads that have been filtered, polyA and SMART adapter trimmed, and tagged with the following:
     - XX: x-coordinate
     - XY: y-coordinate
-    - (OPTIONAL) XZ: z-coordinate (well coordinate in DbitX)
+    - (OPTIONAL) XZ: z-coordinate (well coordinate in xDbit)
     - XM: molecular barcode (UMI)
 
 Algorithm:
@@ -47,15 +47,12 @@ https://github.com/RebekkaWegmann/splitseq_toolbox
 """
 
 ## libraries
-import sys, os, timeit, h5py
+import sys, os, h5py
 import pysam
-import itertools
 import numpy as np
 import pandas as pd
-import matplotlib
 from matplotlib import pyplot as plt
 from argparse import ArgumentParser
-from tqdm import tqdm_notebook as tqdm
 from datetime import datetime, timedelta
 import subprocess
 import glob
@@ -64,6 +61,8 @@ from multiprocessing import Pool
 import Levenshtein as lv
 import json
 import gzip
+import string
+from itertools import combinations
 
 
 ## Functions
@@ -82,6 +81,37 @@ def make_plate_overview(well_count):
         xy = well2ind(wellpos[0])
         out[xy[0], xy[1]] = int(wellpos[1])
     return out
+
+def plot_plate_overview(bc_matrices, all_bc_cumsum, coord_names, est_num_cells, out_dir):
+    ## plotting summary graphs
+    fig, axs = plt.subplots(2,2)
+    axs = axs.ravel()
+
+    for i, name in enumerate(coord_names):
+        # plot heat map
+        matrix = bc_matrices[name]
+        p = axs[i].imshow(np.log10(matrix+1))
+        
+        # set title
+        axs[i].set_title('Number of reads per {}-coordinate'.format(name))
+        
+        # set x and y ticks
+        axs[i].set_xticks(list(range(0, 12)), list(range(1, 13)))
+        axs[i].set_yticks(list(range(0, 8)), list(string.ascii_uppercase[:8]))
+        axs[i].tick_params(axis='both', which='both',length=0)
+        
+        # set color bar
+        clb = fig.colorbar(p, ax=axs[i])
+        clb.set_label('No. BCs, log10')
+
+    # plotting the cumulative fraction of reads per barcode helps to determine the number of assayed cells (see Macosko, 2015)
+    axs[3].plot(all_bc_cumsum); axs[3].set_title('Cumulative fraction of reads per barcode')
+    axs[3].set_xlim(0, est_num_cells * 1.2)
+    axs[3].set_xlabel("Barcodes sorted by number of reads")
+    axs[3].set_ylabel("Cumulative fraction of reads")
+
+    fig.set_size_inches(12,7)
+    fig.savefig(os.path.join(out_dir,'filtering_summary.pdf'),bbox_inches='tight')
 
 def average_time(time_list):
     average_timedelta = sum(time_list, timedelta(0)) / len(time_list)
@@ -207,11 +237,22 @@ def spatialfilter(in_bam):
         record_dict['features']['spot_found'] = 0
         record_dict['features']['umi_found'] = 0
         record_dict['features']['added'] = 0
+        
         for v in feature_legend.Feature.values:
             record_dict['features'][v] = 0
-            record_dict['features'][v] = 0
-
-
+        
+        # for IntAct-seq
+        record_dict['interact'] = {}
+        record_dict['interact']['direct'] = 0
+        record_dict['interact']['corrected'] = 0
+        record_dict['interact']['spot_found'] = 0
+        record_dict['interact']['umi_found'] = 0
+        record_dict['interact']['added'] = 0
+        
+        interaction_combinations = ["+".join(map(str, comb)) for comb in combinations(feature_legend.Feature.values, 2)]
+        for c in interaction_combinations:
+            record_dict['interact'][c] = 0
+        
     # start timing
     start_time_filtering = datetime.now()
     start_time = datetime.now()
@@ -223,13 +264,14 @@ def spatialfilter(in_bam):
         record_dict['total_count']+=1
         keep = True
         add = True
+        interact_signal = False
 
         # extract barcodes from entry
         barcodes = {name: entry.get_tag("X" + name) for name in coord_names}
 
         # check if all barcodes are in the respective barcode sets
         if np.all([barcodes[name] in barcode_dicts[name] for name in coord_names]):
-            # if both barcodes directly found:
+            # if all barcodes directly found:
             # get well coordinate
             wells = {name: barcode_dicts[name][bc][0] for (name, bc) in barcodes.items()}
 
@@ -256,8 +298,10 @@ def spatialfilter(in_bam):
             for name in coord_names:
                 
                 # check barcode and add coordinate to tag if matching barcode found.
-                entry, record_dict, coord, well, keep = check_barcode_and_add_coord_to_tag(entry=entry, barcodes=barcodes, coord_name=name, 
-                    barcode_dictionaries=barcode_dicts, record_dictionary=record_dict, dist_threshold=dist_thresholds[name], compute_dist_function=compute_dist,
+                entry, record_dict, coord, well, keep = check_barcode_and_add_coord_to_tag(
+                    entry=entry, barcodes=barcodes, coord_name=name, 
+                    barcode_dictionaries=barcode_dicts, record_dictionary=record_dict, 
+                    dist_threshold=dist_thresholds[name], compute_dist_function=compute_dist,
                     keep=keep)
 
                 # collect the coordinates
@@ -272,8 +316,17 @@ def spatialfilter(in_bam):
             # check if features have to be extracted too
             if feat_file is not None:
                 xg = entry.get_tag('XG')
+                
+                # check if there is an IntAct read in the entry
+                if entry.has_tag('XH'):
+                    xh = entry.get_tag('XH')
+                    interact_signal = True
+                else:
+                    xh = None
+                
                 umi = entry.get_tag('XM')
 
+                # check first possible feature tag
                 if xg in feature_dict:
                     # get feature name
                     featurename = feature_dict[xg]
@@ -298,6 +351,43 @@ def spatialfilter(in_bam):
                         record_dict['features'][featurename]+=1
                     else:
                         keep=False
+                
+                if keep and interact_signal:
+                    # check first possible feature tag
+                    if xh in feature_dict:
+                        # add feature name to first featurename to mark an interact signal
+                        featurename = featurename + "+" + feature_dict[xh]
+                        entry.set_tag('gn', featurename, value_type='Z')
+
+                        # record
+                        record_dict['interact']['direct']+=1
+                        
+                        if featurename in record_dict['interact'].keys():
+                            record_dict['interact'][featurename]+=1
+                        else:
+                            record_dict['interact'][featurename]=1
+
+                    else:
+                        # If barcode is not found in feature barcode list: Check for mismatches in feature barcode
+                        d = [compute_dist(xg,bc) for bc in feature_barcodes]
+                        idx = [i for i,e in enumerate(d) if e<=feature_dist]
+
+                        if len(idx)==1:
+                            xg = feature_barcodes[idx[0]]
+                            featurename = feature_dict[xg]
+                            entry.set_tag('gn', featurename, value_type = 'Z')
+
+                            # record
+                            record_dict['interact']['corrected']+=1
+                            
+                            if featurename in record_dict['interact'].keys():
+                                record_dict['interact'][featurename]+=1
+                            else:
+                                record_dict['interact'][featurename]=1
+                            
+                        else:
+                            keep=False
+                    
 
         if keep:
             # set coordinates as tag and write to output file
@@ -314,8 +404,15 @@ def spatialfilter(in_bam):
                     current_umi_list = umi_dict[coord_concat][featurename]
 
                     # record
-                    record_dict['features']['spot_found']+=1
-                    total_umi_dict[coord_concat][featurename].append(umi)
+                    if interact_signal:
+                        record_dict['interact']['spot_found']+=1
+                    else:
+                        record_dict['features']['spot_found']+=1
+                    
+                    if featurename in total_umi_dict[coord_concat].keys():
+                        total_umi_dict[coord_concat][featurename].append(umi)
+                    else:
+                        total_umi_dict[coord_concat][featurename] = [umi]
 
                     # Check if UMI was already used for this spot
                     if umi in current_umi_list:
@@ -323,19 +420,33 @@ def spatialfilter(in_bam):
                         add = False
 
                         # record
-                        record_dict['features']['umi_found']+=1
+                        if interact_signal:
+                            record_dict['interact']['umi_found']+=1
+                        else:
+                            record_dict['features']['umi_found']+=1
                     
                 else:
                     add = False
                 
                 if add:
                     # If cell barcode in RNA cell list and UMI was not used before: Count +1 in DGE.
-                    dge.loc[featurename, coord_concat]+=1
+                    if featurename in dge.index:
+                        dge.loc[featurename, coord_concat]+=1
+                    else:
+                        # if interaction featurename is not yet in dge dataframe add it here and add count
+                        dge.loc[featurename] = [0] * dge.shape[1]
+                        dge.loc[featurename, coord_concat]+=1
                     # And add UMI to UMI list
-                    umi_dict[coord_concat][featurename].append(umi)
+                    if featurename in umi_dict[coord_concat].keys():
+                        umi_dict[coord_concat][featurename].append(umi)
+                    else:
+                        umi_dict[coord_concat][featurename] = [umi]
 
                     # record
-                    record_dict['features']['added']+=1
+                    if interact_signal:
+                        record_dict['interact']['added']+=1
+                    else:
+                        record_dict['features']['added']+=1
 
         elif store_discarded:
                 print(entry.query_name, file = open(os.path.join(out_dir,'discarded_reads.txt'),'a'), flush=True)
@@ -372,9 +483,10 @@ if __name__ == '__main__':
     parser.add_argument("--debug_flag",action="store_true",help="Turn on debug flag. This will produce some additional output which might be helpful.")
     parser.add_argument("--store_discarded",action="store_true",help="Store names of discarded reads?")
     parser.add_argument("-m", action='store_true', help="Use multithreading?")
-    parser.add_argument("--mode", action='store', default='DbitX', help="Which mode? DbitX or Dbit-seq?")
+    parser.add_argument("--mode", action='store', default='xDbit', help="Which mode? xDbit or Dbit-seq?")
     parser.add_argument("-f" "--feature_file", action="store", dest="feature_file", default=None, help="Path to the feature legend. Defaults to a file feature_legend.csv in the current directory.")
     parser.add_argument("-r" "--rna_dge_file", action='store', dest="rna_dge_file", default='-', help="Specify RNA DGE matrix")
+    parser.add_argument("--interact", action='store_true', help="Use flag if there are interaction reads in the data.")
 
 
     ## Start timing
@@ -394,7 +506,10 @@ if __name__ == '__main__':
     mode = args.mode
     feat_file = args.feature_file
     rna_dge_file = args.rna_dge_file
+    interact_mode = args.interact
+    
     feature_dist = 2
+    
 
     split_dir = os.path.join(tmp_dir, 'tmp_split')
 
@@ -408,11 +523,11 @@ if __name__ == '__main__':
     # check out mode
     if mode == 'Dbit-seq':
         coord_names = ['X', 'Y']
-    elif mode == 'DbitX':
+    elif mode == 'xDbit':
         coord_names = ['X', 'Y', 'Z']
     else:
         # exit script
-        sys.exit('{} is no valid mode ["DbitX", "Dbit-seq"]'.format(mode))
+        sys.exit('{} is no valid mode ["xDbit", "Dbit-seq"]'.format(mode))
         
     ## Import barcode legend and extract information
     barcode_legend = pd.read_csv(bc_file)
@@ -422,6 +537,15 @@ if __name__ == '__main__':
     # retrieve string matching settings
     dist_alg = barcode_legend['string_matching_algorithm'][0]
     dist_thresholds = {name: int(barcode_legend[name + "_maxdist"][0]) for name in coord_names}
+    
+    # check which distance algorithm to use
+    if dist_alg == "hamming":
+        compute_dist = lv.hamming
+    elif dist_alg == "levenshtein":
+        compute_dist = lv.distance
+    else:
+        print("Unknown string matching alogrithm. Used levenshtein as default.", flush=True)
+        compute_dist = lv.distance
 
     # Check if feature legend file is given
     if feat_file is not None:
@@ -449,20 +573,20 @@ if __name__ == '__main__':
         # create dictionary to collect all UMIs per cell
         umi_dict = {cell:{gene:[] for gene in feature_legend.Feature.values} for cell in rna_spot_list}
         total_umi_dict = {cell:{gene:[] for gene in feature_legend.Feature.values} for cell in rna_spot_list}
+        
+        if interact_mode:
+            # add also all combinations of antibodies as entries in umi dictionaries
+            for dic in [umi_dict, total_umi_dict]:
+                for cell in dic:
+                    for v in feature_legend.Feature.values:
+                        for w in feature_legend.Feature.values:
+                            dic[cell][v + "+" + w] = []
 
         # create empty gene expression matrix
-        dge = pd.DataFrame(0, index=feature_legend.Feature, columns=rna_spot_list,dtype=int)
-
-    if dist_alg == "hamming":
-        compute_dist = lv.hamming
-    elif dist_alg == "levenshtein":
-        compute_dist = lv.distance
-    else:
-        print("Unknown string matching alogrithm. Used levenshtein as default.", flush=True)
-        compute_dist = lv.distance
+        dge = pd.DataFrame(0, index=feature_legend.Feature, columns=rna_spot_list, dtype=int)
 
     ## Write parameters to logfile
-    print('AbDbitX barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'filtering_log.txt'), 'w'))
+    print('AbxDbit barcode filtering log - based on %s algorithm\n---------------------------------------\nParameters:' % dist_alg, file = open(os.path.join(out_dir,'filtering_log.txt'), 'w'))
     print('Input bam: %s' % input_bam, file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
     print('Path to output bam files: %s' % split_dir, file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
     print('Estimated number of cells: %d' % est_num_cells, file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
@@ -550,7 +674,7 @@ if __name__ == '__main__':
 
     if feat_file is not None:
         print('', file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
-        print('Statistics about DGE matrix generation:', file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+        print('Statistics about DGE matrix generation for feature reads:', file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('RNA cell list retrieved from: ' + str(rna_dge_file), file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('Found %d [%.2f%%] expected feature barcodes' % (record_dict['features']['direct'], record_dict['features']['direct']/record_dict['total_count']*100), 
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
@@ -562,9 +686,32 @@ if __name__ == '__main__':
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('Found %d [%.2f%%] unique UMIs with correct cell and feature barcode that were added to the DGE matrix' % (record_dict['features']['added'], record_dict['features']['added']/record_dict['total_count']*100), 
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+        
+        # write log for antibody features
         for v, b in zip(feature_legend.Feature.values, feature_legend.Barcode.values):
-            print('Feature %s (%s) was found %d times' % (v, b, record_dict['features'][v]), 
+            print('Antibody feature %s (%s) was found %d times' % (v, b, record_dict['features'][v]), 
                     file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+        
+        if interact_mode:
+            print('-------------------------------', file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Interaction reads', file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Found %d [%.2f%%] expected feature barcodes' % (record_dict['interact']['direct'], record_dict['interact']['direct']/record_dict['total_count']*100), 
+                file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Found %d [%.2f%%] expected feature barcodes with distance %d' % (record_dict['interact']['corrected'], record_dict['interact']['corrected']/record_dict['total_count']*100, feature_dist), 
+                    file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Found %d [%.2f%%] complete cellular barcodes in RNA cell list' % (record_dict['interact']['spot_found'], record_dict['interact']['spot_found']/record_dict['total_count']*100), 
+                    file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Found %d [%.2f%%] cases where UMI was found directly in UMI list and was not added to DGE matrix.' % (record_dict['interact']['umi_found'], record_dict['interact']['umi_found']/record_dict['total_count']*100), 
+                    file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            print('Found %d [%.2f%%] unique UMIs with correct cell and feature barcode that were added to the DGE matrix' % (record_dict['interact']['added'], record_dict['interact']['added']/record_dict['total_count']*100), 
+                    file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+            # write log for interaction features
+            for c in record_dict['interact'].keys():
+                if c not in ["direct", "corrected", "spot_found", "umi_found", "added"]:
+                    print('Interaction feature %s was found %d times' % (c, record_dict['interact'][c]), 
+                            file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
+                
+        
         print('Feature spot-count matrix was saved into %s.' % dge_out_file, 
                 file = open(os.path.join(out_dir,'filtering_log.txt'),'a'))
         print('Combined spot-count matrix was saved into %s.' % combined_out_file, 
@@ -581,31 +728,16 @@ if __name__ == '__main__':
 
     # Calculate cumulative fraction of reads
     all_bc_cumsum = np.cumsum(sorted(list(all_bc_counts.values()), reverse=True))/n_all_bcs
-
-    ## plotting summary graphs
-    fig, axes = plt.subplots(2,2)
-    axes = axes.ravel()
-
-    for i, name in enumerate(coord_names):
-        matrix = bc_matrices[name]
-        p = axes[i].imshow(np.log10(matrix+1))
-        axes[i].set_title('Number of reads per {}-coordinate'.format(name))
-        clb = fig.colorbar(p, ax=axes[i])
-        clb.set_label('No. BCs, log10')
-
-    # plotting the cumulative fraction of reads per barcode helps to determine the number of assayed cells (see Macosko, 2015)
-    p4 = axes[3].plot(all_bc_cumsum); axes[3].set_title('Cumulative fraction of reads per barcode')
-    axes[3].set_xlim(0, 5000)
-
-    fig.set_size_inches(12,7)
-    fig.savefig(os.path.join(out_dir,'filtering_summary.pdf'),bbox_inches='tight')
+    
+    # plot overview of plate
+    plot_plate_overview(bc_matrices, all_bc_cumsum, coord_names, est_num_cells, out_dir)
 
     ## Stop timing
     t_stop = datetime.now()
     t_elapsed = t_stop-t_start
 
     ## Save the QC output
-    f = h5py.File(os.path.join(out_dir,'abdbitx_filtering_QC_data.hdf5'), 'w')
+    f = h5py.File(os.path.join(out_dir,'abxdbit_filtering_QC_data.hdf5'), 'w')
 
     for name in coord_names:
         f.create_dataset('BC{}_plate_overview'.format(name), data = bc_matrices[name])
@@ -621,6 +753,12 @@ if __name__ == '__main__':
         umi_dict_file = open(os.path.join(tmp_dir, 'umi_dictionary.json'), 'w')
         json.dump(umi_dict, umi_dict_file)
         umi_dict_file.close()
+        
+    # save record dict
+    print('Saving record dictionary...', flush=True)
+    record_dict_file = open(os.path.join(tmp_dir, 'record_dictionary.json'), 'w')
+    json.dump(record_dict, record_dict_file)
+    record_dict_file.close()
 
     ## print info to stdout
     print("Summary generated. Elapsed time: " + str(t_elapsed), flush=True)

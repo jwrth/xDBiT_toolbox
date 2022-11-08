@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# This is a script to process DbitX reads. It is a modified version of \
+# This is a script to process xDbit reads. It is a modified version of \
 # Drop-seq_alignment.sh provided alongside of  Dropseqtools from Steve McCarroll's lab.
 # Also the code is based on work with a Copyright by Rebekka Wegmann (Snijderlab, ETH Zurich, 2019) which has been published in following GitHub repository: 
 # https://github.com/RebekkaWegmann/splitseq_toolbox
@@ -48,7 +48,7 @@ estimated_num_cells=500
 progname=`basename $0`
 barcode_file=
 jobs=1
-mode=DbitX
+mode=xDbit
 feature_pipeline=1
 shorten_summary=
 
@@ -56,12 +56,12 @@ shorten_summary=
 function usage () {
     cat >&2 <<EOF
 USAGE: $progname [options] <unmapped-queryname-sorted.bam>
-Perform DbitX tagging, barcode filtering, alignment and digital expression matrix calculation for RNA and feature reads
+Perform xDbit tagging, barcode filtering, alignment and digital expression matrix calculation for RNA and feature reads
 blubb
 blubb2
 -g <genomedir>      : Directory of STAR genome directory.  Required.
 -r <referencefasta> : Reference fasta of the Drop-seq reference metadata bundle.  Required.
--d <dropseq_root>   : Directory containing Drop-seq executables.  Default: Subdirectory of the DbitX toolbox.
+-d <dropseq_root>   : Directory containing Drop-seq executables.  Default: Subdirectory of the xDbit toolbox.
 -o <outputdir>      : Where to write output bam.  Default: out.
 -t <tmpdir>         : Where to write temporary files.  Default: tmp.
 -s <STAR_path>      : Full path of STAR.  Default: STAR is found via PATH environment variable.
@@ -74,7 +74,8 @@ blubb2
 -a                  : String matching algorithm (hamming or levenshtein). Default: hamming.
 -j                  : Number of threads. Default: 1.
 -l                  : Delete unnecessary files.
--m                  : Mode. "DbitX" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
+-m                  : Mode. "xDbit" (Searches for three barcodes) or "Dbit-seq" (Searches for two barcodes).
+-i                  : Type of features: "antibody" or "interact". 
 EOF
 }
 
@@ -121,7 +122,7 @@ function show_time () {
 }
 
 #getopts parses input options. Options followed by a : expect an input argument. The : at the very beginning prevents standard error messages.
-while getopts ":d:t:o:n:b:f:pg:r:s:c:ej:lm:h" options; do
+while getopts ":d:t:o:n:b:f:pg:r:s:c:ej:lm:i:h" options; do
   case $options in
     d ) dropseq_root=$OPTARG;;
     t ) tmpdir=$OPTARG;;
@@ -138,6 +139,7 @@ while getopts ":d:t:o:n:b:f:pg:r:s:c:ej:lm:h" options; do
     j ) jobs=$OPTARG;;
     l ) clear=1;;
     m ) mode=$OPTARG;;
+    i ) feat_mode=$OPTARG;;
     h ) usage
           exit 1;;
     \? ) usage
@@ -187,8 +189,8 @@ then multithreading="-m"
 else 
     multithreading=""
 fi
- 
-if [[ ${mode} == "DbitX" ]]
+
+if [[ ${mode} == "xDbit" ]]
 then
     min_lengths="35:94"
     multiwell=1
@@ -199,7 +201,7 @@ then
     multiwell=0
     echo "${mode} mode: Expects two spatial barcodes (X, Y)"
 else
-    echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'DbitX'/'Dbit-seq')"
+    echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'xDbit'/'Dbit-seq')"
     exit 1
 fi
 
@@ -267,7 +269,7 @@ filter_fastq="${cutadapt_executable} -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A CTG
 
 # generate .bam file
 rna_unmapped_bam="${rna_outdir}/unmapped.bam"
-generate_bam="java -jar ${picard_jar} FastqToSam F1=${rna_outdir}/R1_filtered.fastq.gz F2=${rna_outdir}/R2_filtered.fastq.gz O=${rna_unmapped_bam} SM=AbDbitXpipe TMP_DIR=${rna_tmpdir}"
+generate_bam="java -jar ${picard_jar} FastqToSam F1=${rna_outdir}/R1_filtered.fastq.gz F2=${rna_outdir}/R2_filtered.fastq.gz O=${rna_unmapped_bam} SM=AbxDbitpipe TMP_DIR=${rna_tmpdir}"
 
 ## Stage 1: pre-alignment tag
 # Extract UMI (Bases 1-10 on Read 2)
@@ -276,7 +278,7 @@ tag_molecules="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${rna_outd
     BASE_RANGE=1-10 BASE_QUALITY=10 BARCODED_READ=2 DISCARD_READ=false TAG_NAME=XM NUM_BASES_BELOW_QUALITY=1 INPUT=${rna_unmapped_bam}"
 
 # Extract the spatial barcodes
-tag_cells_well="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${rna_outdir}/unaligned_tagged_Cellular_2.bam_summary.txt \
+tag_cells_well="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${rna_outdir}/unaligned_tagged_Cellular_1.bam_summary.txt \
 BASE_RANGE=87-94 BASE_QUALITY=10 BARCODED_READ=2 DISCARD_READ=false TAG_NAME=XZ NUM_BASES_BELOW_QUALITY=1"
 
 tag_cells_y="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${rna_outdir}/unaligned_tagged_Cellular_2.bam_summary.txt \
@@ -298,7 +300,7 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${rna_outdir}/polyA_tri
 split_bam="bash ${readstocounts_root}/src/splitbam.sh ${rna_tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${readstocounts_root}/devs/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} \
+filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering.py --mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} \
 -b ${barcode_file} ${multithreading}"
 
 # add header and merge all bam files for alignment
@@ -397,10 +399,13 @@ $echo_prefix $dge_with_introns
 rnaseq_metrics="java -jar ${picard_jar} CollectRnaSeqMetrics I=${rna_outdir}/gene_function_tagged.bam O=${rna_outdir}/rnaseq_metrics.RNA_Metrics REF_FLAT=${refflat} STRAND=FIRST_READ_TRANSCRIPTION_STRAND RIBOSOMAL_INTERVALS=${rRNA_intervals}"
 $echo_prefix $rnaseq_metrics
 
+
+sleep 5 # necessary to make the run time calculation valid if the pipeline runs in < 1 second until here.
 end_time=`date +%s`
 run_time=`expr $end_time - $start_time`
 total_time=`show_time $run_time`
-echo "AbDbitX RNA pipeline finished in ${total_time}"
+
+echo "AbxDbit RNA pipeline finished in ${total_time}"
 
 if (( $feature_pipeline == 1 ))
 then
@@ -409,18 +414,28 @@ then
 	rna_dge=${rna_outdir}/DGE_matrix_with_introns_min100.txt.gz
 	echo "Part 2: Feature matrix generation"
 
-    if [[ ${mode} == "DbitX" ]]
+    if [[ ${feat_mode} == "interact" ]]
     then
-        min_lengths="6:94"
+        r1_min="42"
+    elif [[ ${feat_mode} == "antibody" ]]
+    then
+        r1_min="6"
+    else
+        echo "ERROR: ${feat_mode} is an invalid variable for feature_mode. (Valid: 'antibody'/'interact'"
+    fi
+
+    if [[ ${mode} == "xDbit" ]]
+    then
+        min_lengths="${r1_min}:94"
         multiwell=1
         echo "${mode} mode: Expects three spatial barcodes (X, Y, Z)"
     elif [[ ${mode} == "Dbit-seq" ]]
     then
-        min_lengths="6:56"
+        min_lengths="${r1_min}:56"
         multiwell=0
         echo "${mode} mode: Expects two spatial barcodes (X, Y)"
     else
-        echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'DbitX'/'Dbit-seq')"
+        echo "ERROR: ${mode} is an invalid variable for mode. (Valid: 'xDbit'/'Dbit-seq')"
         exit 1
     fi
 
@@ -437,7 +452,7 @@ then
 
     # generate .bam file
     feat_input_bam="${feat_outdir}/unmapped.bam"
-    generate_bam="java -jar ${picard_jar} FastqToSam F1=${feat_outdir}/R1_filtered.fastq.gz F2=${feat_outdir}/R2_filtered.fastq.gz O=${feat_input_bam} SM=DbitXpipe TMP_DIR=${feat_tmpdir}"
+    generate_bam="java -jar ${picard_jar} FastqToSam F1=${feat_outdir}/R1_filtered.fastq.gz F2=${feat_outdir}/R2_filtered.fastq.gz O=${feat_input_bam} SM=xDbitpipe TMP_DIR=${feat_tmpdir}"
 
 	## Stage 1: Extraction of UMI, cellular barcode and feature barcodes
 	# Extract UMI (bases 1-10 of read2)
@@ -447,7 +462,7 @@ then
 	    BASE_RANGE=1-10 BASE_QUALITY=10 BARCODED_READ=2 DISCARD_READ=false TAG_NAME=XM NUM_BASES_BELOW_QUALITY=1 INPUT=${feat_input_bam}"
 
     # Extract the spatial barcodes
-    tag_cells_well="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Cellular_2.bam_summary.txt \
+    tag_cells_well="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Cellular_1.bam_summary.txt \
     BASE_RANGE=87-94 BASE_QUALITY=10 BARCODED_READ=2 DISCARD_READ=false TAG_NAME=XZ NUM_BASES_BELOW_QUALITY=1"
 
     tag_cells_y="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Cellular_2.bam_summary.txt \
@@ -456,18 +471,26 @@ then
     tag_cells_x="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Cellular_3.bam_summary.txt \
     BASE_RANGE=11-18 BASE_QUALITY=10 BARCODED_READ=2 DISCARD_READ=true TAG_NAME=XX NUM_BASES_BELOW_QUALITY=1" #setting discard_read=true will make sure read 2 is discarded after the last tagging step, resulting in a tagged, single read bam file
 
-	tag_feature="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Cellular_3.bam_summary.txt \
+	tag_feature="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Features.bam_summary.txt \
 	BASE_RANGE=1-6 BASE_QUALITY=10 BARCODED_READ=1 DISCARD_READ=false TAG_NAME=XG NUM_BASES_BELOW_QUALITY=1"
 
-	#discard all reads where any one of the barcode regions has at least 1 base with quality < 10
+    tag_interact="${dropseq_root}/TagBamWithReadSequenceExtended SUMMARY=${feat_outdir}/feat_tagged_Interactions.bam_summary.txt \
+    BASE_RANGE=37-42 BASE_QUALITY=10 BARCODED_READ=1 DISCARD_READ=false TAG_NAME=XH NUM_BASES_BELOW_QUALITY=1"
+
+	# discard all reads where any one of the barcode regions has at least 1 base with quality < 10
 	filter_bam="${dropseq_root}/FilterBam TAG_REJECT=XQ"
 
 	## Stage 3: Filter barcodes
 
 	# filter each split file
-	filter_barcodes="python ${readstocounts_root}/devs/AbDbitX/AbDbitX_filtering.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
+	filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
 	-n ${estimated_num_cells} -b ${barcode_file} ${multithreading} \
 	-f ${feature_file} -r ${rna_dge}"
+
+    if [[ ${feat_mode} == "interact" ]]
+    then
+        filter_barcodes="${filter_barcodes} --interact"
+    fi
 
     # Stage 0
     $echo_prefix $filter_fastq | tee ${feat_outdir}/cutadapt.out
@@ -478,12 +501,20 @@ then
 
     if (( $multiwell == 1))
     then
+        
         $echo_prefix $tag_cells_well INPUT=$feat_tmpdir/feat_tagged_Molecular.bam OUTPUT=$feat_tmpdir/feat_tagged_MW.bam
         $echo_prefix $tag_cells_y INPUT=$feat_tmpdir/feat_tagged_MW.bam OUTPUT=$feat_tmpdir/feat_tagged_MWY.bam
         $echo_prefix $tag_cells_x INPUT=$feat_tmpdir/feat_tagged_MWY.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYX.bam
         $echo_prefix $tag_feature INPUT=$feat_tmpdir/feat_tagged_MWYX.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYXF.bam
-        $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MWYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
-        
+
+        echo "Feature mode: ${feat_mode}"
+        if [[ ${feat_mode} == "interact" ]]
+        then
+            $echo_prefix $tag_interact INPUT=$feat_tmpdir/feat_tagged_MWYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_MWYXFI.bam
+            $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MWYXFI.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
+        else
+            $echo_prefix $filter_bam INPUT=$feat_tmpdir/feat_tagged_MWYXF.bam OUTPUT=$feat_tmpdir/feat_tagged_filtered.bam
+        fi
 
         files_to_delete="$files_to_delete $feat_tmpdir/feat_tagged_Molecular.bam \
                   $feat_tmpdir/feat_tagged_MW.bam $feat_tmpdir/feat_tagged_MWY.bam \
@@ -500,19 +531,19 @@ then
     fi
 
 	# Stage 2
-
+    echo_prefix= # start pipeline from here
 	echo "Filtering command: ${filter_barcodes} -i ${feat_tmpdir}/feat_tagged_filtered.bam"
 	$echo_prefix $filter_barcodes -i ${feat_tmpdir}/feat_tagged_filtered.bam
 
 	end_time=`date +%s`
 	run_time=`expr $end_time + 1 - $start_time`
 	total_time=`show_time $run_time`
-	echo "Feature part finished using ${dist_alg} algorithm in ${total_time}"
+	echo "Feature part finished in ${total_time}"
 
 	abs_end_time=`date +%s`
 	abs_run_time=`expr ${abs_end_time} + 1 - ${abs_start_time}`
 	abs_total_time=`show_time $abs_run_time`
-	echo "AbDbitX feature pipeline finished using ${dist_alg} algorithm in ${abs_total_time}"
+	echo "AbxDbit feature pipeline finished in ${abs_total_time}"
 fi
 
 if (($clear == 1 ))

@@ -1,7 +1,7 @@
   #!/usr/bin/env python
 
 '''
-Script to run AbDbitX pipeline on multiple batches.
+Script to run AbxDbit pipeline on multiple batches.
 
 Usage:
     Input is a .csv file giving the parameters:
@@ -14,7 +14,7 @@ Usage:
         - mode
 
 Command for single analysis:
-nohup bash path/to/DbitX_toolbox/AbDbitX/AbDbitX_pipeline.sh \
+nohup bash path/to/xDbit_toolbox/AbxDbit/AbxDbit_pipeline.sh \
 -g path/to/genomes_STAR/mm_STARmeta/STAR/ -r path/to/genomes_STAR/mm_STARmeta/Mm_metadata.fasta \
 -b path/to/barcodes/barcodes_legend.csv -f path/to/barcodes/feature_legend.csv \
 -n 2000 -m Dbit-seq -j 1 \
@@ -27,10 +27,9 @@ from os.path import dirname, join
 import pandas as pd
 import sys
 from datetime import datetime
-import time
 import numpy as np
 
-print("Starting AbDbitX pipeline batch processing...", flush=True)
+print("Starting AbxDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
@@ -75,11 +74,12 @@ for b in batch_numbers:
         "-f", s["feature_legend"],
         "-n", str(s["expected_n_spots"]),
         "-m", s["mode"],
+        "-i", s["feature_mode"],
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
         #"-l", # clear tmp files after finishing the script
-        #"-e", # for testing
+        "-e", # for testing
         ] + file_list
         )
 
