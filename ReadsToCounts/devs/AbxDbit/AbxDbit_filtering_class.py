@@ -67,18 +67,100 @@ from itertools import combinations
 
 ## Functions
 
+def average_time(time_list):
+    average_timedelta = sum(time_list, timedelta(0)) / len(time_list)
+    return average_timedelta
+
+def get_stdout(command):
+    process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
+    proc_stdout = process.communicate()[0].strip()
+    return proc_stdout
+
+def sum_dicts(dictlist):
+    counter = collections.Counter() 
+    for d in dictlist:  
+        counter.update(d) 
+    
+    result = dict(counter)
+    return result
+
 class xDbit_filter:
-    def __init__(self):
-        self.record_dict = {}
+    def __init__(self, bc_file, feat_file, mode, interact_mode):
+        # generate different objects from input
+        # check out mode
+        if mode == 'Dbit-seq':
+            self.coord_names = ['X', 'Y']
+        elif mode == 'xDbit':
+            self.coord_names = ['X', 'Y', 'Z']
+        else:
+            # exit script
+            sys.exit('{} is no valid mode ["xDbit", "Dbit-seq"]'.format(mode))
+            
+        # Import barcode legend and extract information
+        self.barcode_legend = pd.read_csv(bc_file)
         
-    def well2ind(well):
+        # generate barcode dictionary
+        barcode_dicts = {name: self.create_barcode_dict(self.barcode_legend, name) for name in self.coord_names}
+        
+        # retrieve string matching settings
+        self.dist_alg = self.barcode_legend['string_matching_algorithm'][0]
+        self.dist_thresholds = {name: int(self.barcode_legend[name + "_maxdist"][0]) for name in self.coord_names}
+        
+        # check which distance algorithm to use
+        if self.dist_alg == "hamming":
+            self.compute_dist = lv.hamming
+        elif self.dist_alg == "levenshtein":
+            self.compute_dist = lv.distance
+        else:
+            print("Unknown string matching alogrithm. Used levenshtein as default.", flush=True)
+            self.compute_dist = lv.distance
+            
+            # Check if feature legend file is given
+        if feat_file is not None:
+            # prepare everything for feature extraction if necessary
+            # import feature legend
+            self.feature_legend = pd.read_csv(feat_file)
+
+            # create feature barcode dict
+            self.feature_dict = {self.feature_legend.Barcode.values[x]:self.feature_legend.Feature.values[x] for x in range(len(self.feature_legend))}
+            self.feature_barcodes = self.feature_legend.Barcode.values
+
+            # read RNA cell list from RNA DGE matrix.
+            if rna_dge_file.endswith('.txt.gz'):
+                with gzip.open(rna_dge_file, 'rt') as f:
+                    first_line = f.readline()
+                    self.rna_spot_list = first_line.rstrip('\n').split('\t')[1:]
+            else:
+                if rna_dge_file.endswith('.txt'):
+                    with open(rna_dge_file, 'rt') as f:
+                        first_line = f.readline()
+                        self.rna_spot_list = first_line.rstrip('\n').split('\t')[1:]
+                else:
+                    print('Wrong file format for RNA cell (Neither .txt not .txt.gz)', flush=True)
+    
+        # create dictionary to collect all UMIs per cell
+        self.umi_dict = {cell:{gene:[] for gene in self.feature_legend.Feature.values} for cell in self.rna_spot_list}
+        self.total_umi_dict = {cell:{gene:[] for gene in self.feature_legend.Feature.values} for cell in self.rna_spot_list}
+        
+        if interact_mode:
+            # add also all combinations of antibodies as entries in umi dictionaries
+            for dic in [self.umi_dict, self.total_umi_dict]:
+                for cell in dic:
+                    for v in self.feature_legend.Feature.values:
+                        for w in self.feature_legend.Feature.values:
+                            dic[cell][v + "+" + w] = []
+                            
+        # create empty gene expression matrix
+        self.dge = pd.DataFrame(0, index=self.feature_legend.Feature, columns=self.rna_spot_list, dtype=int)
+
+    def well2ind(self, well):
         """Convert well positions to (zero-based) indices"""
         d = {'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7}
         row = d[well[0]]
         col = int(well[1:])-1
         return [row,col]
 
-    def make_plate_overview(well_count):
+    def make_plate_overview(self, well_count):
         # bring the counts per well into a plate layout
         out = np.zeros([8, 12])
         for wellpos in well_count.items():
@@ -86,7 +168,7 @@ class xDbit_filter:
             out[xy[0], xy[1]] = int(wellpos[1])
         return out
 
-    def plot_plate_overview(bc_matrices, all_bc_cumsum, coord_names, est_num_cells, out_dir):
+    def plot_plate_overview(self, bc_matrices, all_bc_cumsum, coord_names, est_num_cells, out_dir):
         ## plotting summary graphs
         fig, axs = plt.subplots(2,2)
         axs = axs.ravel()
@@ -117,24 +199,7 @@ class xDbit_filter:
         fig.set_size_inches(12,7)
         fig.savefig(os.path.join(out_dir,'filtering_summary.pdf'),bbox_inches='tight')
 
-    def average_time(time_list):
-        average_timedelta = sum(time_list, timedelta(0)) / len(time_list)
-        return average_timedelta
-
-    def get_stdout(command):
-        process = subprocess.Popen(command,stdout=subprocess.PIPE, shell=True)
-        proc_stdout = process.communicate()[0].strip()
-        return proc_stdout
-
-    def sum_dicts(dictlist):
-        counter = collections.Counter() 
-        for d in dictlist:  
-            counter.update(d) 
-        
-        result = dict(counter)
-        return result
-
-    def create_barcode_dict(barcode_legend, coordinate_name):
+    def create_barcode_dict(self, barcode_legend, coordinate_name):
         '''
         Function to generate barcode dictionary.
         Expects following inputs:
@@ -146,8 +211,11 @@ class xDbit_filter:
                                                             barcode_legend[coordinate_name]) if not pd.isnull(coord)}
         return d
 
-    def check_barcode_and_add_coord_to_tag(entry, barcodes, coord_name, barcode_dictionaries, 
-        record_dictionary, dist_threshold, compute_dist_function, keep):
+    def check_barcode_and_add_coord_to_tag(self, entry, barcodes, coord_name, 
+                                           barcode_dictionaries, record_dictionary, 
+                                           dist_threshold, compute_dist_function, 
+                                           keep
+                                           ):
 
         '''
         Function to check a barcode against a list and add a coordinate tag to a pysam entry.
@@ -199,7 +267,7 @@ class xDbit_filter:
 
         return entry, record_dictionary, coord, well, keep
 
-    def spatialfilter(in_bam):
+    def spatialfilter(self, in_bam):
         # count read length of input bam
         print("Count number of reads in input bam...", flush=True)
         bam_length = get_stdout('samtools view ' + in_bam + ' | wc -l')
