@@ -531,7 +531,6 @@ then
     fi
 
 	# Stage 2
-    echo_prefix= # start pipeline from here
 	echo "Filtering command: ${filter_barcodes} -i ${feat_tmpdir}/feat_tagged_filtered.bam"
 	$echo_prefix $filter_barcodes -i ${feat_tmpdir}/feat_tagged_filtered.bam
 

@@ -79,7 +79,7 @@ for b in batch_numbers:
         "-o", out_dir,
         "-t", tmp_dir,
         #"-l", # clear tmp files after finishing the script
-        "-e", # for testing
+        #"-e", # for testing
         ] + file_list
         )
 
