@@ -300,8 +300,8 @@ trim_poly_a="${dropseq_root}/PolyATrimmer OUTPUT_SUMMARY=${rna_outdir}/polyA_tri
 split_bam="bash ${readstocounts_root}/src/splitbam.sh ${rna_tmpdir}/tmp_split ${jobs}"
 
 # filter each split file
-filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering.py --mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} \
--b ${barcode_file} ${multithreading}"
+filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering_class.py \
+--mode ${mode} -t ${rna_tmpdir} -d ${rna_outdir} -n ${estimated_num_cells} --stride 500000 -b ${barcode_file} ${multithreading}"
 
 # add header and merge all bam files for alignment
 merge_filtered_bam="bash ${readstocounts_root}/src/mergebam.sh ${rna_tmpdir}/tmp_split ${tagged_unmapped_bam}"
@@ -483,8 +483,8 @@ then
 	## Stage 3: Filter barcodes
 
 	# filter each split file
-	filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
-	-n ${estimated_num_cells} -b ${barcode_file} ${multithreading} \
+	filter_barcodes="python ${readstocounts_root}/devs/AbxDbit/AbxDbit_filtering_class.py --mode ${mode} -t ${feat_tmpdir} -d ${feat_outdir} \
+	-n ${estimated_num_cells} -b ${barcode_file} ${multithreading} --stride 500000 \
 	-f ${feature_file} -r ${rna_dge}"
 
     if [[ ${feat_mode} == "interact" ]]
