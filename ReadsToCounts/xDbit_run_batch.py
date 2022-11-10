@@ -87,14 +87,14 @@ for b in batch_numbers:
 
         # add other options
         if args.skip_align:
-            commands[0].append("-x")
+            commands[i].append("-x")
         if args.clear_tmp:
-            commands[0].append("-l")
+            commands[i].append("-l")
         if args.echo:
-            commands[0].append("-e")
+            commands[i].append("-e")
 
         # add files to command
-        commands = [commands[0] + [s["fastq_R1"], s["fastq_R2"]]]
+        commands = [commands[i] + [s["fastq_R1"], s["fastq_R2"]]]
 
         log_dirs.append(log_dir)
 
