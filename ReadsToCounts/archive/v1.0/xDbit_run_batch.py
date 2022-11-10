@@ -1,24 +1,23 @@
   #!/usr/bin/env python
 
 '''
-Script to run AbDbitX pipeline on multiple batches.
+Script to run xDbit pipeline on multiple batches.
 
 Usage:
+
+    Idea:
     Input is a .csv file giving the parameters:
-        - directory of fastqs (2 for RNA only, 4 for RNA+features)
+        - directory of fastqs
         - STAR genome directory
         - STAR genome fasta file path
         - directory of barcode legend .csv
-        - (Optional) feature legend file
         - number of expected spots
         - mode
 
 Command for single analysis:
-nohup bash path/to/DbitX_toolbox/AbDbitX/AbDbitX_pipeline.sh \
--g path/to/genomes_STAR/mm_STARmeta/STAR/ -r path/to/genomes_STAR/mm_STARmeta/Mm_metadata.fasta \
--b path/to/barcodes/barcodes_legend.csv -f path/to/barcodes/feature_legend.csv \
--n 2000 -m Dbit-seq -j 1 \
-path/to/RNA_R1.fastq path/to/RNA_R2.fastq path/to/features_R1.fastq path/to/features_R2.fastq &
+nohup bash /home/jwirth/projects/xDbit_toolbox/xDbit_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
+-r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/barcodes_legend.csv -n 2000 -m Dbit-seq -j 1 
+../37_30_A2_S2_R1_001.fastq ../37_30_A2_S2_R2_001.fastq &
 
 '''
 
@@ -29,13 +28,23 @@ import sys
 from datetime import datetime
 import time
 import numpy as np
+import argparse
 
-print("Starting AbDbitX pipeline batch processing...", flush=True)
+print("Starting xDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
-print("Reading batch parameters from {}".format(sys.argv[1]))
-settings = pd.read_csv(sys.argv[1])
+# Parse arguments
+print("Parse arguments")
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--batch_file", help="Batch file with all parameters for xDbit batch processing.")
+parser.add_argument("-s", "--skip_align", action='store_true', help="Skip alignment steps for testing.")
+parser.add_argument("-c", "--clear_tmp", help="Clear files in temporary directory after pipeline is finished.")
+parser.add_argument("-e", "--echo", help="Print all commands to output instead of executing them.")
+args = parser.parse_args()
+
+print("Reading batch parameters from {}".format(args.batch_file))
+settings = pd.read_csv(args.batch_file)
 
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
@@ -55,39 +64,39 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
-        out_dir = join(dirname(s["rnafq_R1"]))
-        tmp_dir = join(dirname(s["rnafq_R1"]))
+        log_dir = join(dirname(s["fastq_R1"]), "pipeline_batch{}_{}.out".format(b, f"{datetime.now():%Y_%m_%d}"))
+        out_dir = join(dirname(s["fastq_R1"]), "out")
+        tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
 
-        print("Writing log to {}".format(log_dir), flush=True)
-        print("Output directory: {}".format(out_dir), flush=True)
-        print("Temp directory: {}".format(tmp_dir), flush=True)
-        
-        # get input files
-        filecats = ["rnafq_R1", "rnafq_R2", "featfq_R1", "featfq_R2"]
-        file_list = [s[cat] for cat in filecats if not pd.isnull(s[cat])]
+        print("\tWriting log to {}".format(log_dir), flush=True)
+        print("\tOutput directory: {}".format(out_dir), flush=True)
+        print("\tTemp directory: {}".format(tmp_dir), flush=True)
 
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 
         "-g", s["STAR_genome"],
         "-r", s["STAR_fasta"],
         "-b", s["legend"],
-        "-f", s["feature_legend"],
         "-n", str(s["expected_n_spots"]),
         "-m", s["mode"],
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
-        #"-l", # clear tmp files after finishing the script
         #"-e", # for testing
-        ] + file_list
-        )
+        ])
+
+        # add other options
+        if args.skip_align:
+            commands[0].append("-x")
+        if args.clear_tmp:
+            commands[0].append("-l")
+        if args.echo:
+            commands[0].append("-e")
+
+        # add files to command
+        commands = [commands[0] + [s["fastq_R1"], s["fastq_R2"]]]
 
         log_dirs.append(log_dir)
-
-    for e, elem in enumerate(commands):
-        print("Command {}:".format(e+1), flush=True)
-        print(" ".join(elem), flush=True)
 
     procs = [Popen(commands[i], stdout=PIPE, stderr=STDOUT) for i in range(len(commands))]
 

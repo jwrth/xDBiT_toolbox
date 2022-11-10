@@ -9,6 +9,12 @@ tmp/
 out/
 figures/
 */test_files/testrun/
+rna_out/
+rna_tmp/
+feature_out/
+feature_tmp/
+pipeline*.out
+nohup.out
 
 # Boilerplate list
 # Byte-compiled / optimized / DLL files

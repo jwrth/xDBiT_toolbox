@@ -25,25 +25,16 @@ path/to/RNA_R1.fastq path/to/RNA_R2.fastq path/to/features_R1.fastq path/to/feat
 from subprocess import Popen, PIPE, STDOUT
 from os.path import dirname, join
 import pandas as pd
+import sys
 from datetime import datetime
 import numpy as np
-import argparse
 
 print("Starting AbxDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
-# Parse arguments
-print("Parse arguments")
-parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--batch_file", help="Batch file with all parameters for xDbit batch processing.")
-parser.add_argument("-s", "--skip_align", action='store_true', help="Skip alignment steps for testing.")
-parser.add_argument("-c", "--clear_tmp", help="Clear files in temporary directory after pipeline is finished.")
-parser.add_argument("-e", "--echo", help="Print all commands to output instead of executing them.")
-args = parser.parse_args()
-
-print("Reading batch parameters from {}".format(args.batch_file))
-settings = pd.read_csv(args.batch_file)
+print("Reading batch parameters from {}".format(sys.argv[1]))
+settings = pd.read_csv(sys.argv[1])
 
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
@@ -63,7 +54,7 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_batch{}-{}_{}.out".format(b, i, f"{datetime.now():%Y_%m_%d}"))
+        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_{}.out".format(f"{datetime.now():%Y_%m_%d}"))
         out_dir = join(dirname(s["rnafq_R1"]))
         tmp_dir = join(dirname(s["rnafq_R1"]))
 
@@ -74,38 +65,26 @@ for b in batch_numbers:
         # get input files
         filecats = ["rnafq_R1", "rnafq_R2", "featfq_R1", "featfq_R2"]
         file_list = [s[cat] for cat in filecats if not pd.isnull(s[cat])]
-        
+
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 
         "-g", s["STAR_genome"],
         "-r", s["STAR_fasta"],
         "-b", s["legend"],
+        "-f", s["feature_legend"],
         "-n", str(s["expected_n_spots"]),
         "-m", s["mode"],
+        "-i", s["feature_mode"],
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
-        ])
-
-        # if feature files are given, add them
-        if not pd.isnull(s["feature_legend"]):
-            commands[i] += ["-f", s["feature_legend"]]
-        if not pd.isnull(s["feature_mode"]):
-            commands[i] += ["-u", s["feature_mode"]]
-        
-        # add other flags
-        if args.skip_align:
-            commands[i].append("-x")
-        if args.clear_tmp:
-            commands[i].append("-l")
-        if args.echo:
-            commands[i].append("-e")
-            
-        # add file list
-        commands[i] += file_list
+        #"-l", # clear tmp files after finishing the script
+        #"-e", # for testing
+        ] + file_list
+        )
 
         log_dirs.append(log_dir)
-    
+
     for e, elem in enumerate(commands):
         print("Command {}:".format(e+1), flush=True)
         print(" ".join(elem), flush=True)
