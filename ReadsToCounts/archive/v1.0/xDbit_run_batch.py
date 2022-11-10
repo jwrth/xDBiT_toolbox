@@ -1,35 +1,36 @@
   #!/usr/bin/env python
 
 '''
-Script to run AbxDbit pipeline on multiple batches.
+Script to run xDbit pipeline on multiple batches.
 
 Usage:
+
+    Idea:
     Input is a .csv file giving the parameters:
-        - directory of fastqs (2 for RNA only, 4 for RNA+features)
+        - directory of fastqs
         - STAR genome directory
         - STAR genome fasta file path
         - directory of barcode legend .csv
-        - (Optional) feature legend file
         - number of expected spots
         - mode
 
 Command for single analysis:
-nohup bash path/to/xDbit_toolbox/AbxDbit/AbxDbit_pipeline.sh \
--g path/to/genomes_STAR/mm_STARmeta/STAR/ -r path/to/genomes_STAR/mm_STARmeta/Mm_metadata.fasta \
--b path/to/barcodes/barcodes_legend.csv -f path/to/barcodes/feature_legend.csv \
--n 2000 -m Dbit-seq -j 1 \
-path/to/RNA_R1.fastq path/to/RNA_R2.fastq path/to/features_R1.fastq path/to/features_R2.fastq &
+nohup bash /home/jwirth/projects/xDbit_toolbox/xDbit_pipeline.sh -g /home/hpc/meier/genomes_STAR/mm_STARmeta/STAR/ 
+-r /home/hpc/meier/genomes_STAR/mm_STARmeta/Mm_metadata.fasta -b ../barcodes/barcodes_legend.csv -n 2000 -m Dbit-seq -j 1 
+../37_30_A2_S2_R1_001.fastq ../37_30_A2_S2_R2_001.fastq &
 
 '''
 
 from subprocess import Popen, PIPE, STDOUT
 from os.path import dirname, join
 import pandas as pd
+import sys
 from datetime import datetime
+import time
 import numpy as np
 import argparse
 
-print("Starting AbxDbit pipeline batch processing...", flush=True)
+print("Starting xDbit pipeline batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
@@ -63,18 +64,14 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_batch{}-{}_{}.out".format(b, i, f"{datetime.now():%Y_%m_%d}"))
-        out_dir = join(dirname(s["rnafq_R1"]))
-        tmp_dir = join(dirname(s["rnafq_R1"]))
+        log_dir = join(dirname(s["fastq_R1"]), "pipeline_batch{}_{}.out".format(b, f"{datetime.now():%Y_%m_%d}"))
+        out_dir = join(dirname(s["fastq_R1"]), "out")
+        tmp_dir = join(dirname(s["fastq_R1"]), "tmp")
 
-        print("Writing log to {}".format(log_dir), flush=True)
-        print("Output directory: {}".format(out_dir), flush=True)
-        print("Temp directory: {}".format(tmp_dir), flush=True)
-        
-        # get input files
-        filecats = ["rnafq_R1", "rnafq_R2", "featfq_R1", "featfq_R2"]
-        file_list = [s[cat] for cat in filecats if not pd.isnull(s[cat])]
-        
+        print("\tWriting log to {}".format(log_dir), flush=True)
+        print("\tOutput directory: {}".format(out_dir), flush=True)
+        print("\tTemp directory: {}".format(tmp_dir), flush=True)
+
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 
         "-g", s["STAR_genome"],
@@ -85,30 +82,21 @@ for b in batch_numbers:
         "-j", "1",
         "-o", out_dir,
         "-t", tmp_dir,
+        #"-e", # for testing
         ])
 
-        # if feature files are given, add them
-        if not pd.isnull(s["feature_legend"]):
-            commands[i] += ["-f", s["feature_legend"]]
-        if not pd.isnull(s["feature_mode"]):
-            commands[i] += ["-u", s["feature_mode"]]
-        
-        # add other flags
+        # add other options
         if args.skip_align:
-            commands[i].append("-x")
+            commands[0].append("-x")
         if args.clear_tmp:
-            commands[i].append("-l")
+            commands[0].append("-l")
         if args.echo:
-            commands[i].append("-e")
-            
-        # add file list
-        commands[i] += file_list
+            commands[0].append("-e")
+
+        # add files to command
+        commands = [commands[0] + [s["fastq_R1"], s["fastq_R2"]]]
 
         log_dirs.append(log_dir)
-    
-    for e, elem in enumerate(commands):
-        print("Command {}:".format(e+1), flush=True)
-        print(" ".join(elem), flush=True)
 
     procs = [Popen(commands[i], stdout=PIPE, stderr=STDOUT) for i in range(len(commands))]
 
