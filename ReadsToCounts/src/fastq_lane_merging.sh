@@ -23,10 +23,10 @@ do
     for i in $(find $dir -type f -name "*.fastq.gz" | while read F; do basename $F | rev | cut -c 22- | rev; done | sort | uniq)
     do 
         echo "Merging R1 in $dir"
-        cat $dir/"$i"_L00*_R1_001.fastq.gz > $dir/"$i"_me_R1_001.fastq.gz
+        cat $dir/"$i"_L00*_R1_001.fastq.gz > $dir/"$i"_merged_R1_001.fastq.gz
 
         echo "Merging R2 in $dir"
-        cat $dir/"$i"_L00*_R2_001.fastq.gz > $dir/"$i"_me_R2_001.fastq.gz
+        cat $dir/"$i"_L00*_R2_001.fastq.gz > $dir/"$i"_merged_R2_001.fastq.gz
 
     done
 done
