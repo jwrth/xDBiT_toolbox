@@ -7,6 +7,16 @@ This part is partially based on the Split-seq toolbox: https://github.com/Rebekk
 
 If you have questions or suggestions, please feel free to open an issue or contact me directly.
 
+## Versions
+- v1.0:
+    - Initial version. Works for RNA reads only.
+- v2.0:
+    - ReadsToCounts:
+        - Fixed very important bug in `xDbit_run_batch.py`.
+        - Analysis of feature reads along with RNA reads.
+
+The `main` branch corresponds to the latest version.
+        
 ## Contents
 
 1. [Introduction](#introduction)
