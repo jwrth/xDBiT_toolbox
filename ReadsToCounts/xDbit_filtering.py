@@ -751,9 +751,9 @@ class xDbit_filter:
         
 if __name__ == '__main__':
     ## Run Script
-    print("-------------------------")
-    print("THIS IS THE CLASS SCRIPT!")
-    print("-------------------------")
+    print("--------------------------")
+    print("--xDbit filtering script--")
+    print("--------------------------")
     
     # Setup input parser
     parser = ArgumentParser()

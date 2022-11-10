@@ -37,7 +37,11 @@ To test whether the installation worked and the ReadsToCounts pipeline works on 
 
 ```
 # test run
+conda activate ReadsToCounts
 nohup python xDbit_run_batch.py --skip_align --batch_file batch_parameters.csv &
+
+# OR
+nohup python xDbit_run_batch.py --skip_align --batch_file batch_parameters.xlsx &
 ```
 
 The test run creates a `nohup.out` file in the current directory and for each batch specified in `./batch_parameters.csv` a log file in `./test_files/pipeline_batch{n}_{date}.out`. To check the test files one can use `cat` or `tail -f` to follow the addition of output in real time.

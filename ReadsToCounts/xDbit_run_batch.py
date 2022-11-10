@@ -28,6 +28,8 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 import argparse
+from pathlib import Path
+import warnings
 
 print("Starting AbxDbit pipeline batch processing...", flush=True)
 ## Start timing
@@ -42,8 +44,17 @@ parser.add_argument("-c", "--clear_tmp", help="Clear files in temporary director
 parser.add_argument("-e", "--echo", help="Print all commands to output instead of executing them.")
 args = parser.parse_args()
 
-print("Reading batch parameters from {}".format(args.batch_file))
-settings = pd.read_csv(args.batch_file)
+batch_file = Path(args.batch_file)
+print("Reading batch parameters from {}".format(batch_file))
+
+if batch_file.suffix == ".csv":
+    settings = pd.read_csv(batch_file)
+elif batch_file.suffix == ".xlsx":
+    with warnings.catch_warnings():
+        warnings.simplefilter(action='ignore', category=UserWarning) # using a drop-down list always throws an UserWarning which is ignored here
+        settings = pd.read_excel(batch_file)
+else:
+    raise TypeError("Wrong type of settings file. Allowed: `.csv` or `.xlsx`")
 
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
