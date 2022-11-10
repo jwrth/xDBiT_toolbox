@@ -31,7 +31,7 @@ import argparse
 from pathlib import Path
 import warnings
 
-print("Starting AbxDbit pipeline batch processing...", flush=True)
+print("Starting xDbit pipeline v2.0 batch processing...", flush=True)
 ## Start timing
 t_start = datetime.now()
 
