@@ -221,8 +221,12 @@ fi
 # create directories for output and temporary files if they do not exist
 rna_tmpdir=${outdir}/rna_tmp
 rna_outdir=${outdir}/rna_out
-feat_tmpdir=${outdir}/feature_tmp
-feat_outdir=${outdir}/feature_out
+
+if [[ $feature_pipeline == 1 ]]
+then
+    feat_tmpdir=${outdir}/feature_tmp
+    feat_outdir=${outdir}/feature_out
+fi
 
 if [[ ! -d $rna_tmpdir ]]
 then mkdir -p ${rna_tmpdir}
