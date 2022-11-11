@@ -10,6 +10,7 @@
 #@ String (label="Input file format: ", choices={".tif", ".png", ".jpg"}, style="listBox") file_ending
 #@ String (label="Channels to process (comma-separated; e.g. 'C00,C01')") channels
 #@ String (label="Pattern in target directories (Optional): ", value="") pattern_dir
+#@ String (label="Convert to following bit type after stitching:", choices={"8-bit","16-bit","RGB Color"}, style="listBox") bit_type
 #@ String (label="Flip? ", choices={"Vertically", "Horizontally", "Do not flip"}, style="listBox") flip
 #@ Boolean (label="Compute overlap? ") compute
 #@ Boolean (label="Overwrite output file if it exists? ") overwrite
@@ -119,6 +120,10 @@ function StitchImages(FolderPath, SavePath, FileName, ConfigFile)
 		"absolute_displacement_threshold=3.50 " + 
 		"image_output=[Fuse and display]");
 	}
+	
+	// change bit type as specified
+	run(bit_type);
+	print("Output bit type: " + bit_type);
 
 	if (flip != "Do not flip"){
 		run("Flip " + flip);

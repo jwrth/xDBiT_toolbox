@@ -6,8 +6,8 @@
 #@ Integer (label="First file index i: ") index_start
 #@ Integer (label="Index length (e.g. 4 for '0000'): ") index_length
 //#@ String (label="Histogram settings for each channel (In this syntax: 'Min1,Max1;None;auto'") minmax
+#@ String (label="Convert to following bit type before correction:", choices={"8-bit","16-bit","RGB Color"}, style="listBox") bit_type
 #@ String (label="Blurring radius for pseudo flatfield correction. '0' if no correction. Comma-separated for each channel (e.g. 50,0,50): ") radius
-#@ String (label="Bit format of output images", choices={"8-bit","16-bit","RGB Color"}, style="listBox") output_format
 
 setBatchMode(true); // run all processes in background
 
@@ -46,7 +46,7 @@ macro  ApplyFunctionToMultipleFolders
 	print(outfile, "Channels: " + channels);
 	//print(outfile, "Pseudo flatfield correction yes/no: " + correction);
 	print(outfile, "Pseudo flatfield correction radius: " + radius);
-	print(outfile, "Output format: " + output_format);
+	print(outfile, "Output format: " + bit_type);
 	//print(outfile, "Projection method: " + projection_method);
 	
 	for(Cpt=0; Cpt<DirList.length; Cpt++){
@@ -89,14 +89,15 @@ function FlatfieldCorrection()
 		// rename image using channel name
 		
 		rename(channel_ar[i]);
+		
+		// change bit type as specified
+		run(bit_type);
 
 		if( radius_ar[i] > 0 ){
 			// run pseudo flat field correction
 			print("Run pseudo flat field correction for channel " + channel_ar[i]);
 			run("Pseudo flat field correction", "blurring=" + radius_ar[i] + " hide stack");
 		}
-		// change output format as specified
-		run(output_format);
 	
 		// save files
 		print("Save to " + SaveDir);
