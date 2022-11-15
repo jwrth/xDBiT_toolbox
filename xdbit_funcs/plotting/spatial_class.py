@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 from anndata import AnnData
 from ..images import set_histogram
-from ..tools import check_raw, create_color_dict, extract_groups, get_crange, get_nrows_maxcols
+from ..tools import check_raw, create_color_dict, extract_groups, get_crange, get_nrows_maxcols, deactivate_empty_plots
+from ..readwrite import save_and_show_figure
 import gc
 
 
@@ -219,7 +220,7 @@ class ExpressionData:
         
 class MultiSpatialPlot:
     '''
-    https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html
+    Class to plot xDbit spatial transcriptomics data.
     '''
     def __init__(self, 
                  adata: AnnData, 
@@ -254,6 +255,11 @@ class MultiSpatialPlot:
                  histogram_setting: Optional[Tuple[int, int]] = None,
                  lowres: bool = True,
                  
+                 # saving
+                 savepath: Optional[str] = None,
+                 save_only: bool = False,
+                 dpi_save: int = 300,
+                 
                  # less important
                  prefix_groups: str = '',
                  groupheader_fontsize: int = 20
@@ -285,6 +291,9 @@ class MultiSpatialPlot:
         self.colorbar = colorbar
         self.clb_title = clb_title
         self.header = header
+        self.savepath = savepath
+        self.save_only = save_only
+        self.dpi_save = dpi_save
         
         # image stuff
         self.image_key = image_key
@@ -301,8 +310,13 @@ class MultiSpatialPlot:
         # plotting
         self.setup_subplots()
         self.plot_to_subplots()
-        
-        self.fig.tight_layout()
+                
+        save_and_show_figure(
+            savepath=self.savepath,
+            fig=self.fig,
+            save_only=self.save_only,
+            dpi_save=self.dpi_save
+            )
         
         gc.collect()
         
@@ -346,7 +360,6 @@ class MultiSpatialPlot:
             }
         
     def setup_subplots(self):
-        
         if self.multigroups:
             if self.multikeys:
                 n_rows = len(self.groups)
@@ -374,15 +387,13 @@ class MultiSpatialPlot:
                     self.axs = self.axs.ravel()
                 else:
                     self.axs = [self.axs]
-            
-            # remove axes from empty plots
-            if n_plots > 1:
-                # check if there are empty plots remaining
-                i = n_plots
-                while i < n_rows * self.max_cols - 1:
-                    i+=1
-                    # remove empty plots
-                    self.axs[i].set_axis_off()
+                    
+                deactivate_empty_plots(
+                    n_plots=n_plots, 
+                    nrows=n_rows,
+                    ncols=self.max_cols,
+                    axis=self.axs
+                    )
         
         else:
             n_plots = len(self.keys)
@@ -399,6 +410,19 @@ class MultiSpatialPlot:
             self.fig, self.axs = plt.subplots(n_rows, self.max_cols, 
                                               figsize=(7.6 * self.max_cols, 6 * n_rows), 
                                               dpi=self.dpi_display)
+            
+            if n_plots > 1:
+                self.axs = self.axs.ravel()
+            else:
+                self.axs = [self.axs]
+                
+            # remove axes from empty plots
+            deactivate_empty_plots(
+                    n_plots=n_plots, 
+                    nrows=n_rows,
+                    ncols=self.max_cols,
+                    axis=self.axs
+                    )
             
         if self.header is not None:
             plt.suptitle(self.header, fontsize=18, x=0.5, y=0.98)
@@ -475,15 +499,18 @@ class MultiSpatialPlot:
                     ax.set_facecolor('k')
                     ax.tick_params(labelsize=12)
                     
-                    # set titles
-                    ax.set_title(ExpD.key, fontsize=20, fontweight='bold')
-                    
-                    if col == 0:
-                        ax.annotate(group, 
-                                    xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
-                                    xycoords=ax.yaxis.label, textcoords='offset points',
-                                    size=20, 
-                                    ha='right', va='center', weight='bold')
+                    if self.multigroups and not self.multikeys:
+                        ax.set_title(group + "\n" + ExpD.key, fontsize=20, fontweight='bold')
+                    else:
+                        # set titles
+                        ax.set_title(ExpD.key, fontsize=20, fontweight='bold')
+                        
+                        if col == 0:
+                            ax.annotate(group, 
+                                        xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - 5, 0),
+                                        xycoords=ax.yaxis.label, textcoords='offset points',
+                                        size=20, 
+                                        ha='right', va='center', weight='bold')
 
                     # calculate marker size
                     pixels_per_unit = ax.transData.transform(
@@ -510,8 +537,12 @@ class MultiSpatialPlot:
                     ax.set_axis_off()
                     
                 # free RAM
-                del ExpD, ImgD
+                del ExpD
                 gc.collect()
+                
+            # free RAM
+            del ImgD
+            gc.collect()
                     
     def single_spatial(
         self, 

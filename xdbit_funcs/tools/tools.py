@@ -224,3 +224,17 @@ def difference_sets(d, target_key):
         a.difference_update(d[k])
         
     return a
+
+def deactivate_empty_plots(n_plots, nrows, ncols, axis):
+    '''
+    Function to deactivate the axis of empty plots.
+    '''
+    assert len(axis.shape) == 1, "Axis object must have only one dimension."
+    if n_plots > 1:
+        # check if there are empty plots remaining
+        i = n_plots - 1
+        while i < nrows * ncols - 1:
+            i+=1
+            # remove empty plots
+            axis[i].set_axis_off()
+            
