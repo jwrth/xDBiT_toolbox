@@ -36,7 +36,7 @@ class SelectionWindow:
 
         # set entry window for file
         self.entry = Entry(self.root)
-        self.entry.insert(END, "Z:/Daten/01 HPC/03 Team Meier/08_Projects/37_Spatial_Barcoding/37_30/CountsToAnndata/37_30_CtoA_params.csv")
+        self.entry.insert(END, "D:/data/37_53/CountsToAnndata/37_53_CoA_param_withvertices_20221115.csv")
         self.entry.grid(row=0,column=1)
 
         # set file select button
@@ -69,7 +69,7 @@ class SelectionWindow:
         self.labelDir3 = Label(self.root, textvariable=self.labelText3)
         self.labelDir3.grid(row=3, column=0)
 
-        self.ppmalign_default = IntVar(self.root, value=2.0231)
+        self.ppmalign_default = IntVar(self.root, value=0.6069)
         self.ppmalign_entry = Entry(self.root, textvariable=self.ppmalign_default, width=6, justify=CENTER)
         self.ppmalign_entry.grid(row=3, column=1)
 
@@ -97,9 +97,9 @@ class SelectionWindow:
         self.cancel = Button(self.root, text="Cancel", command=sys.exit)
         self.cancel.grid(row=6,column=1)
 
-        # set okay button to continue script
-        self.okay = Button(self.root, text="Okay", command=self.closewindow)
-        self.okay.grid(row=6,column=0)
+        # set run button to continue script
+        self.run = Button(self.root, text="Run", command=self.closewindow)
+        self.run.grid(row=6,column=0)
 
         # key bindings
         self.root.bind("<Return>", func=self.closewindow)

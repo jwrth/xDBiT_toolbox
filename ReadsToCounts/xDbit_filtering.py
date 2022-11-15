@@ -544,8 +544,8 @@ class xDbit_filter:
                             idx = [i for i,e in enumerate(d) if e<=self.feat_dist_threshold]
 
                             if len(idx)==1:
-                                xg = self.feature_barcodes[idx[0]]
-                                featurename = self.feature_dict[xg]
+                                xh = self.feature_barcodes[idx[0]]
+                                featurename = featurename + "+" + self.feature_dict[xh]
                                 entry.set_tag('gn', featurename, value_type = 'Z')
 
                                 # record

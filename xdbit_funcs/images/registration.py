@@ -33,8 +33,16 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
 
     # dim = (4000,4000)
     if maxpx is not None:
-        dim_image = tuple([int(elem / np.max(image.shape) * maxpx) for elem in image.shape])
-        dim_template = tuple([int(elem / np.max(template.shape) * maxpx) for elem in template.shape])
+        if np.max(image.shape) > maxpx:
+            dim_image = tuple([int(elem / np.max(image.shape) * maxpx) for elem in image.shape])
+        else:
+            dim_image = image.shape
+        
+        if np.max(template.shape) > maxpx:        
+            dim_template = tuple([int(elem / np.max(template.shape) * maxpx) for elem in template.shape])
+        else:
+            dim_template = template.shape
+            
         print("Rescale image to following dimensions: {}".format(dim_image))
         print("Rescale template to following dimensions: {}".format(dim_template))
         image_scaled = resize_image(img=image, dim=dim_image)
