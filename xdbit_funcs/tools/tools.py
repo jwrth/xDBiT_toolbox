@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import math
 from typing import Optional, Tuple, Union, List, Dict, Any
+import json
+import pickle
+from pathlib import Path
 
 
 def decode_list(l):
@@ -224,3 +227,24 @@ def difference_sets(d, target_key):
         a.difference_update(d[k])
         
     return a
+
+def save_metadata(metadata, outfile):
+    # make sure that parent directory of url exists
+    outfile = Path(outfile)
+    outfile.parent.mkdir(parents=True, exist_ok=True)
+        
+    if outfile.suffix == ".json":    
+        # make dictionary json serializable
+        metadata = {k: (int(v) if isinstance(v, np.int32) else v) for k, v in metadata.items()}
+        metadata = {k: (list(v) if isinstance(v, np.ndarray) else v) for k, v in metadata.items()}
+        metadata = {k: ([int(e) for e in v] if isinstance(v, list) else v) for k, v in metadata.items()} 
+
+        with open(outfile, 'w') as f:
+            json.dump(metadata, f)
+            
+    elif outfile.suffix in [".pkl", ".pickle"]:
+        with open(outfile, 'wb') as f:
+            pickle.dump(metadata, f)
+            
+    else:
+        raise ValueError('Unknown file ending. Must be ".json", ".pkl" or ".pickle"')
