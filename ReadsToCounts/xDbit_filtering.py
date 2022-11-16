@@ -480,6 +480,7 @@ class xDbit_filter:
                     wells[name] = well
 
             if keep:
+                interaction_found = False
                 # concatenate coordinates
                 coords_list = [str(coords[name]) for name in self.coord_names]
                 coord_concat = "x".join(coords_list)
@@ -537,6 +538,8 @@ class xDbit_filter:
                                 self.record_dict['interact'][featurename]+=1
                             else:
                                 self.record_dict['interact'][featurename]=1
+                                
+                            interaction_found = True
 
                         else:
                             # If barcode is not found in feature barcode list: Check for mismatches in feature barcode
@@ -555,10 +558,8 @@ class xDbit_filter:
                                     self.record_dict['interact'][featurename]+=1
                                 else:
                                     self.record_dict['interact'][featurename]=1
-                                
-                            else:
-                                keep=False
-                        
+                                    
+                                interaction_found = True                        
 
             if keep:
                 # set coordinates as tag and write to output file
@@ -575,7 +576,7 @@ class xDbit_filter:
                         current_umi_list = self.umi_dict[coord_concat][featurename]
 
                         # record
-                        if interact_signal:
+                        if interact_signal and interaction_found:
                             self.record_dict['interact']['spot_found']+=1
                         else:
                             self.record_dict['features']['spot_found']+=1
@@ -591,7 +592,7 @@ class xDbit_filter:
                             add = False
 
                             # record
-                            if interact_signal:
+                            if interact_signal and interaction_found:
                                 self.record_dict['interact']['umi_found']+=1
                             else:
                                 self.record_dict['features']['umi_found']+=1
@@ -614,7 +615,7 @@ class xDbit_filter:
                             self.umi_dict[coord_concat][featurename] = [umi]
 
                         # record
-                        if interact_signal:
+                        if interact_signal and interaction_found:
                             self.record_dict['interact']['added']+=1
                         else:
                             self.record_dict['features']['added']+=1
