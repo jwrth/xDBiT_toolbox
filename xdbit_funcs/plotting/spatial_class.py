@@ -56,7 +56,7 @@ class ImageData:
         '''
         self.load_from_zarr = False
         if self.zarr_key in adata.uns.keys():
-            zarr_dirs = adata.uns[self.zarr_key]
+            zarr_dirs = adata.uns[self.zarr_key][self.group]
             zarr_dirs = list(set(zarr_dirs)) # make list unique
             
             # select zarr_dirs that are a directory

@@ -4,5 +4,4 @@ from .general import *
 from .qc import *
 from .go import *
 from .interactive import *
-from .spatial_class import MultiSpatialPlot as spatial_test
-#from .spatial_class import *
+from .spatial_class import MultiSpatialPlot as spatial
