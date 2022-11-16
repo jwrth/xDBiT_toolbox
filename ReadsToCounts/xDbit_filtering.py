@@ -540,12 +540,12 @@ class xDbit_filter:
 
                         else:
                             # If barcode is not found in feature barcode list: Check for mismatches in feature barcode
-                            d = [self.compute_dist(xg,bc) for bc in self.feature_barcodes]
+                            d = [self.compute_dist(xh,bc) for bc in self.feature_barcodes]
                             idx = [i for i,e in enumerate(d) if e<=self.feat_dist_threshold]
 
                             if len(idx)==1:
-                                xg = self.feature_barcodes[idx[0]]
-                                featurename = self.feature_dict[xg]
+                                xh = self.feature_barcodes[idx[0]]
+                                featurename = featurename + "+" + self.feature_dict[xh]
                                 entry.set_tag('gn', featurename, value_type = 'Z')
 
                                 # record
