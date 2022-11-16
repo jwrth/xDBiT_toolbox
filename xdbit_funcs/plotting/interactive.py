@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from ..tools import get_nrows_maxcols, extract_groups
-from .spatial_functions import spatial
+from .spatial_class import MultiSpatialPlot as spatial
 
 def view_rgbs(results, max_cols=4, min=None, max=None):
     '''
