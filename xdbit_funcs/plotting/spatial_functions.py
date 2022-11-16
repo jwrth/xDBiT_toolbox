@@ -97,7 +97,7 @@ def spatial_single(adata, keys, groupby=None, group=None, max_cols=4, pd_datafra
             image_key_matches = [k for k in image_key_matches if group in k]
 
         if len(image_key_matches) == 0:
-            print("No match for img_key [{}] found in list of image_keys: ".format(image_key, image_key_list))
+            print("No match for img_key [{}] found in list of image_keys: {}".format(image_key, image_key_list))
             return
         elif len(image_key_matches) > 1:
             print("More than one possible match for img_key [{}] found: {}".format(image_key, image_key_matches))
@@ -481,7 +481,7 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
 
                     spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
                             group=group, fig=fig, axis=axs[row, col], show=False,
-                            xlim=xlim, ylim=ylim, 
+                            xlim=xlim, ylim=ylim,
                             spot_size_unit=spot_size, crange=crange_, 
                             palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, header_names=header_name, **kwargs)
 
@@ -518,9 +518,11 @@ def spatial(adata, keys, groupby='id', groups=None, raw=False, layer=None, max_c
                     crange_ = crange
 
                 spatial_single(adata, key, raw=raw, layer=layer, groupby=groupby,
-                        group=group, fig=fig, axis=axs[i], show=False, header_names=header_names,
-                        xlim=xlim, ylim=ylim, spot_size_unit=spot_size, crange=crange_, crange_type=crange_type,
-                        palette=palette, color_dict=color_dict, pd_dataframe=pd_dataframe, **kwargs)
+                        group=group, fig=fig, axis=axs[i], show=False, 
+                        header_names=header_names, xlim=xlim, ylim=ylim, 
+                        spot_size_unit=spot_size, crange=crange_, crange_type=crange_type,
+                        palette=palette, color_dict=color_dict, 
+                        pd_dataframe=pd_dataframe, **kwargs)
 
                 axs[i].set_title("{} - {}{}".format(key, prefix_groups, group))
                 

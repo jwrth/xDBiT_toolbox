@@ -153,7 +153,7 @@ def create_color_dict(adata, key, palette):
         categories = adata.obs[key].values.categories
         color_dict = dict(zip(categories, sns.color_palette(palette=palette, n_colors=len(categories))))
     else:
-        color_dict = None
+        color_dict = palette
 
     return color_dict
 
