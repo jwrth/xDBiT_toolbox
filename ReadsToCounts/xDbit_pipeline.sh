@@ -222,12 +222,6 @@ fi
 rna_tmpdir=${outdir}/rna_tmp
 rna_outdir=${outdir}/rna_out
 
-if [[ $feature_pipeline == 1 ]]
-then
-    feat_tmpdir=${outdir}/feature_tmp
-    feat_outdir=${outdir}/feature_out
-fi
-
 if [[ ! -d $rna_tmpdir ]]
 then mkdir -p ${rna_tmpdir}
 fi
@@ -236,12 +230,18 @@ if [[ ! -d $rna_outdir ]]
 then mkdir -p ${rna_outdir}
 fi
 
-if [[ ! -d $feat_tmpdir ]]
-then mkdir -p ${feat_tmpdir}
-fi
+if [[ $feature_pipeline == 1 ]]
+then
+    feat_tmpdir=${outdir}/feature_tmp
+    feat_outdir=${outdir}/feature_out
 
-if [[ ! -d $feat_outdir ]]
-then mkdir -p ${feat_outdir}
+    if [[ ! -d $feat_tmpdir ]]
+    then mkdir -p ${feat_tmpdir}
+    fi
+
+    if [[ ! -d $feat_outdir ]]
+    then mkdir -p ${feat_outdir}
+    fi
 fi
 
 reference_suffix=$(echo $reference | sed s/.*\\./\\./) #reference can be .fa or .fasta

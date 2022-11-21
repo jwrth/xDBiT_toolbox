@@ -5,3 +5,4 @@ from .qc import *
 from .go import *
 from .interactive import *
 from .spatial_class import MultiSpatialPlot as spatial
+from .color_palettes import *
