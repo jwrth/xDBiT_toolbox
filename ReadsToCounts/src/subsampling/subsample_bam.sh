@@ -49,7 +49,6 @@ then
 	read -p "Please give list of percentages for subsampling as integers: " list
 else
 	seed="0"
-	echo 'here'
 	list=(10 25 50 75)
 fi
 
