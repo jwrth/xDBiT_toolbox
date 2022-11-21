@@ -2,7 +2,7 @@
 
 ## Create DGE matrices from subsampled files
 
-dropseq_root="/home/hpc/meier/software/splitseq_toolbox/external_tools/Drop-seq_tools-2.1.0"
+dropseq_root="../../external_tools/Drop-seq_tools-2.1.0/"
 picard_jar=${dropseq_root}/3rdParty/picard/picard.jar
 
 outdir=`pwd`
