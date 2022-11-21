@@ -58,13 +58,20 @@ elif batch_file.suffix == ".xlsx":
 else:
     raise TypeError("Wrong type of settings file. Allowed: `.csv` or `.xlsx`")
 
+# get total number of files
+nfiles = len(settings)
+
+# get number of batches
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
 
 for b in batch_numbers:
-    batch = settings.query('batch == {}'.format(b))
-
-    print("{} : Start processing batch {} of {} with {} files".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", b, batch_numbers[-1], len(batch)), flush=True)
+    batch = settings.query('batch == {}'.format(b))  
+    print("{} : Start processing batch {} of {} with {} files".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", 
+                                                                    b, 
+                                                                    batch_numbers[-1], 
+                                                                    len(batch)), flush=True)
+     
     ## Start timing of batch
     t_start_batch = datetime.now()
 
@@ -74,20 +81,29 @@ for b in batch_numbers:
     for i in range(len(batch)):
         # extract settings
         s = batch.iloc[i, :]
-
-        # get directory
-        bamfile = Path(s["file_directory"])
+        
+        # get parameters
+        bamfile = Path(s["file"])
+        
+        # create outfile paths
         out_dir = bamfile.parent / "subsampling"
         out_dir.mkdir(parents=True, exist_ok=True)
-        log_file = out_dir / "subsampling_{}.out".format(f"{datetime.now():%Y_%m_%d}")
-
-        print("Output directory: {}".format(out_dir), flush=True)
-        print("Writing log to {}".format(log_file), flush=True)
+        #outfile = out_dir / Path(bamfile.stem + "_{}p".format(p) + bamfile.suffix)
+        log_dir = out_dir / "subsampling_log.out" 
+        
+        print("Output directory: {}".format(out_dir), flush=True)    
+        print("Log file: {}".format(log_dir), flush=True)   
         
         # generate commands
-        commands.append(["bash", subsample_script, "-f", bamfile])
-
-        log_dirs.append(log_file)
+        commands.append(["bash", 
+                         str(subsample_script), 
+                         "-o", # overwrite existing out files
+                         str(bamfile)])
+        # commands.append(["samtools", "view", "-s", "{}.{}".format(seed, p), 
+        #                     "-b", str(bamfile), ">", str(outfile)])
+        
+        # collect log files
+        log_dirs.append(log_dir)
     
     for e, elem in enumerate(commands):
         print("Command {}:".format(e+1), flush=True)
@@ -96,16 +112,17 @@ for b in batch_numbers:
     procs = [Popen(commands[i], stdout=PIPE, stderr=STDOUT) for i in range(len(commands))]
 
     running = [True]*len(procs)
-
+    
     # open log files
     log_files = [open(d, "a") for d in log_dirs]
-
+    
     while True:
         for i, p in enumerate(procs):
             output = p.stdout.readline()
             if running[i] and p.poll() is not None:
                 running[i] = False
-                print("{}: Process {} in batch {} finished".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", i+1, b), flush=True)
+                print("{}: Process {} in batch {} finished".format(
+                    f"{datetime.now():%Y-%m-%d %H:%M:%S}", i+1, b), flush=True)
             if output:
                 print(output.decode("utf-8").strip(), file=log_files[i], flush=True)
         if not np.any(running):
@@ -115,7 +132,7 @@ for b in batch_numbers:
             print("{}: All processes of batch {} finished after {}.".format(
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}", b, str(t_elapsed_batch)), flush=True)
             break
-
+        
     # close log files
     for f in log_files:
         f.close()
@@ -124,4 +141,4 @@ for b in batch_numbers:
 t_stop = datetime.now()
 t_elapsed = t_stop-t_start
     
-print("{}: All batches finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
+print("{}: All files finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
