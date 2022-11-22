@@ -6,26 +6,39 @@ Script to plot the mean genes per cell for the subsampled matrices created with 
 '''
 
 import scanpy as sc
-import anndata as ad
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import glob
 import os
 import sys
+from pathlib import Path
+import argparse
 
-# get inputs
-full_mtx_path = sys.argv[1]
-subsampled_path = sys.argv[2]
+# # get inputs
+# full_mtx_path = Path(sys.argv[1])
+# subsampled_path = Path(sys.argv[2])
 
-output_file = './seq_saturation.png'
+# Parse arguments
+print("Parse arguments")
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--full_mtx_path", help="Path to full DGE matrix.")
+parser.add_argument("-s", "--subsampled_path", help="Path to subsampled DGe matrices.")
+parser.add_argument("-n", "--name", default="seq", help="Name to add as prefix to output file.")
+args = parser.parse_args()
+
+full_mtx_path = Path(args.full_mtx_path)
+subsampled_path = Path(args.subsampled_path)
+name = args.name
+
+# create output file
+output_file = subsampled_path / "{}_saturation.png".format(name)
 
 # load full matrix and subsampled matrices
 print("Find files...", flush=True)
 adata_100 = sc.read_text(os.path.join(full_mtx_path, "DGE_matrix_with_introns_min100.txt.gz")).transpose()
 #adata_100 = sc.read_text("out/DGE_matrix_with_introns_min100.txt.gz").transpose()
 
-files = glob.glob(os.path.join(subsampled_path, 'DGE_matrix_with_introns_*'))
+files = sorted(glob.glob(os.path.join(subsampled_path, 'DGE_matrix_with_introns_*')))
 #files = glob.glob(os.path.join('out/subsampling/DGE_matrix_with_introns_*'))
 print("Import files...", flush=True)
 adatas = [sc.read_text(elem).transpose() for elem in files]
@@ -90,4 +103,4 @@ ax[1].set_ylabel('Mean genes per cell')
 
 plt.savefig(output_file, bbox_inches='tight', dpi=100)
 
-print("Plot saved in " + output_file, flush=True)
+print("Plot saved in {}".format(output_file), flush=True)

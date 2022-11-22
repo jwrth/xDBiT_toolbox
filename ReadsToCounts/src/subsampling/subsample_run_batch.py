@@ -30,6 +30,7 @@ import numpy as np
 import argparse
 from pathlib import Path
 import warnings
+import os
 
 print("Starting subsampling pipeline...", flush=True)
 ## Start timing
@@ -84,11 +85,11 @@ for b in batch_numbers:
         
         # get parameters
         bamfile = Path(s["file"])
+        name = s["name"]
         
         # create outfile paths
         out_dir = bamfile.parent / "subsampling"
         out_dir.mkdir(parents=True, exist_ok=True)
-        #outfile = out_dir / Path(bamfile.stem + "_{}p".format(p) + bamfile.suffix)
         log_dir = out_dir / "subsampling_log.out" 
         
         print("Output directory: {}".format(out_dir), flush=True)    
@@ -98,9 +99,16 @@ for b in batch_numbers:
         commands.append(["bash", 
                          str(subsample_script), 
                          "-o", # overwrite existing out files
+                         "-d", # create DGE matrix
                          str(bamfile)])
-        # commands.append(["samtools", "view", "-s", "{}.{}".format(seed, p), 
-        #                     "-b", str(bamfile), ">", str(outfile)])
+        
+        ## Plotting
+        os.system("{}/plot_subsampled_data.py -f {} -s {} -n {}".format(
+            current_script_dir,
+            bamfile.parent, # directory of full matrix
+            out_dir, # directory of subsampled matrices            
+            name
+        ))
         
         # collect log files
         log_dirs.append(log_dir)
@@ -142,3 +150,4 @@ t_stop = datetime.now()
 t_elapsed = t_stop-t_start
     
 print("{}: All files finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
+
