@@ -66,11 +66,11 @@ nfiles = len(settings)
 batch_numbers = settings['batch'].unique()
 print("Found following batch numbers: {}".format(batch_numbers))
 
-for b in batch_numbers:
+for bi, b in enumerate(batch_numbers):
     batch = settings.query('batch == {}'.format(b))  
     print("{} : Start processing batch {} of {} with {} files".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", 
-                                                                    b, 
-                                                                    batch_numbers[-1], 
+                                                                    bi, 
+                                                                    len(batch_numbers), 
                                                                     len(batch)), flush=True)
      
     ## Start timing of batch
@@ -85,7 +85,6 @@ for b in batch_numbers:
         
         # get parameters
         bamfile = Path(s["file"])
-        name = s["name"]
         
         # create outfile paths
         out_dir = bamfile.parent / "subsampling"
@@ -101,14 +100,6 @@ for b in batch_numbers:
                          "-o", # overwrite existing out files
                          "-d", # create DGE matrix
                          str(bamfile)])
-        
-        ## Plotting
-        os.system("{}/plot_subsampled_data.py -f {} -s {} -n {}".format(
-            current_script_dir,
-            bamfile.parent, # directory of full matrix
-            out_dir, # directory of subsampled matrices            
-            name
-        ))
         
         # collect log files
         log_dirs.append(log_dir)
@@ -151,3 +142,23 @@ t_elapsed = t_stop-t_start
     
 print("{}: All files finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
 
+## Plotting
+print("Plotting of results", flush=True)
+for idx, row in settings.iterrows():
+    
+    # create outfile paths
+    bamfile = Path(row["file"])
+    out_dir = bamfile.parent / "subsampling"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
+    # get sample name
+    name = row["name"]
+    
+    os.system("{}/plot_subsampled_data.py -f {} -s {} -n {}".format(
+        current_script_dir,
+        bamfile.parent, # directory of full matrix
+        out_dir, # directory of subsampled matrices            
+        name
+    ))
+    
+print("Finished everything.", flush=True)
