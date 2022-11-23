@@ -31,7 +31,10 @@ subsampled_path = Path(args.subsampled_path)
 name = args.name
 
 # create output file
-output_file = subsampled_path / "{}_saturation.png".format(name)
+output_files = [
+    subsampled_path / "{}_saturation.png".format(name),
+    subsampled_path / "{}_saturation.pdf".format(name)
+]
 
 # load full matrix and subsampled matrices
 print("Find files...", flush=True)
@@ -101,6 +104,6 @@ ax[1].plot(fractions, genes_means)
 ax[1].set_xlabel('Fractions of reads')
 ax[1].set_ylabel('Mean genes per cell')
 
-plt.savefig(output_file, bbox_inches='tight', dpi=100)
-
-print("Plot saved in {}".format(output_file), flush=True)
+for output_file in output_files:
+    plt.savefig(output_file, bbox_inches='tight', dpi=100)
+    print("Plot saved in {}".format(output_file), flush=True)
