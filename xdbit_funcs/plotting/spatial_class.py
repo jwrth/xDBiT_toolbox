@@ -500,7 +500,7 @@ class MultiSpatialPlot:
             if n_plots > 1:
                 self.axs = self.axs.ravel()
             else:
-                self.axs = [self.axs]
+                self.axs = np.array([self.axs])
                 
             # remove axes from empty plots
             deactivate_empty_plots(

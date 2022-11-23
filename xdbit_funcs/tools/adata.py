@@ -141,7 +141,8 @@ def check_raw(adata, use_raw, layer=None):
         if layer is None:
             adata_X = adata.X
         else:
-            adata_X = adata.layers[layer].toarray()
+            #adata_X = adata.layers[layer].toarray()
+            adata_X = adata.layers[layer]
         adata_var = adata.var
         adata_var_names = adata.var_names
     

@@ -232,8 +232,8 @@ def deactivate_empty_plots(n_plots, nrows, ncols, axis):
     '''
     Function to deactivate the axis of empty plots.
     '''
-    assert len(axis.shape) == 1, "Axis object must have only one dimension."
     if n_plots > 1:
+        assert len(axis.shape) == 1, "Axis object must have only one dimension."
         # check if there are empty plots remaining
         i = n_plots - 1
         while i < nrows * ncols - 1:
