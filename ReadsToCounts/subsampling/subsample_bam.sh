@@ -7,7 +7,7 @@ manual=0
 overwrite=0
 dge=0
 subsampling_root=$(dirname $0)
-dropseq_root=${subsampling_root}/../../external_tools/Drop-seq_tools-2.1.0
+dropseq_root=${subsampling_root}/../external_tools/Drop-seq_tools-2.1.0
 
 function print_usage () {
     cat >&2 <<EOF

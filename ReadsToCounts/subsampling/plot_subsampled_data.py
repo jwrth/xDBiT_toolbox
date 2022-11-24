@@ -14,10 +14,6 @@ import sys
 from pathlib import Path
 import argparse
 
-# # get inputs
-# full_mtx_path = Path(sys.argv[1])
-# subsampled_path = Path(sys.argv[2])
-
 # Parse arguments
 print("Parse arguments")
 parser = argparse.ArgumentParser()
