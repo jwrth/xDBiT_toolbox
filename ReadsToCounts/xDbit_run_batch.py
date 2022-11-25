@@ -42,6 +42,7 @@ parser.add_argument("-f", "--batch_file", help="Batch file with all parameters f
 parser.add_argument("-s", "--skip_align", action='store_true', help="Skip alignment steps for testing.")
 parser.add_argument("-c", "--clear_tmp", action='store_true', help="Clear files in temporary directory after pipeline is finished.")
 parser.add_argument("-e", "--echo", action='store_true', help="Print all commands to output instead of executing them.")
+parser.add_argument("--spatial_only", action='store_true', help="Perform analysis only on the spatial coordinates on R2. Can be used for spillover analysis.")
 args = parser.parse_args()
 
 batch_file = Path(args.batch_file)
@@ -74,9 +75,13 @@ for b in batch_numbers:
         s = batch.iloc[i, :]
 
         # get directory
-        log_dir = join(dirname(s["rnafq_R1"]), "pipeline_batch{}-{}_{}.out".format(b, i, f"{datetime.now():%Y_%m_%d}"))
-        out_dir = join(dirname(s["rnafq_R1"]))
-        tmp_dir = join(dirname(s["rnafq_R1"]))
+        if pd.notnull(s["rnafq_R1"]):
+            sdir = dirname(s["rnafq_R1"])
+        else:
+            sdir = dirname(s["rnafq_R2"])
+        log_dir = join(sdir, "pipeline_batch{}-{}_{}.out".format(b, i, f"{datetime.now():%Y_%m_%d}"))
+        out_dir = join(sdir)
+        tmp_dir = join(sdir)
 
         print("Writing log to {}".format(log_dir), flush=True)
         print("Output directory: {}".format(out_dir), flush=True)
@@ -88,8 +93,6 @@ for b in batch_numbers:
         
         # generate commands
         commands.append(["bash", s["pipeline_dir"], 
-        "-g", s["STAR_genome"],
-        "-r", s["STAR_fasta"],
         "-b", s["legend"],
         "-n", str(s["expected_n_spots"]),
         "-m", s["mode"],
@@ -97,6 +100,12 @@ for b in batch_numbers:
         "-o", out_dir,
         "-t", tmp_dir,
         ])
+        
+        if args.spatial_only:
+            commands[i].append("-y")
+        else:
+            # add also the informations needed for the STAR alignment
+            commands[i].append(["-g", s["STAR_genome"], "-r", s["STAR_fasta"]])
 
         # if feature files are given, add them
         if not pd.isnull(s["feature_legend"]):
@@ -151,5 +160,9 @@ for b in batch_numbers:
 ## Stop timing
 t_stop = datetime.now()
 t_elapsed = t_stop-t_start
-    
+
+# in the words of Jim Morrison
 print("{}: All batches finished after {}.".format(f"{datetime.now():%Y-%m-%d %H:%M:%S}", str(t_elapsed)), flush=True)
+print("This is the end, beautiful friend", flush=True)
+print("This is the end, my only friend", flush=True)
+print("The end.", flush=True)
