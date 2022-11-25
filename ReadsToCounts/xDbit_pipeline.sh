@@ -417,7 +417,6 @@ fi
         $echo_prefix $split_bam ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
     fi
     
-    echo_prefix= # start pipeline from here in echo mode
     echo "${filter_barcodes} -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam"
     $echo_prefix $filter_barcodes -i ${rna_tmpdir}/unaligned_mc_tagged_polyA_filtered.bam
 
