@@ -4,7 +4,7 @@ from math import sqrt
 from scipy.spatial import distance as dist
 #from sympy import lowergamma
 from ..exceptions import ModuleNotFoundOnWindows, ImportErrorLoess
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Tuple, Union, List, Dict, Any, Literal
 from .lowess import lowess
 from warnings import warn
 
@@ -167,7 +167,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     max: Optional[float] = None,
     #stepsize: Optional[float] = None,
     nsteps: Optional[float] = None,
-    method: str = True,
+    method: Literal["lowess", "loess"] = "lowess",
     stderr: bool = True,
     K: int = 100
     ):
@@ -261,8 +261,11 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
         xs_pred = xs_pred[(xs_pred < xs.max()) & (xs_pred > xs.min())]
 
     # predict on data
-    pred =  ls.predict(xs_pred,
-                       stderror=stderr, K=K)
+    if loess:
+        pred =  ls.predict(xs_pred, stderror=stderr)
+    else:
+        pred =  ls.predict(xs_pred, stderror=stderr, K=K)
+        
     # get predicted values
     ys_hat = pred.values
     
