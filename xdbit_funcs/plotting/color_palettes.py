@@ -8,3 +8,5 @@ class color_palettes:
                            '#f781bf', '#a65628', '#984ea3',
                            '#999999', '#e41a1c', '#dede00']
         
+        # palette from Caro. Optimized for colorblind people.
+        self.caro = ['#3288BD','#440055', '#D35F5F', '#A02C2C','#225500', '#66C2A5', '#447C69']
