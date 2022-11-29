@@ -555,10 +555,13 @@ class CountsToAnndata():
                 Path(plotdir).mkdir(parents=True, exist_ok=True)
                 
                 for g, mv in adata_trans.uns['matchedVis'].items():
-                    plotpath = os.path.join(plotdir, "{}_matchedVis.png".format(g))
+                    pngpath = os.path.join(plotdir, "{}_matchedVis.png".format(g))
+                    pdfpath = os.path.join(plotdir, "{}_matchedVis.pdf".format(g))
                     plt.imshow(mv)
-                    print("Saving matched visualization into {}".format(plotpath))
-                    plt.savefig(plotpath, dpi=400)
+                    print("Saving matched visualization into {}".format(pngpath))
+                    print("Saving matched visualization into {}".format(pdfpath))
+                    plt.savefig(pngpath, dpi=400)
+                    plt.savefig(pdfpath, dpi=400)
                     plt.close()
 
                 # remove images and save adata without images
@@ -578,7 +581,8 @@ class CountsToAnndata():
         # create plot to check success of registration
         plotdir = os.path.join(output_dir, "registration_checks")
         Path(plotdir).mkdir(parents=True, exist_ok=True)
-        plotpath = os.path.join(plotdir, unique_id + "_check_registration.png")
+        pngpath = os.path.join(plotdir, unique_id + "_check_registration.png")
+        pdfpath = os.path.join(plotdir, unique_id + "_check_registration.pdf")
 
         # parameters
         idxs = adata.obs['id'].unique()
@@ -600,7 +604,8 @@ class CountsToAnndata():
                     axs[r+c].set_title(c_names[c] + "\n" + gene, fontsize=12, fontweight='bold')
                     
         fig.tight_layout()
-        plt.savefig(plotpath, dpi=200)
+        plt.savefig(pngpath, dpi=200)
+        plt.savefig(pdfpath, dpi=200)
 
         if save_only:
             plt.close(fig)
