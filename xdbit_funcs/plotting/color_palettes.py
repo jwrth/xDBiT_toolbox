@@ -1,5 +1,4 @@
 from matplotlib.colors import ListedColormap, rgb2hex
-from matplotlib import cm
 
 class color_palettes:
     '''
