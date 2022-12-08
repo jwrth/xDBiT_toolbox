@@ -197,6 +197,9 @@ def register_adata_coords_to_new_images(adata_in, groupby, image_dir_dict, group
 
     The images are expected to be in adata.uns[spatial_key][image_id].
     The image_id is expected to be in the format "{well}_{channel}".
+    ------------
+    Returns:
+    registered_img, H, matchedVis
     '''
     if not in_place:
         adata = adata_in.copy()
