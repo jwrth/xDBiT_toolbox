@@ -171,10 +171,14 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
             # warping
             print("{}: Register image by perspective transformation...".format(
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+            
+            image = convert_to_8bit(image)
             registered = cv2.warpPerspective(image, H, (w, h))
         else:
             print("{}: Register image by affine transformation...".format(
                 f"{datetime.now():%Y-%m-%d %H:%M:%S}"))
+            
+            image = convert_to_8bit(image)
             registered = cv2.warpAffine(image, H, (w, h))
 
         if return_grayscale:
