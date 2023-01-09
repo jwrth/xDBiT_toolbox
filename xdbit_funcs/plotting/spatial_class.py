@@ -403,7 +403,7 @@ class MultiSpatialPlot:
             save_only=self.save_only,
             dpi_save=self.dpi_save
             )
-        
+
         gc.collect()
         
     def check_arguments(self):
