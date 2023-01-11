@@ -206,7 +206,6 @@ def save_and_show_figure(savepath, fig, save_only=False, show=True, dpi_save=300
     if save_only:
         plt.close(fig)
     elif show:
-        fig.show()
-        #return plt.show()
+        return plt.show()
     else:
         return

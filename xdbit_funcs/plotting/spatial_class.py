@@ -119,7 +119,10 @@ class ImageData:
             
     def load_image_from_uns(self, adata):
         self.image_metadata = adata.uns['spatial'][self.image_key]['scalefactors']
-        self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
+        if "pixel_per_um" in self.image_metadata:
+            self.pixel_per_um = self.image_metadata["pixel_per_um"]
+        else:
+            self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
         
         if self.lowres:
             if 'lowres' in adata.uns['spatial'][self.image_key]['images'].keys():
@@ -151,7 +154,10 @@ class ImageData:
         with open(meta_file, "rb") as f:
             self.image_metadata = pickle.load(f)
             
-        self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
+        if "pixel_per_um" in self.image_metadata:
+            self.pixel_per_um = self.image_metadata["pixel_per_um"]
+        else:
+            self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
 
     def process_image(self):
         self.bit_type = np.uint8 if self.image.max() < 256 else np.uint16
@@ -195,7 +201,11 @@ class ImageData:
             # extract image metadata if possible
             if 'scalefactors' in first_entry:
                 self.image_metadata = first_entry['scalefactors']
-                self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
+                if "pixel_per_um" in self.image_metadata:
+                    self.pixel_per_um = self.image_metadata["pixel_per_um"]
+                else:
+                    self.pixel_per_um = self.image_metadata["pixel_per_um_real"]
+                    
                 self.scale_factor = self.image_metadata['tissue_hires_scalef']
             else:
                 print("pixel_per_um scalefactor not found. Plotted pixel coordinates instead.")
