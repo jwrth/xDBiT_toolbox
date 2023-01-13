@@ -15,6 +15,7 @@ from ..readwrite import save_and_show_figure
 from ..images import set_histogram
 from tqdm import tqdm
 import warnings
+from warnings import warn
 from scipy.stats import zscore
 
 # ignore future warnings (suppresses annoying pandas warning)
@@ -158,8 +159,12 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
         return plt.show()
     else:
         return ax
+    
+def expression_along_observation_value(*args, **kwargs):
+    warn('This function is deprecated. Use instead `db.pl.expr_along_obs_val()`', DeprecationWarning, stacklevel=2)
+    expr_along_obs_val(*args, **kwargs)
 
-def expression_along_observation_value(adata, keys, x_category, groupby, splitby=None, hue=None, 
+def expr_along_obs_val(adata, keys, x_category, groupby, splitby=None, hue=None, 
     range_min=None, range_max=None, cmap="tab10",
     extra_cats=None,
     normalize=False,
