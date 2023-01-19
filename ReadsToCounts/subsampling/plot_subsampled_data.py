@@ -10,15 +10,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import glob
 import os
-import sys
 from pathlib import Path
 import argparse
+import pandas as pd
 
 # Parse arguments
 print("Parse arguments")
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--full_mtx_path", help="Path to full DGE matrix.")
-parser.add_argument("-s", "--subsampled_path", help="Path to subsampled DGe matrices.")
+parser.add_argument("-s", "--subsampled_path", help="Path to subsampled DGE matrices.")
 parser.add_argument("-n", "--name", default="seq", help="Name to add as prefix to output file.")
 args = parser.parse_args()
 
@@ -27,10 +27,11 @@ subsampled_path = Path(args.subsampled_path)
 name = args.name
 
 # create output file
-output_files = [
+output_plot_files = [
     subsampled_path / "{}_saturation.png".format(name),
     subsampled_path / "{}_saturation.pdf".format(name)
 ]
+output_data_file = subsampled_path / "{}_saturation.csv".format(name)
 
 # load full matrix and subsampled matrices
 print("Find files...", flush=True)
@@ -86,6 +87,13 @@ print("Calculate mean of genes and UMIs...", flush=True)
 genes_means = [np.mean(adata.obs['n_genes']) for adata in adatas]
 umi_means = [np.mean(adata.obs['n_counts']) for adata in adatas]
 
+print("Save data to {}...".format(output_data_file), flush=True)
+data = pd.DataFrame({
+    "fractions": fractions,
+    "umi_means": umi_means
+})
+data.to_csv(output_data_file, index=False)
+
 # Plotting
 print("Plotting...", flush=True)
 fig, ax = plt.subplots(1, 2, figsize=(15, 5))
@@ -100,6 +108,6 @@ ax[1].plot(fractions, genes_means)
 ax[1].set_xlabel('Fractions of reads')
 ax[1].set_ylabel('Mean genes per cell')
 
-for output_file in output_files:
+for output_file in output_plot_files:
     plt.savefig(output_file, bbox_inches='tight', dpi=100)
     print("Plot saved in {}".format(output_file), flush=True)
