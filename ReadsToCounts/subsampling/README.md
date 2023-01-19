@@ -14,7 +14,7 @@ To analyze the saturation of sequencing runs we randomly subsampled the sequenci
 conda activate ReadsToCounts
 
 # start run
-nohup python </path/to/>subsample_run_batch.py -f </path/to/>subsampling_parameters.csv
+nohup python </path/to/>subsample_run_batch.py -f </path/to/>subsampling_parameters.csv &
 ```
 
 Depending on the size of the samples the analysis can take several hours.
