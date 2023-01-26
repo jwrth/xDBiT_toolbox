@@ -7,6 +7,8 @@ import seaborn as sns
 import networkx as nx
 from ..readwrite import save_and_show_figure
 import textwrap
+from scipy.stats import pearsonr
+
 
 
 # https://stackoverflow.com/questions/50569419/where-to-put-the-doc-string-for-a-decorator
@@ -480,3 +482,31 @@ def violinplot(data, x, y, ax, hue=None,
     if show:
         plt.tight_layout()
         return plt.show()
+
+def pearson_facet_plot(adata, groupby, 
+                       savepath=None, save_only=False, dpi_save=300):
+    
+    df = adata.to_df()
+    df = pd.concat([adata.obs, df], axis=1)
+    long_df = df.melt(id_vars=adata.obs.columns)
+
+    indices = long_df[groupby].unique()
+    n = len(indices)
+
+    fig, axs = plt.subplots(n, n, figsize=(8*n, 6*n))
+
+    for r, rid in enumerate(indices):
+        for c, cid in enumerate(indices):
+            x = long_df.query('{} == "{}"'.format(groupby, cid))['value'].values
+            y = long_df.query('{} == "{}"'.format(groupby, rid))['value'].values
+
+            axs[r, c].scatter(x, y)
+            axs[r, c].set_title("r = {}".format(round(pearsonr(x, y)[0], 2)), fontsize=20)
+            if r == n-1:
+                axs[r, c].set_xlabel(cid, fontsize=20)
+
+            if c == 0:
+                axs[r, c].set_ylabel(rid, fontsize=20)
+                
+    save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
+    

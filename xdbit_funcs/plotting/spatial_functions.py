@@ -17,6 +17,8 @@ from tqdm import tqdm
 import warnings
 from warnings import warn
 from scipy.stats import zscore
+from typing import Literal
+from anndata import AnnData
 
 # ignore future warnings (suppresses annoying pandas warning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -164,27 +166,35 @@ def expression_along_observation_value(*args, **kwargs):
     warn('This function is deprecated. Use instead `db.pl.expr_along_obs_val()`', DeprecationWarning, stacklevel=2)
     expr_along_obs_val(*args, **kwargs)
 
-def expr_along_obs_val(adata, keys, x_category, groupby, splitby=None, hue=None, 
-    range_min=None, range_max=None, cmap="tab10",
-    extra_cats=None,
-    normalize=False,
-    nsteps=100,
-    show_progress=False,
-    use_raw=False,
-    max_cols=4,
-    xlabel=None,ylabel=None,
-    vline=None, hline=None,
-    #values_into_title=None, title_suffix='', 
-    custom_titles=None,
-    legend_fontsize=24, 
-    plot_legend=True,
-    xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
-    savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
-    dpi_save=300,
-    smooth=True, 
-    method='lowess',
-    stderr=False, 
-    **kwargs):
+def expr_along_obs_val(adata: AnnData, 
+                       keys: str, 
+                       x_category: str, 
+                       groupby: str, 
+                       splitby: str = None, 
+                       hue: str = None, 
+                       method: Literal["lowess", "loess"] = 'lowess',
+                       stderr: bool = False, 
+                       range_min=None, 
+                       range_max=None, 
+                       cmap="tab10",
+                       extra_cats=None,
+                       normalize=False,
+                       nsteps=100,
+                       show_progress=False,
+                       use_raw=False,
+                       max_cols=4,
+                       xlabel=None,ylabel=None,
+                       vline=None, hline=None,
+                       #values_into_title=None, title_suffix='', 
+                       custom_titles=None,
+                       legend_fontsize=24, 
+                       plot_legend=True,
+                       xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
+                       savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
+                       dpi_save=300,
+                       smooth=True, 
+                       **kwargs
+                       ):
 
     '''
     Plot the expression of a gene as a function of an observation value (e.g. the automatic expression histology value 
