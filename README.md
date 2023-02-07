@@ -1,4 +1,4 @@
-# xDbit_toolbox
+# xDBiT_toolbox
 
 This repository contains all code that is necessary to reproduce results shown in the preprint https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1.
 
