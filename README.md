@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/349469737.svg)](https://zenodo.org/badge/latestdoi/349469737)
+
 # xDBiT_toolbox
 
 This repository contains all code that is necessary to reproduce results shown in the preprint https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1.
@@ -6,6 +8,7 @@ Further, it includes an analysis pipeline to compute the digital gene expression
 This part is partially based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
 
 If you have questions or suggestions, please feel free to open an issue or contact me directly.
+
 
 ## Versions
 - `v1.0`:
