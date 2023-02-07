@@ -18,7 +18,7 @@ If you have questions or suggestions, please feel free to open an issue or conta
         - Fixed very important bug in `xDbit_run_batch.py`.
         - Analysis of feature reads along with RNA reads.
 - `v2.1`:
-    - Branch for final publication. Includes all changes and new notebooks that have been added during the review process.
+    - Version for reproducing results of final publication. Includes all changes and new notebooks that have been added during the review process.
     - ReadsToCounts:
         - Optional analysis of interaction reads added (this feature has barely been tested).
 
