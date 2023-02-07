@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from ..tools import get_nrows_maxcols, extract_groups
-from .spatial_functions import spatial
+from .spatial_class import MultiSpatialPlot as spatial
 
 def view_rgbs(results, max_cols=4, min=None, max=None):
     '''
@@ -22,7 +22,7 @@ def view_rgbs(results, max_cols=4, min=None, max=None):
     fig.tight_layout()
     plt.show()
     
-def view_spots_rgb(adata, genes, regions, region_id, metadata, alpha=0.7):
+def view_spots_rgb(adata, genes, regions, region_id, metadata, alpha=0.7, **kwargs):
     '''
     Function to view image with overlayed spots in region selected by napari.
     '''
@@ -69,5 +69,6 @@ def view_spots_rgb(adata, genes, regions, region_id, metadata, alpha=0.7):
                 #xlim=(0, xlim[1]-xlim[0]), ylim=(0, ylim[1]-ylim[0])
                 xlim=(0, (xlim[1]-xlim[0])/ppm), ylim=(0, (ylim[1]-ylim[0])/ppm),
                 origin_zero=False, margin=False,
-                alpha=alpha
+                alpha=alpha,
+                **kwargs
                 )

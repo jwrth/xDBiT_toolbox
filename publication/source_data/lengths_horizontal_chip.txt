@@ -1,0 +1,1257 @@
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 81f
+            Closed
+    Constant width    0.0000
+              area   14.5121
+         perimeter   314.7730
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 80c
+            Closed
+    Constant width    0.0000
+              area   14.7663
+         perimeter   324.9387
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 7e6
+            Closed
+    Constant width    0.0000
+              area   15.0204
+         perimeter   335.1044
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 7f9
+            Closed
+    Constant width    0.0000
+              area   15.2746
+         perimeter   345.2701
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+Press ENTER to continue:
+                   LineWeight: 0.25 mm
+                   Handle = 59d
+            Closed
+    Constant width    0.0000
+              area   15.2746
+         perimeter   345.2701
+
+            radius    1.0000
+       start angle        96
+         end angle       354
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 577
+            Closed
+    Constant width    0.0000
+              area   15.0204
+         perimeter   335.1044
+
+
+                          LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 58a
+            Closed
+    Constant width    0.0000
+              area   14.7663
+         perimeter   324.9387
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 56d
+            Closed
+    Constant width    0.0000
+              area   14.5121
+         perimeter   314.7730
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 7d3
+            Closed
+    Constant width    0.0000
+              area   14.0221
+         perimeter   295.1730
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 7c0
+            Closed
+    Constant width    0.0000
+              area   14.2763
+         perimeter   305.3387
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 7ad
+            Closed
+    Constant width    0.0000
+              area   14.5304
+         perimeter   315.5044
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 788
+            Closed
+    Constant width    0.0000
+              area   14.7846
+         perimeter   325.6701
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+Press ENTER to continue:
+                   LineWeight: 0.25 mm
+                   Handle = 5d6
+            Closed
+    Constant width    0.0000
+              area   14.7846
+         perimeter   325.6701
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 5e9
+            Closed
+    Constant width    0.0000
+              area   14.5304
+         perimeter   315.5044
+
+             bulge    2.0817
+
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 5c3
+            Closed
+    Constant width    0.0000
+              area   14.2763
+         perimeter   305.3387
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 5b0
+            Closed
+    Constant width    0.0000
+              area   14.0221
+         perimeter   295.1730
+
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 563
+            Closed
+    Constant width    0.0000
+              area   13.5526
+         perimeter   276.3931
+
+          at point  X= -11.2250  Y= -25.2604  Z=   0.0000
+          at point  X= -10.5770  Y= -25.9084  Z=   0.0000
+          at point  X= -10.4439  Y= -27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -9.4500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -9.3400  Y= -26.0061  Z=   0.0000
+          at point  X= -10.5416  Y= -25.8730  Z=   0.0000
+          at point  X= -11.1750  Y= -25.2396  Z=   0.0000
+          at point  X= -11.1750  Y= -15.0936  Z=   0.0000
+          at point  X=  -6.5250  Y= -15.0936  Z=   0.0000
+          at point  X=  -6.5250  Y=  12.9436  Z=   0.0000
+          at point  X=   1.0250  Y=  12.9436  Z=   0.0000
+          at point  X=   1.0250  Y= -10.8936  Z=   0.0000
+          at point  X=   4.4750  Y= -10.8936  Z=   0.0000
+          at point  X=   4.4750  Y=  15.0936  Z=   0.0000
+          at point  X= -11.1750  Y=  15.0936  Z=   0.0000
+          at point  X= -11.1750  Y=  25.2396  Z=   0.0000
+          at point  X= -10.5416  Y=  25.8730  Z=   0.0000
+          at point  X=  -9.3400  Y=  26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -9.4500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X= -10.4439  Y=  27.1100  Z=   0.0000
+          at point  X= -10.5770  Y=  25.9084  Z=   0.0000
+          at point  X= -11.2250  Y=  25.2604  Z=   0.0000
+          at point  X= -11.2250  Y=  15.0436  Z=   0.0000
+          at point  X=   4.4250  Y=  15.0436  Z=   0.0000
+          at point  X=   4.4250  Y= -10.8436  Z=   0.0000
+          at point  X=   1.0750  Y= -10.8436  Z=   0.0000
+          at point  X=   1.0750  Y=  12.9936  Z=   0.0000
+          at point  X=  -6.5750  Y=  12.9936  Z=   0.0000
+          at point  X=  -6.5750  Y= -15.0436  Z=   0.0000
+          at point  X= -11.2250  Y= -15.0436  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 775
+            Closed
+    Constant width    0.0000
+              area   13.7863
+         perimeter   285.7387
+
+          at point  X=  -6.6400  Y=  26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -7.7439  Y=  27.1100  Z=   0.0000
+          at point  X=  -7.8770  Y=  25.9084  Z=   0.0000
+          at point  X=  -8.9604  Y=  24.8250  Z=   0.0000
+          at point  X= -11.1250  Y=  24.8250  Z=   0.0000
+          at point  X= -11.1250  Y=  15.1436  Z=   0.0000
+          at point  X=   4.5250  Y=  15.1436  Z=   0.0000
+Press ENTER to continue:
+          at point  X=   4.5250  Y= -10.9436  Z=   0.0000
+          at point  X=   0.9750  Y= -10.9436  Z=   0.0000
+          at point  X=   0.9750  Y=  12.8936  Z=   0.0000
+          at point  X=  -6.4750  Y=  12.8936  Z=   0.0000
+          at point  X=  -6.4750  Y= -15.1436  Z=   0.0000
+          at point  X= -11.1250  Y= -15.1436  Z=   0.0000
+          at point  X= -11.1250  Y= -24.8250  Z=   0.0000
+          at point  X=  -8.9604  Y= -24.8250  Z=   0.0000
+          at point  X=  -7.8770  Y= -25.9084  Z=   0.0000
+          at point  X=  -7.7439  Y= -27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -6.6400  Y= -26.0061  Z=   0.0000
+          at point  X=  -7.8416  Y= -25.8730  Z=   0.0000
+          at point  X=  -8.9396  Y= -24.7750  Z=   0.0000
+          at point  X= -11.0750  Y= -24.7750  Z=   0.0000
+          at point  X= -11.0750  Y= -15.1936  Z=   0.0000
+          at point  X=  -6.4250  Y= -15.1936  Z=   0.0000
+          at point  X=  -6.4250  Y=  12.8436  Z=   0.0000
+          at point  X=   0.9250  Y=  12.8436  Z=   0.0000
+          at point  X=   0.9250  Y= -10.9936  Z=   0.0000
+          at point  X=   4.5750  Y= -10.9936  Z=   0.0000
+          at point  X=   4.5750  Y=  15.1936  Z=   0.0000
+          at point  X= -11.0750  Y=  15.1936  Z=   0.0000
+          at point  X= -11.0750  Y=  24.7750  Z=   0.0000
+          at point  X=  -8.9396  Y=  24.7750  Z=   0.0000
+          at point  X=  -7.8416  Y=  25.8730  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 562
+            Closed
+    Constant width    0.0000
+              area   14.0404
+         perimeter   295.9044
+
+          at point  X=  -6.3604  Y= -24.7250  Z=   0.0000
+          at point  X=  -5.1770  Y= -25.9084  Z=   0.0000
+          at point  X=  -5.0439  Y= -27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -3.9400  Y= -26.0061  Z=   0.0000
+          at point  X=  -5.1416  Y= -25.8730  Z=   0.0000
+          at point  X=  -6.3396  Y= -24.6750  Z=   0.0000
+          at point  X= -10.9750  Y= -24.6750  Z=   0.0000
+          at point  X= -10.9750  Y= -15.2936  Z=   0.0000
+          at point  X=  -6.3250  Y= -15.2936  Z=   0.0000
+          at point  X=  -6.3250  Y=  12.7436  Z=   0.0000
+          at point  X=   0.8250  Y=  12.7436  Z=   0.0000
+          at point  X=   0.8250  Y= -11.0936  Z=   0.0000
+          at point  X=   4.6750  Y= -11.0936  Z=   0.0000
+          at point  X=   4.6750  Y=  15.2936  Z=   0.0000
+          at point  X= -10.9750  Y=  15.2936  Z=   0.0000
+          at point  X= -10.9750  Y=  24.6750  Z=   0.0000
+          at point  X=  -6.3396  Y=  24.6750  Z=   0.0000
+          at point  X=  -5.1416  Y=  25.8730  Z=   0.0000
+          at point  X=  -3.9400  Y=  26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -5.0439  Y=  27.1100  Z=   0.0000
+          at point  X=  -5.1770  Y=  25.9084  Z=   0.0000
+Press ENTER to continue:
+          at point  X=  -6.3604  Y=  24.7250  Z=   0.0000
+          at point  X= -11.0250  Y=  24.7250  Z=   0.0000
+          at point  X= -11.0250  Y=  15.2436  Z=   0.0000
+          at point  X=   4.6250  Y=  15.2436  Z=   0.0000
+          at point  X=   4.6250  Y= -11.0436  Z=   0.0000
+          at point  X=   0.8750  Y= -11.0436  Z=   0.0000
+          at point  X=   0.8750  Y=  12.7936  Z=   0.0000
+          at point  X=  -6.3750  Y=  12.7936  Z=   0.0000
+          at point  X=  -6.3750  Y= -15.2436  Z=   0.0000
+          at point  X= -11.0250  Y= -15.2436  Z=   0.0000
+          at point  X= -11.0250  Y= -24.7250  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 750
+            Closed
+    Constant width    0.0000
+              area   14.2946
+         perimeter   306.0701
+
+          at point  X=   4.7750  Y=  15.3936  Z=   0.0000
+          at point  X= -10.8750  Y=  15.3936  Z=   0.0000
+          at point  X= -10.8750  Y=  24.5750  Z=   0.0000
+          at point  X=  -3.7396  Y=  24.5750  Z=   0.0000
+          at point  X=  -2.4416  Y=  25.8730  Z=   0.0000
+          at point  X=  -1.2400  Y=  26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -1.3500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -2.3439  Y=  27.1100  Z=   0.0000
+          at point  X=  -2.4770  Y=  25.9084  Z=   0.0000
+          at point  X=  -3.7604  Y=  24.6250  Z=   0.0000
+          at point  X= -10.9250  Y=  24.6250  Z=   0.0000
+          at point  X= -10.9250  Y=  15.3436  Z=   0.0000
+          at point  X=   4.7250  Y=  15.3436  Z=   0.0000
+          at point  X=   4.7250  Y= -11.1436  Z=   0.0000
+          at point  X=   0.7750  Y= -11.1436  Z=   0.0000
+          at point  X=   0.7750  Y=  12.6936  Z=   0.0000
+          at point  X=  -6.2750  Y=  12.6936  Z=   0.0000
+          at point  X=  -6.2750  Y= -15.3436  Z=   0.0000
+          at point  X= -10.9250  Y= -15.3436  Z=   0.0000
+          at point  X= -10.9250  Y= -24.6250  Z=   0.0000
+          at point  X=  -3.7604  Y= -24.6250  Z=   0.0000
+          at point  X=  -2.4770  Y= -25.9084  Z=   0.0000
+          at point  X=  -2.3439  Y= -27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -1.3500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -1.2400  Y= -26.0061  Z=   0.0000
+          at point  X=  -2.4416  Y= -25.8730  Z=   0.0000
+          at point  X=  -3.7396  Y= -24.5750  Z=   0.0000
+          at point  X= -10.8750  Y= -24.5750  Z=   0.0000
+          at point  X= -10.8750  Y= -15.3936  Z=   0.0000
+          at point  X=  -6.2250  Y= -15.3936  Z=   0.0000
+          at point  X=  -6.2250  Y=  12.6436  Z=   0.0000
+          at point  X=   0.7250  Y=  12.6436  Z=   0.0000
+          at point  X=   0.7250  Y= -11.1936  Z=   0.0000
+          at point  X=   4.7750  Y= -11.1936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 635
+            Closed
+    Constant width    0.0000
+Press ENTER to continue:
+              area   14.2946
+         perimeter   306.0701
+
+          at point  X=   6.2250  Y=  15.3936  Z=   0.0000
+          at point  X=   6.2250  Y= -12.6436  Z=   0.0000
+          at point  X=  -0.7250  Y= -12.6436  Z=   0.0000
+          at point  X=  -0.7250  Y=  11.1936  Z=   0.0000
+          at point  X=  -4.7750  Y=  11.1936  Z=   0.0000
+          at point  X=  -4.7750  Y= -15.3936  Z=   0.0000
+          at point  X=  10.8750  Y= -15.3936  Z=   0.0000
+          at point  X=  10.8750  Y= -24.5750  Z=   0.0000
+          at point  X=   3.7396  Y= -24.5750  Z=   0.0000
+          at point  X=   2.4416  Y= -25.8730  Z=   0.0000
+          at point  X=   1.2400  Y= -26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   2.3439  Y= -27.1100  Z=   0.0000
+          at point  X=   2.4770  Y= -25.9084  Z=   0.0000
+          at point  X=   3.7604  Y= -24.6250  Z=   0.0000
+          at point  X=  10.9250  Y= -24.6250  Z=   0.0000
+          at point  X=  10.9250  Y= -15.3436  Z=   0.0000
+          at point  X=  -4.7250  Y= -15.3436  Z=   0.0000
+          at point  X=  -4.7250  Y=  11.1436  Z=   0.0000
+          at point  X=  -0.7750  Y=  11.1436  Z=   0.0000
+          at point  X=  -0.7750  Y= -12.6936  Z=   0.0000
+          at point  X=   6.2750  Y= -12.6936  Z=   0.0000
+          at point  X=   6.2750  Y=  15.3436  Z=   0.0000
+          at point  X=  10.9250  Y=  15.3436  Z=   0.0000
+          at point  X=  10.9250  Y=  24.6250  Z=   0.0000
+          at point  X=   3.7604  Y=  24.6250  Z=   0.0000
+          at point  X=   2.4770  Y=  25.9084  Z=   0.0000
+          at point  X=   2.3439  Y=  27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   1.2400  Y=  26.0061  Z=   0.0000
+          at point  X=   2.4416  Y=  25.8730  Z=   0.0000
+          at point  X=   3.7396  Y=  24.5750  Z=   0.0000
+          at point  X=  10.8750  Y=  24.5750  Z=   0.0000
+          at point  X=  10.8750  Y=  15.3936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 622
+            Closed
+    Constant width    0.0000
+              area   14.0404
+         perimeter   295.9044
+
+          at point  X=  10.9750  Y=  15.2936  Z=   0.0000
+          at point  X=   6.3250  Y=  15.2936  Z=   0.0000
+          at point  X=   6.3250  Y= -12.7436  Z=   0.0000
+          at point  X=  -0.8250  Y= -12.7436  Z=   0.0000
+          at point  X=  -0.8250  Y=  11.0936  Z=   0.0000
+          at point  X=  -4.6750  Y=  11.0936  Z=   0.0000
+          at point  X=  -4.6750  Y= -15.2936  Z=   0.0000
+          at point  X=  10.9750  Y= -15.2936  Z=   0.0000
+          at point  X=  10.9750  Y= -24.6750  Z=   0.0000
+          at point  X=   6.3396  Y= -24.6750  Z=   0.0000
+          at point  X=   5.1416  Y= -25.8730  Z=   0.0000
+          at point  X=   3.9400  Y= -26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   4.0500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+
+
+                     Closed
+    Constant width    0.0000
+              area   13.7863
+         perimeter   285.7387
+
+          at point  X=   8.9396  Y=  24.7750  Z=   0.0000
+          at point  X=  11.0750  Y=  24.7750  Z=   0.0000
+          at point  X=  11.0750  Y=  15.1936  Z=   0.0000
+          at point  X=   6.4250  Y=  15.1936  Z=   0.0000
+          at point  X=   6.4250  Y= -12.8436  Z=   0.0000
+          at point  X=  -0.9250  Y= -12.8436  Z=   0.0000
+          at point  X=  -0.9250  Y=  10.9936  Z=   0.0000
+          at point  X=  -4.5750  Y=  10.9936  Z=   0.0000
+          at point  X=  -4.5750  Y= -15.1936  Z=   0.0000
+          at point  X=  11.0750  Y= -15.1936  Z=   0.0000
+          at point  X=  11.0750  Y= -24.7750  Z=   0.0000
+          at point  X=   8.9396  Y= -24.7750  Z=   0.0000
+          at point  X=   7.8416  Y= -25.8730  Z=   0.0000
+          at point  X=   6.6400  Y= -26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   6.7500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   7.7439  Y= -27.1100  Z=   0.0000
+          at point  X=   7.8770  Y= -25.9084  Z=   0.0000
+          at point  X=   8.9604  Y= -24.8250  Z=   0.0000
+          at point  X=  11.1250  Y= -24.8250  Z=   0.0000
+          at point  X=  11.1250  Y= -15.1436  Z=   0.0000
+          at point  X=  -4.5250  Y= -15.1436  Z=   0.0000
+          at point  X=  -4.5250  Y=  10.9436  Z=   0.0000
+          at point  X=  -0.9750  Y=  10.9436  Z=   0.0000
+          at point  X=  -0.9750  Y= -12.8936  Z=   0.0000
+          at point  X=   6.4750  Y= -12.8936  Z=   0.0000
+          at point  X=   6.4750  Y=  15.1436  Z=   0.0000
+          at point  X=  11.1250  Y=  15.1436  Z=   0.0000
+          at point  X=  11.1250  Y=  24.8250  Z=   0.0000
+          at point  X=   8.9604  Y=  24.8250  Z=   0.0000
+          at point  X=   7.8770  Y=  25.9084  Z=   0.0000
+          at point  X=   7.7439  Y=  27.1100  Z=   0.0000
+             bulge    2.0817
+Press ENTER to continue:
+            center  X=   6.7500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   6.6400  Y=  26.0061  Z=   0.0000
+          at point  X=   7.8416  Y=  25.8730  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 5fc
+            Closed
+    Constant width    0.0000
+              area   13.5526
+         perimeter   276.3931
+
+          at point  X=  11.1750  Y= -25.2396  Z=   0.0000
+          at point  X=  10.5416  Y= -25.8730  Z=   0.0000
+          at point  X=   9.3400  Y= -26.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   9.4500  Y= -27.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=  10.4439  Y= -27.1100  Z=   0.0000
+          at point  X=  10.5770  Y= -25.9084  Z=   0.0000
+          at point  X=  11.2250  Y= -25.2604  Z=   0.0000
+          at point  X=  11.2250  Y= -15.0436  Z=   0.0000
+          at point  X=  -4.4250  Y= -15.0436  Z=   0.0000
+          at point  X=  -4.4250  Y=  10.8436  Z=   0.0000
+          at point  X=  -1.0750  Y=  10.8436  Z=   0.0000
+          at point  X=  -1.0750  Y= -12.9936  Z=   0.0000
+          at point  X=   6.5750  Y= -12.9936  Z=   0.0000
+          at point  X=   6.5750  Y=  15.0436  Z=   0.0000
+          at point  X=  11.2250  Y=  15.0436  Z=   0.0000
+          at point  X=  11.2250  Y=  25.2604  Z=   0.0000
+          at point  X=  10.5770  Y=  25.9084  Z=   0.0000
+          at point  X=  10.4439  Y=  27.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=   9.4500  Y=  27.0000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   9.3400  Y=  26.0061  Z=   0.0000
+          at point  X=  10.5416  Y=  25.8730  Z=   0.0000
+          at point  X=  11.1750  Y=  25.2396  Z=   0.0000
+          at point  X=  11.1750  Y=  15.0936  Z=   0.0000
+          at point  X=   6.5250  Y=  15.0936  Z=   0.0000
+          at point  X=   6.5250  Y= -12.9436  Z=   0.0000
+          at point  X=  -1.0250  Y= -12.9436  Z=   0.0000
+          at point  X=  -1.0250  Y=  10.8936  Z=   0.0000
+          at point  X=  -4.4750  Y=  10.8936  Z=   0.0000
+          at point  X=  -4.4750  Y= -15.0936  Z=   0.0000
+          at point  X=  11.1750  Y= -15.0936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 73d
+            Closed
+    Constant width    0.0000
+              area   13.0861
+         perimeter   257.7304
+
+          at point  X= -10.5770  Y= -21.4084  Z=   0.0000
+          at point  X= -10.4439  Y= -22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -9.4500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -9.3400  Y= -21.5061  Z=   0.0000
+          at point  X= -10.5416  Y= -21.3730  Z=   0.0000
+          at point  X= -10.7750  Y= -21.1396  Z=   0.0000
+          at point  X= -10.7750  Y= -15.4936  Z=   0.0000
+          at point  X=  -6.1250  Y= -15.4936  Z=   0.0000
+          at point  X=  -6.1250  Y=  12.5436  Z=   0.0000
+          at point  X=   0.6250  Y=  12.5436  Z=   0.0000
+          at point  X=   0.6250  Y= -11.2936  Z=   0.0000
+          at point  X=   4.8750  Y= -11.2936  Z=   0.0000
+          at point  X=   4.8750  Y=  15.4936  Z=   0.0000
+          at point  X= -10.7750  Y=  15.4936  Z=   0.0000
+          at point  X= -10.7750  Y=  21.1396  Z=   0.0000
+          at point  X= -10.5416  Y=  21.3730  Z=   0.0000
+          at point  X=  -9.3400  Y=  21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -9.4500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X= -10.4439  Y=  22.6100  Z=   0.0000
+          at point  X= -10.5770  Y=  21.4084  Z=   0.0000
+          at point  X= -10.8250  Y=  21.1604  Z=   0.0000
+          at point  X= -10.8250  Y=  15.4436  Z=   0.0000
+          at point  X=   4.8250  Y=  15.4436  Z=   0.0000
+          at point  X=   4.8250  Y= -11.2436  Z=   0.0000
+          at point  X=   0.6750  Y= -11.2436  Z=   0.0000
+          at point  X=   0.6750  Y=  12.5936  Z=   0.0000
+          at point  X=  -6.1750  Y=  12.5936  Z=   0.0000
+          at point  X=  -6.1750  Y= -15.4436  Z=   0.0000
+          at point  X= -10.8250  Y= -15.4436  Z=   0.0000
+          at point  X= -10.8250  Y= -21.1604  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 717
+            Closed
+    Constant width    0.0000
+              area   13.2963
+         perimeter   266.1387
+
+          at point  X=   4.9750  Y=  15.5936  Z=   0.0000
+          at point  X= -10.6750  Y=  15.5936  Z=   0.0000
+          at point  X= -10.6750  Y=  20.2750  Z=   0.0000
+          at point  X=  -8.9396  Y=  20.2750  Z=   0.0000
+          at point  X=  -7.8416  Y=  21.3730  Z=   0.0000
+          at point  X=  -6.6400  Y=  21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -7.7439  Y=  22.6100  Z=   0.0000
+Press ENTER to continue:
+          at point  X=  -7.8770  Y=  21.4084  Z=   0.0000
+          at point  X=  -8.9604  Y=  20.3250  Z=   0.0000
+          at point  X= -10.7250  Y=  20.3250  Z=   0.0000
+          at point  X= -10.7250  Y=  15.5436  Z=   0.0000
+          at point  X=   4.9250  Y=  15.5436  Z=   0.0000
+          at point  X=   4.9250  Y= -11.3436  Z=   0.0000
+          at point  X=   0.5750  Y= -11.3436  Z=   0.0000
+          at point  X=   0.5750  Y=  12.4936  Z=   0.0000
+          at point  X=  -6.0750  Y=  12.4936  Z=   0.0000
+          at point  X=  -6.0750  Y= -15.5436  Z=   0.0000
+          at point  X= -10.7250  Y= -15.5436  Z=   0.0000
+          at point  X= -10.7250  Y= -20.3250  Z=   0.0000
+          at point  X=  -8.9604  Y= -20.3250  Z=   0.0000
+          at point  X=  -7.8770  Y= -21.4084  Z=   0.0000
+          at point  X=  -7.7439  Y= -22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -6.6400  Y= -21.5061  Z=   0.0000
+          at point  X=  -7.8416  Y= -21.3730  Z=   0.0000
+          at point  X=  -8.9396  Y= -20.2750  Z=   0.0000
+          at point  X= -10.6750  Y= -20.2750  Z=   0.0000
+          at point  X= -10.6750  Y= -15.5936  Z=   0.0000
+          at point  X=  -6.0250  Y= -15.5936  Z=   0.0000
+          at point  X=  -6.0250  Y=  12.4436  Z=   0.0000
+          at point  X=   0.5250  Y=  12.4436  Z=   0.0000
+          at point  X=   0.5250  Y= -11.3936  Z=   0.0000
+          at point  X=   4.9750  Y= -11.3936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 72a
+            Closed
+    Constant width    0.0000
+              area   13.5504
+         perimeter   276.3044
+
+          at point  X=   5.0250  Y=  15.6436  Z=   0.0000
+          at point  X=   5.0250  Y= -11.4436  Z=   0.0000
+          at point  X=   0.4750  Y= -11.4436  Z=   0.0000
+          at point  X=   0.4750  Y=  12.3936  Z=   0.0000
+          at point  X=  -5.9750  Y=  12.3936  Z=   0.0000
+          at point  X=  -5.9750  Y= -15.6436  Z=   0.0000
+          at point  X= -10.6250  Y= -15.6436  Z=   0.0000
+          at point  X= -10.6250  Y= -20.2250  Z=   0.0000
+          at point  X=  -6.3604  Y= -20.2250  Z=   0.0000
+          at point  X=  -5.1770  Y= -21.4084  Z=   0.0000
+          at point  X=  -5.0439  Y= -22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -3.9400  Y= -21.5061  Z=   0.0000
+          at point  X=  -5.1416  Y= -21.3730  Z=   0.0000
+          at point  X=  -6.3396  Y= -20.1750  Z=   0.0000
+          at point  X= -10.5750  Y= -20.1750  Z=   0.0000
+          at point  X= -10.5750  Y= -15.6936  Z=   0.0000
+          at point  X=  -5.9250  Y= -15.6936  Z=   0.0000
+          at point  X=  -5.9250  Y=  12.3436  Z=   0.0000
+          at point  X=   0.4250  Y=  12.3436  Z=   0.0000
+          at point  X=   0.4250  Y= -11.4936  Z=   0.0000
+          at point  X=   5.0750  Y= -11.4936  Z=   0.0000
+          at point  X=   5.0750  Y=  15.6936  Z=   0.0000
+          at point  X= -10.5750  Y=  15.6936  Z=   0.0000
+          at point  X= -10.5750  Y=  20.1750  Z=   0.0000
+          at point  X=  -6.3396  Y=  20.1750  Z=   0.0000
+          at point  X=  -5.1416  Y=  21.3730  Z=   0.0000
+Press ENTER to continue:
+          at point  X=  -3.9400  Y=  21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -5.0439  Y=  22.6100  Z=   0.0000
+          at point  X=  -5.1770  Y=  21.4084  Z=   0.0000
+          at point  X=  -6.3604  Y=  20.2250  Z=   0.0000
+          at point  X= -10.6250  Y=  20.2250  Z=   0.0000
+          at point  X= -10.6250  Y=  15.6436  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 561
+            Closed
+    Constant width    0.0000
+              area   13.8046
+         perimeter   286.4701
+
+          at point  X=  -3.7604  Y= -20.1250  Z=   0.0000
+          at point  X=  -2.4770  Y= -21.4084  Z=   0.0000
+          at point  X=  -2.3439  Y= -22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -1.3500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -1.2400  Y= -21.5061  Z=   0.0000
+          at point  X=  -2.4416  Y= -21.3730  Z=   0.0000
+          at point  X=  -3.7396  Y= -20.0750  Z=   0.0000
+          at point  X= -10.4750  Y= -20.0750  Z=   0.0000
+          at point  X= -10.4750  Y= -15.7936  Z=   0.0000
+          at point  X=  -5.8250  Y= -15.7936  Z=   0.0000
+          at point  X=  -5.8250  Y=  12.2436  Z=   0.0000
+          at point  X=   0.3250  Y=  12.2436  Z=   0.0000
+          at point  X=   0.3250  Y= -11.5936  Z=   0.0000
+          at point  X=   5.1750  Y= -11.5936  Z=   0.0000
+          at point  X=   5.1750  Y=  15.7936  Z=   0.0000
+          at point  X= -10.4750  Y=  15.7936  Z=   0.0000
+          at point  X= -10.4750  Y=  20.0750  Z=   0.0000
+          at point  X=  -3.7396  Y=  20.0750  Z=   0.0000
+          at point  X=  -2.4416  Y=  21.3730  Z=   0.0000
+          at point  X=  -1.2400  Y=  21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -1.3500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -2.3439  Y=  22.6100  Z=   0.0000
+          at point  X=  -2.4770  Y=  21.4084  Z=   0.0000
+          at point  X=  -3.7604  Y=  20.1250  Z=   0.0000
+          at point  X= -10.5250  Y=  20.1250  Z=   0.0000
+          at point  X= -10.5250  Y=  15.7436  Z=   0.0000
+          at point  X=   5.1250  Y=  15.7436  Z=   0.0000
+          at point  X=   5.1250  Y= -11.5436  Z=   0.0000
+          at point  X=   0.3750  Y= -11.5436  Z=   0.0000
+          at point  X=   0.3750  Y=  12.2936  Z=   0.0000
+          at point  X=  -5.8750  Y=  12.2936  Z=   0.0000
+          at point  X=  -5.8750  Y= -15.7436  Z=   0.0000
+          at point  X= -10.5250  Y= -15.7436  Z=   0.0000
+          at point  X= -10.5250  Y= -20.1250  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 680
+            Closed
+    Constant width    0.0000
+Press ENTER to continue:
+              area   13.8046
+         perimeter   286.4701
+
+          at point  X=   1.2400  Y= -21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   2.3439  Y= -22.6100  Z=   0.0000
+          at point  X=   2.4770  Y= -21.4084  Z=   0.0000
+          at point  X=   3.7604  Y= -20.1250  Z=   0.0000
+          at point  X=  10.5250  Y= -20.1250  Z=   0.0000
+          at point  X=  10.5250  Y= -15.7436  Z=   0.0000
+          at point  X=  -5.1250  Y= -15.7436  Z=   0.0000
+          at point  X=  -5.1250  Y=  11.5436  Z=   0.0000
+          at point  X=  -0.3750  Y=  11.5436  Z=   0.0000
+          at point  X=  -0.3750  Y= -12.2936  Z=   0.0000
+          at point  X=   5.8750  Y= -12.2936  Z=   0.0000
+          at point  X=   5.8750  Y=  15.7436  Z=   0.0000
+          at point  X=  10.5250  Y=  15.7436  Z=   0.0000
+          at point  X=  10.5250  Y=  20.1250  Z=   0.0000
+          at point  X=   3.7604  Y=  20.1250  Z=   0.0000
+          at point  X=   2.4770  Y=  21.4084  Z=   0.0000
+          at point  X=   2.3439  Y=  22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   1.2400  Y=  21.5061  Z=   0.0000
+          at point  X=   2.4416  Y=  21.3730  Z=   0.0000
+          at point  X=   3.7396  Y=  20.0750  Z=   0.0000
+          at point  X=  10.4750  Y=  20.0750  Z=   0.0000
+          at point  X=  10.4750  Y=  15.7936  Z=   0.0000
+          at point  X=   5.8250  Y=  15.7936  Z=   0.0000
+          at point  X=   5.8250  Y= -12.2436  Z=   0.0000
+          at point  X=  -0.3250  Y= -12.2436  Z=   0.0000
+          at point  X=  -0.3250  Y=  11.5936  Z=   0.0000
+          at point  X=  -5.1750  Y=  11.5936  Z=   0.0000
+          at point  X=  -5.1750  Y= -15.7936  Z=   0.0000
+          at point  X=  10.4750  Y= -15.7936  Z=   0.0000
+          at point  X=  10.4750  Y= -20.0750  Z=   0.0000
+          at point  X=   3.7396  Y= -20.0750  Z=   0.0000
+          at point  X=   2.4416  Y= -21.3730  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 560
+            Closed
+    Constant width    0.0000
+              area   13.5504
+         perimeter   276.3044
+
+          at point  X=   6.3604  Y=  20.2250  Z=   0.0000
+          at point  X=   5.1770  Y=  21.4084  Z=   0.0000
+          at point  X=   5.0439  Y=  22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=   4.0500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   3.9400  Y=  21.5061  Z=   0.0000
+          at point  X=   5.1416  Y=  21.3730  Z=   0.0000
+          at point  X=   6.3396  Y=  20.1750  Z=   0.0000
+          at point  X=  10.5750  Y=  20.1750  Z=   0.0000
+          at point  X=  10.5750  Y=  15.6936  Z=   0.0000
+          at point  X=   5.9250  Y=  15.6936  Z=   0.0000
+          at point  X=   5.9250  Y= -12.3436  Z=   0.0000
+          at point  X=  -0.4250  Y= -12.3436  Z=   0.0000
+          at point  X=  -0.4250  Y=  11.4936  Z=   0.0000
+
+
+                            LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 648
+            Closed
+    Constant width    0.0000
+              area   13.2963
+         perimeter   266.1387
+
+          at point  X=   6.6400  Y= -21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=   6.7500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   7.7439  Y= -22.6100  Z=   0.0000
+          at point  X=   7.8770  Y= -21.4084  Z=   0.0000
+          at point  X=   8.9604  Y= -20.3250  Z=   0.0000
+          at point  X=  10.7250  Y= -20.3250  Z=   0.0000
+          at point  X=  10.7250  Y= -15.5436  Z=   0.0000
+          at point  X=  -4.9250  Y= -15.5436  Z=   0.0000
+          at point  X=  -4.9250  Y=  11.3436  Z=   0.0000
+          at point  X=  -0.5750  Y=  11.3436  Z=   0.0000
+          at point  X=  -0.5750  Y= -12.4936  Z=   0.0000
+          at point  X=   6.0750  Y= -12.4936  Z=   0.0000
+          at point  X=   6.0750  Y=  15.5436  Z=   0.0000
+          at point  X=  10.7250  Y=  15.5436  Z=   0.0000
+          at point  X=  10.7250  Y=  20.3250  Z=   0.0000
+          at point  X=   8.9604  Y=  20.3250  Z=   0.0000
+          at point  X=   7.8770  Y=  21.4084  Z=   0.0000
+          at point  X=   7.7439  Y=  22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=   6.7500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   6.6400  Y=  21.5061  Z=   0.0000
+          at point  X=   7.8416  Y=  21.3730  Z=   0.0000
+          at point  X=   8.9396  Y=  20.2750  Z=   0.0000
+          at point  X=  10.6750  Y=  20.2750  Z=   0.0000
+          at point  X=  10.6750  Y=  15.5936  Z=   0.0000
+          at point  X=   6.0250  Y=  15.5936  Z=   0.0000
+          at point  X=   6.0250  Y= -12.4436  Z=   0.0000
+          at point  X=  -0.5250  Y= -12.4436  Z=   0.0000
+          at point  X=  -0.5250  Y=  11.3936  Z=   0.0000
+Press ENTER to continue:
+          at point  X=  -4.9750  Y=  11.3936  Z=   0.0000
+          at point  X=  -4.9750  Y= -15.5936  Z=   0.0000
+          at point  X=  10.6750  Y= -15.5936  Z=   0.0000
+          at point  X=  10.6750  Y= -20.2750  Z=   0.0000
+          at point  X=   8.9396  Y= -20.2750  Z=   0.0000
+          at point  X=   7.8416  Y= -21.3730  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 65b
+            Closed
+    Constant width    0.0000
+              area   13.0861
+         perimeter   257.7304
+
+          at point  X=   6.1250  Y=  15.4936  Z=   0.0000
+          at point  X=   6.1250  Y= -12.5436  Z=   0.0000
+          at point  X=  -0.6250  Y= -12.5436  Z=   0.0000
+          at point  X=  -0.6250  Y=  11.2936  Z=   0.0000
+          at point  X=  -4.8750  Y=  11.2936  Z=   0.0000
+          at point  X=  -4.8750  Y= -15.4936  Z=   0.0000
+          at point  X=  10.7750  Y= -15.4936  Z=   0.0000
+          at point  X=  10.7750  Y= -21.1396  Z=   0.0000
+          at point  X=  10.5416  Y= -21.3730  Z=   0.0000
+          at point  X=   9.3400  Y= -21.5061  Z=   0.0000
+             bulge    2.0817
+            center  X=   9.4500  Y= -22.5000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=  10.4439  Y= -22.6100  Z=   0.0000
+          at point  X=  10.5770  Y= -21.4084  Z=   0.0000
+          at point  X=  10.8250  Y= -21.1604  Z=   0.0000
+          at point  X=  10.8250  Y= -15.4436  Z=   0.0000
+          at point  X=  -4.8250  Y= -15.4436  Z=   0.0000
+          at point  X=  -4.8250  Y=  11.2436  Z=   0.0000
+          at point  X=  -0.6750  Y=  11.2436  Z=   0.0000
+          at point  X=  -0.6750  Y= -12.5936  Z=   0.0000
+          at point  X=   6.1750  Y= -12.5936  Z=   0.0000
+          at point  X=   6.1750  Y=  15.4436  Z=   0.0000
+          at point  X=  10.8250  Y=  15.4436  Z=   0.0000
+          at point  X=  10.8250  Y=  21.1604  Z=   0.0000
+          at point  X=  10.5770  Y=  21.4084  Z=   0.0000
+          at point  X=  10.4439  Y=  22.6100  Z=   0.0000
+             bulge    2.0817
+            center  X=   9.4500  Y=  22.5000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   9.3400  Y=  21.5061  Z=   0.0000
+          at point  X=  10.5416  Y=  21.3730  Z=   0.0000
+          at point  X=  10.7750  Y=  21.1396  Z=   0.0000
+          at point  X=  10.7750  Y=  15.4936  Z=   0.0000
+
+                            LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 6f2
+            Closed
+    Constant width    0.0000
+              area   12.8730
+         perimeter   249.2084
+
+          at point  X= -10.4250  Y=  16.7936  Z=   0.0000
+          at point  X= -10.4250  Y=  15.8436  Z=   0.0000
+          at point  X=   5.2250  Y=  15.8436  Z=   0.0000
+          at point  X=   5.2250  Y= -11.6436  Z=   0.0000
+          at point  X=   0.2750  Y= -11.6436  Z=   0.0000
+          at point  X=   0.2750  Y=  12.1936  Z=   0.0000
+          at point  X=  -5.7750  Y=  12.1936  Z=   0.0000
+          at point  X=  -5.7750  Y= -15.8436  Z=   0.0000
+          at point  X= -10.4250  Y= -15.8436  Z=   0.0000
+          at point  X= -10.4250  Y= -16.7936  Z=   0.0000
+          at point  X=  -7.9917  Y= -16.7936  Z=   0.0000
+          at point  X=  -7.8770  Y= -16.9084  Z=   0.0000
+          at point  X=  -7.7439  Y= -18.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y= -18.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -6.6400  Y= -17.0061  Z=   0.0000
+          at point  X=  -7.8416  Y= -16.8730  Z=   0.0000
+          at point  X=  -7.9710  Y= -16.7436  Z=   0.0000
+          at point  X= -10.3750  Y= -16.7436  Z=   0.0000
+          at point  X= -10.3750  Y= -15.8936  Z=   0.0000
+          at point  X=  -5.7250  Y= -15.8936  Z=   0.0000
+          at point  X=  -5.7250  Y=  12.1436  Z=   0.0000
+          at point  X=   0.2250  Y=  12.1436  Z=   0.0000
+          at point  X=   0.2250  Y= -11.6936  Z=   0.0000
+          at point  X=   5.2750  Y= -11.6936  Z=   0.0000
+          at point  X=   5.2750  Y=  15.8936  Z=   0.0000
+          at point  X= -10.3750  Y=  15.8936  Z=   0.0000
+          at point  X= -10.3750  Y=  16.7436  Z=   0.0000
+          at point  X=  -7.9710  Y=  16.7436  Z=   0.0000
+          at point  X=  -7.8416  Y=  16.8730  Z=   0.0000
+          at point  X=  -6.6400  Y=  17.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -6.7500  Y=  18.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -7.7439  Y=  18.1100  Z=   0.0000
+          at point  X=  -7.8770  Y=  16.9084  Z=   0.0000
+          at point  X=  -7.9917  Y=  16.7936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 6df
+            Closed
+    Constant width    0.0000
+              area   13.1272
+         perimeter   259.3740
+
+          at point  X= -10.2750  Y=  15.9936  Z=   0.0000
+          at point  X= -10.2750  Y=  16.6436  Z=   0.0000
+          at point  X=  -5.3710  Y=  16.6436  Z=   0.0000
+          at point  X=  -5.1416  Y=  16.8730  Z=   0.0000
+          at point  X=  -3.9400  Y=  17.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y=  18.0000  Z=   0.0000
+            radius    1.0000
+Press ENTER to continue:
+       start angle       276
+         end angle       174
+          at point  X=  -5.0439  Y=  18.1100  Z=   0.0000
+          at point  X=  -5.1770  Y=  16.9084  Z=   0.0000
+          at point  X=  -5.3917  Y=  16.6936  Z=   0.0000
+          at point  X= -10.3250  Y=  16.6936  Z=   0.0000
+          at point  X= -10.3250  Y=  15.9436  Z=   0.0000
+          at point  X=   5.3250  Y=  15.9436  Z=   0.0000
+          at point  X=   5.3250  Y= -11.7436  Z=   0.0000
+          at point  X=   0.1750  Y= -11.7436  Z=   0.0000
+          at point  X=   0.1750  Y=  12.0936  Z=   0.0000
+          at point  X=  -5.6750  Y=  12.0936  Z=   0.0000
+          at point  X=  -5.6750  Y= -15.9436  Z=   0.0000
+          at point  X= -10.3250  Y= -15.9436  Z=   0.0000
+          at point  X= -10.3250  Y= -16.6936  Z=   0.0000
+          at point  X=  -5.3917  Y= -16.6936  Z=   0.0000
+          at point  X=  -5.1770  Y= -16.9084  Z=   0.0000
+          at point  X=  -5.0439  Y= -18.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=  -4.0500  Y= -18.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -3.9400  Y= -17.0061  Z=   0.0000
+          at point  X=  -5.1416  Y= -16.8730  Z=   0.0000
+          at point  X=  -5.3710  Y= -16.6436  Z=   0.0000
+          at point  X= -10.2750  Y= -16.6436  Z=   0.0000
+          at point  X= -10.2750  Y= -15.9936  Z=   0.0000
+          at point  X=  -5.6250  Y= -15.9936  Z=   0.0000
+          at point  X=  -5.6250  Y=  12.0436  Z=   0.0000
+          at point  X=   0.1250  Y=  12.0436  Z=   0.0000
+          at point  X=   0.1250  Y= -11.7936  Z=   0.0000
+          at point  X=   5.3750  Y= -11.7936  Z=   0.0000
+          at point  X=   5.3750  Y=  15.9936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 6cc
+            Closed
+    Constant width    0.0000
+              area   13.3813
+         perimeter   269.5397
+
+          at point  X= -10.1750  Y=  16.0936  Z=   0.0000
+          at point  X= -10.1750  Y=  16.5436  Z=   0.0000
+          at point  X=  -2.7710  Y=  16.5436  Z=   0.0000
+          at point  X=  -2.4416  Y=  16.8730  Z=   0.0000
+          at point  X=  -1.2400  Y=  17.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=  -1.3500  Y=  18.0000  Z=   0.0000
+            radius    1.0000
+       start angle       276
+         end angle       174
+          at point  X=  -2.3439  Y=  18.1100  Z=   0.0000
+          at point  X=  -2.4770  Y=  16.9084  Z=   0.0000
+          at point  X=  -2.7917  Y=  16.5936  Z=   0.0000
+          at point  X= -10.2250  Y=  16.5936  Z=   0.0000
+          at point  X= -10.2250  Y=  16.0436  Z=   0.0000
+          at point  X=   5.4250  Y=  16.0436  Z=   0.0000
+          at point  X=   5.4250  Y= -11.8436  Z=   0.0000
+          at point  X=   0.0750  Y= -11.8436  Z=   0.0000
+          at point  X=   0.0750  Y=  11.9936  Z=   0.0000
+          at point  X=  -5.5750  Y=  11.9936  Z=   0.0000
+          at point  X=  -5.5750  Y= -16.0436  Z=   0.0000
+          at point  X= -10.2250  Y= -16.0436  Z=   0.0000
+          at point  X= -10.2250  Y= -16.5936  Z=   0.0000
+          at point  X=  -2.7917  Y= -16.5936  Z=   0.0000
+          at point  X=  -2.4770  Y= -16.9084  Z=   0.0000
+          at point  X=  -2.3439  Y= -18.1100  Z=   0.0000
+             bulge    2.0817
+Press ENTER to continue:
+            center  X=  -1.3500  Y= -18.0000  Z=   0.0000
+            radius    1.0000
+       start angle       186
+         end angle        84
+          at point  X=  -1.2400  Y= -17.0061  Z=   0.0000
+          at point  X=  -2.4416  Y= -16.8730  Z=   0.0000
+          at point  X=  -2.7710  Y= -16.5436  Z=   0.0000
+          at point  X= -10.1750  Y= -16.5436  Z=   0.0000
+          at point  X= -10.1750  Y= -16.0936  Z=   0.0000
+          at point  X=  -5.5250  Y= -16.0936  Z=   0.0000
+          at point  X=  -5.5250  Y=  11.9436  Z=   0.0000
+          at point  X=   0.0250  Y=  11.9436  Z=   0.0000
+          at point  X=   0.0250  Y= -11.8936  Z=   0.0000
+          at point  X=   5.4750  Y= -11.8936  Z=   0.0000
+          at point  X=   5.4750  Y=  16.0936  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 6b9
+            Closed
+    Constant width    0.0000
+              area   13.3813
+         perimeter   269.5397
+
+          at point  X=   2.7917  Y= -16.5936  Z=   0.0000
+          at point  X=  10.2250  Y= -16.5936  Z=   0.0000
+          at point  X=  10.2250  Y= -16.0436  Z=   0.0000
+          at point  X=  -5.4250  Y= -16.0436  Z=   0.0000
+          at point  X=  -5.4250  Y=  11.8436  Z=   0.0000
+          at point  X=  -0.0750  Y=  11.8436  Z=   0.0000
+          at point  X=  -0.0750  Y= -11.9936  Z=   0.0000
+          at point  X=   5.5750  Y= -11.9936  Z=   0.0000
+          at point  X=   5.5750  Y=  16.0436  Z=   0.0000
+          at point  X=  10.2250  Y=  16.0436  Z=   0.0000
+          at point  X=  10.2250  Y=  16.5936  Z=   0.0000
+          at point  X=   2.7917  Y=  16.5936  Z=   0.0000
+          at point  X=   2.4770  Y=  16.9084  Z=   0.0000
+          at point  X=   2.3439  Y=  18.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y=  18.0000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   1.2400  Y=  17.0061  Z=   0.0000
+          at point  X=   2.4416  Y=  16.8730  Z=   0.0000
+          at point  X=   2.7710  Y=  16.5436  Z=   0.0000
+          at point  X=  10.1750  Y=  16.5436  Z=   0.0000
+          at point  X=  10.1750  Y=  16.0936  Z=   0.0000
+          at point  X=   5.5250  Y=  16.0936  Z=   0.0000
+          at point  X=   5.5250  Y= -11.9436  Z=   0.0000
+          at point  X=  -0.0250  Y= -11.9436  Z=   0.0000
+          at point  X=  -0.0250  Y=  11.8936  Z=   0.0000
+          at point  X=  -5.4750  Y=  11.8936  Z=   0.0000
+          at point  X=  -5.4750  Y= -16.0936  Z=   0.0000
+          at point  X=  10.1750  Y= -16.0936  Z=   0.0000
+          at point  X=  10.1750  Y= -16.5436  Z=   0.0000
+          at point  X=   2.7710  Y= -16.5436  Z=   0.0000
+          at point  X=   2.4416  Y= -16.8730  Z=   0.0000
+          at point  X=   1.2400  Y= -17.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   1.3500  Y= -18.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   2.3439  Y= -18.1100  Z=   0.0000
+          at point  X=   2.4770  Y= -16.9084  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+Press ENTER to continue:
+                   LineWeight: 0.25 mm
+                   Handle = 6a6
+            Closed
+    Constant width    0.0000
+              area   13.1272
+         perimeter   259.3740
+
+          at point  X=  10.2750  Y=  15.9936  Z=   0.0000
+          at point  X=   5.6250  Y=  15.9936  Z=   0.0000
+          at point  X=   5.6250  Y= -12.0436  Z=   0.0000
+          at point  X=  -0.1250  Y= -12.0436  Z=   0.0000
+          at point  X=  -0.1250  Y=  11.7936  Z=   0.0000
+          at point  X=  -5.3750  Y=  11.7936  Z=   0.0000
+          at point  X=  -5.3750  Y= -15.9936  Z=   0.0000
+          at point  X=  10.2750  Y= -15.9936  Z=   0.0000
+          at point  X=  10.2750  Y= -16.6436  Z=   0.0000
+          at point  X=   5.3710  Y= -16.6436  Z=   0.0000
+          at point  X=   5.1416  Y= -16.8730  Z=   0.0000
+          at point  X=   3.9400  Y= -17.0061  Z=   0.0000
+             bulge    2.0817
+            center  X=   4.0500  Y= -18.0000  Z=   0.0000
+            radius    1.0000
+       start angle        96
+         end angle       354
+          at point  X=   5.0439  Y= -18.1100  Z=   0.0000
+          at point  X=   5.1770  Y= -16.9084  Z=   0.0000
+          at point  X=   5.3917  Y= -16.6936  Z=   0.0000
+          at point  X=  10.3250  Y= -16.6936  Z=   0.0000
+          at point  X=  10.3250  Y= -15.9436  Z=   0.0000
+          at point  X=  -5.3250  Y= -15.9436  Z=   0.0000
+          at point  X=  -5.3250  Y=  11.7436  Z=   0.0000
+          at point  X=  -0.1750  Y=  11.7436  Z=   0.0000
+          at point  X=  -0.1750  Y= -12.0936  Z=   0.0000
+          at point  X=   5.6750  Y= -12.0936  Z=   0.0000
+          at point  X=   5.6750  Y=  15.9436  Z=   0.0000
+          at point  X=  10.3250  Y=  15.9436  Z=   0.0000
+          at point  X=  10.3250  Y=  16.6936  Z=   0.0000
+          at point  X=   5.3917  Y=  16.6936  Z=   0.0000
+          at point  X=   5.1770  Y=  16.9084  Z=   0.0000
+          at point  X=   5.0439  Y=  18.1100  Z=   0.0000
+             bulge    2.0817
+            center  X=   4.0500  Y=  18.0000  Z=   0.0000
+            radius    1.0000
+       start angle         6
+         end angle       264
+          at point  X=   3.9400  Y=  17.0061  Z=   0.0000
+          at point  X=   5.1416  Y=  16.8730  Z=   0.0000
+          at point  X=   5.3710  Y=  16.6436  Z=   0.0000
+          at point  X=  10.2750  Y=  16.6436  Z=   0.0000
+
+                  LWPOLYLINE  Layer: "0"
+                            Space: Model space
+                   Color: BYLAYER    Linetype: "Continuous"
+                   LineWeight: 0.25 mm
+                   Handle = 693
+            Closed
+    Constant width    0.0000
+              area   12.8730
+         perimeter   249.2084
+
+          at point  X=  10.3750  Y=  15.8936  Z=   0.0000
+          at point  X=   5.7250  Y=  15.8936  Z=   0.0000
+          at point  X=   5.7250  Y= -12.1436  Z=   0.0000
+          at point  X=  -0.2250  Y= -12.1436  Z=   0.0000
+          at point  X=  -0.2250  Y=  11.6936  Z=   0.0000
+          at point  X=  -5.2750  Y=  11.6936  Z=   0.0000
+          at point  X=  -5.2750  Y= -15.8936  Z=   0.0000
+          at point  X=  10.3750  Y= -15.8936  Z=   0.0000
+          at point  X=  10.3750  Y= -16.7436  Z=   0.0000
+          at point  X=   7.9710  Y= -16.7436  Z=   0.0000
+          at point  X=   7.8416  Y= -16.8730  Z=   0.0000
+          at point  X=   6.6400  Y= -17.0061  Z=   0.0000
+             bulge    2.0817

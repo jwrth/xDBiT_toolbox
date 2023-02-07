@@ -6,8 +6,9 @@ from ..calculations import dist_points, rotation_angle
 from sklearn.preprocessing import minmax_scale
 import numpy as np
 from scipy import ndimage
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Tuple, Union, List, Dict, Any, Literal
 from PIL import Image
+from skimage.color import rgb2hed, hed2rgb
 
 def rotateImage(img, angle, pivot, imagetype="grayscale", PIL=True, order=3):
     """
@@ -153,6 +154,9 @@ def resize_image(img, dim=None, scale_factor=None):
     '''
     Resize image by scale_factor
     '''
+    # make sure the image is np.uint8
+    img = img.astype(np.uint8)
+    
     if scale_factor is not None:
         width = int(img.shape[1] * scale_factor)
         height = int(img.shape[0] * scale_factor)
@@ -325,3 +329,35 @@ def crop_center(image, center, width):
     Crop image from given center and width.
     '''
     return image[int(center[0] - width/2): int(center[0] + width/2), int(center[1] - width/2): int(center[1] + width/2)]
+
+def deconvolve_he(
+    img: np.ndarray,
+    return_type: Literal["grayscale", "greyscale", "rgb"] = "grayscale"
+    ) -> np.ndarray:
+    '''
+    Deconvolves H&E image to separately extract hematoxylin and eosin stainings.
+    
+    from: https://scikit-image.org/docs/stable/auto_examples/color_exposure/plot_ihc_color_separation.html
+    
+    --------------
+    Returns:
+    For return_type "grayscale": Numpy array with shape (h, w, 3) where the 3 channels correspond to 
+        hematoxylin, eosin and a third channel
+        
+    For return_type "rgb": Three separate RGB images as numpy array. Order: Hematoxylin, eosin, and third green channel.
+    '''
+    # perform deconvolution
+    ihc_hed = rgb2hed(img)
+    
+    if return_type in ["grayscale", "greyscale"]:
+        return ihc_hed
+    
+    else:
+        # Create an RGB image for each of the stains
+        null = np.zeros_like(ihc_hed[:, :, 0])
+        ihc_h = hed2rgb(np.stack((ihc_hed[:, :, 0], null, null), axis=-1))
+        ihc_e = hed2rgb(np.stack((null, ihc_hed[:, :, 1], null), axis=-1))
+        ihc_d = hed2rgb(np.stack((null, null, ihc_hed[:, :, 2]), axis=-1))
+
+        return ihc_h, ihc_e, ihc_d
+    

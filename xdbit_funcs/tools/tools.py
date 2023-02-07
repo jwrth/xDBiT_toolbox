@@ -228,6 +228,19 @@ def difference_sets(d, target_key):
         
     return a
 
+def deactivate_empty_plots(n_plots, nrows, ncols, axis):
+    '''
+    Function to deactivate the axis of empty plots.
+    '''
+    if n_plots > 1:
+        assert len(axis.shape) == 1, "Axis object must have only one dimension."
+        # check if there are empty plots remaining
+        i = n_plots - 1
+        while i < nrows * ncols - 1:
+            i+=1
+            # remove empty plots
+            axis[i].set_axis_off()
+            
 def save_metadata(metadata, outfile):
     # make sure that parent directory of url exists
     outfile = Path(outfile)

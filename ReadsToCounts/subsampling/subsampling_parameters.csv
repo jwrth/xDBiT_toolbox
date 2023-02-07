@@ -1,0 +1,10 @@
+name,batch,file
+Sample_22L000005-Spleen,0,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000005/out/gene_function_tagged.bam
+Sample_22L000006-Spleen,0,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000006/out/gene_function_tagged.bam
+Sample_22L000007-Heart,0,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000007/out/gene_function_tagged.bam
+Sample_22L000008-Heart,1,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000008/out/gene_function_tagged.bam
+Sample_22L000009-Liver,1,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000009/out/gene_function_tagged.bam
+Sample_22L000010-Kidney,1,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000010/out/gene_function_tagged.bam
+Sample_22L000011-Kidney,2,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000011/out/gene_function_tagged.bam
+Sample_22L000012-Brain,2,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000012/out/gene_function_tagged.bam
+Sample_22L000013-Brain,2,/home/hpc/johannes.wirth/data/experiments/37_46/sequencing_data/fastq/Sample_22L000013/out/gene_function_tagged.bam

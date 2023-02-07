@@ -54,3 +54,24 @@ def load_zarr_dir(directory):
         results[ch] = da.from_zarr(url)
         
     return results
+
+def add_new_zarr_dir(
+    adata, 
+    zarr_dir,
+    zarr_key: str = "zarr_directories"):
+    '''
+    Function to add new zarr directories to the zarr path collection in the adata.
+    '''
+    # make sure there is a `zarr` folder in the given directory
+    zarr_dir = Path(zarr_dir)
+    zarr_subdir = zarr_dir / "zarr"
+    assert zarr_subdir.is_dir(), "No folder `zarr` in given zarr data directory."
+
+    # create dictionary with new directories
+    new_dirs = {elem.stem: elem for elem in zarr_subdir.glob("*")}
+
+    # add new paths to collection
+    for k, v in adata.uns[zarr_key].items():
+        if k in new_dirs:
+            adata.uns[zarr_key][k] = np.append(adata.uns[zarr_key][k], str(new_dirs[k]))
+            

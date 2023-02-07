@@ -62,8 +62,9 @@ def spatialde_run(adata, layer=None, run=True, normalize=True, output_name='spat
 
 def standard_preprocessing(adata_in, 
     hvg_batch_key=None, hvg_flavor='seurat', hvg_n_top_genes=None,
-    do_lognorm=True, regress_out=None, filter_hvg=False, dim_reduction=True, 
-    batch_correction_key=None,  batch_correction_method="scanorama", verbose=False,
+    do_lognorm=True, regress_out=None, filter_hvg=False, 
+    dim_reduction=True, umap=True, tsne=True,
+    batch_correction_key=None,  batch_correction_method="scanorama", verbose=True,
     tsne_lr=1000, tsne_jobs=8,
     **kwargs):
     '''
@@ -81,10 +82,10 @@ def standard_preprocessing(adata_in,
 
         # n top genes must be specified for this method
         if hvg_n_top_genes is None:
-            print("HVG computation: For flavor {} `hvg_n_top_genes` is mandatory".format(hvg_flavor))
+            print("HVG computation: For flavor {} `hvg_n_top_genes` is mandatory".format(hvg_flavor)) if verbose else None
             return
     else:
-        print("Unknown value for `hvg_flavor`: {}. Possible values: {}".format(hvg_flavor, ["seurat", "cell_ranger", "seurat_v3"]))
+        print("Unknown value for `hvg_flavor`: {}. Possible values: {}".format(hvg_flavor, ["seurat", "cell_ranger", "seurat_v3"])) if verbose else None
 
 
     if batch_correction_method == "bbknn":
@@ -103,41 +104,43 @@ def standard_preprocessing(adata_in,
             return
 
         # store raw counts in layer
-        print("Store raw counts in adata.layers['counts']...")
+        print("Store raw counts in adata.layers['counts']...") if verbose else None
         adata.layers['counts'] = adata.X.copy()
 
         # preprocessing according to napari tutorial in squidpy
-        print("Normalization, log-transformation...")
+        print("Normalization, log-transformation...") if verbose else None
         sc.pp.normalize_total(adata)
         adata.layers['norm_counts'] = adata.X.copy()
         sc.pp.log1p(adata)
 
     if hvg_batch_key is None:
-        print("Calculate highly-variable genes across all samples using {} flavor...".format(hvg_flavor))
+        print("Calculate highly-variable genes across all samples using {} flavor...".format(hvg_flavor)) if verbose else None
     else:
-        print("Calculate highly-variable genes per batch key {} using {} flavor...".format(hvg_batch_key, hvg_flavor))
+        print("Calculate highly-variable genes per batch key {} using {} flavor...".format(hvg_batch_key, hvg_flavor)) if verbose else None
 
     sc.pp.highly_variable_genes(adata, batch_key=hvg_batch_key, flavor=hvg_flavor, layer=hvg_layer, n_top_genes=hvg_n_top_genes)
 
     if filter_hvg:
-        print("Filter for highly-variable genes...")
+        print("Filter for highly-variable genes...") if verbose else None
         # add the normalized and log data to raw
         adata.raw = adata
         # Filter for highly variable genes
         adata = adata[:, adata.var.highly_variable].copy()
 
     if regress_out is not None:
-        print("Regress out {}...".format(regress_out))
+        print("Regress out {}...".format(regress_out)) if verbose else None
         sc.pp.regress_out(adata, regress_out)
 
     if dim_reduction:
         if batch_correction_key is None:
             # dimensionality reduction
-            print("Dimensionality reduction...")
+            print("Dimensionality reduction...") if verbose else None
             sc.pp.pca(adata)
-            sc.pp.neighbors(adata)
-            sc.tl.umap(adata)
-            sc.tl.tsne(adata, n_jobs=tsne_jobs, learning_rate=tsne_lr)
+            if umap:
+                sc.pp.neighbors(adata)
+                sc.tl.umap(adata)
+            if tsne:
+                sc.tl.tsne(adata, n_jobs=tsne_jobs, learning_rate=tsne_lr)
 
         else:
             # PCA
@@ -154,17 +157,17 @@ def standard_preprocessing(adata_in,
 
             # batch correction
             if batch_correction_method == "bbknn":
-                print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key))
+                print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key)) if verbose else None
                 bbknn.bbknn(adata, batch_key=batch_correction_key, metric='euclidean') # is used as alternative to sc.pp.neighbors
 
                 # dim reduction with corrected data
-                print("Dimensionality reduction with batch corrected data...")
+                print("Dimensionality reduction with batch corrected data...") if verbose else None
                 sc.tl.umap(adata)
                 sc.tl.tsne(adata)
             elif batch_correction_method == "scanorama":
-                print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key))
+                print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key)) if verbose else None
                 hvgs = list(adata.var_names[adata.var['highly_variable']])
-                adata = scanorama(adata, batch=batch_correction_key, hvg=hvgs, verbose=verbose, **kwargs)
+                adata = scanorama(adata, batch=batch_correction_key, hvg=hvgs, verbose=False, **kwargs)
 
                 # find neighbors
                 sc.pp.neighbors(adata, use_rep="X_scanorama")
@@ -172,7 +175,7 @@ def standard_preprocessing(adata_in,
                 sc.tl.tsne(adata, use_rep="X_scanorama")
 
         # clustering
-        print("Leiden clustering...")
+        print("Leiden clustering...") if verbose else None
         sc.tl.leiden(adata)
 
     # if not in_place:
