@@ -30,3 +30,5 @@ do
 
     done
 done
+
+echo "Finished all directories."
