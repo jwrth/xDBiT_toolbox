@@ -105,7 +105,7 @@ for b in batch_numbers:
             commands[i].append("-y")
         else:
             # add also the informations needed for the STAR alignment
-            commands[i].append(["-g", s["STAR_genome"], "-r", s["STAR_fasta"]])
+            commands[i] += ["-g", s["STAR_genome"], "-r", s["STAR_fasta"]]
 
         # if feature files are given, add them
         if not pd.isnull(s["feature_legend"]):
@@ -128,6 +128,7 @@ for b in batch_numbers:
     
     for e, elem in enumerate(commands):
         print("Command {}:".format(e+1), flush=True)
+        #print(elem)
         print(" ".join(elem), flush=True)
 
     procs = [Popen(commands[i], stdout=PIPE, stderr=STDOUT) for i in range(len(commands))]
