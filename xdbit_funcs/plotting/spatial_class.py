@@ -325,6 +325,8 @@ class MultiSpatialPlot:
                  groups: Optional[List[str]] = None,
                  raw: bool = False,
                  layer: Optional[str] = None,
+                 fig: plt.figure = None,
+                 ax: plt.Axes = None,
                  max_cols: int = 4,
                  xlim: Optional[Tuple[float, float]] = None,
                  ylim: Optional[Tuple[float, float]] = None,
@@ -367,6 +369,8 @@ class MultiSpatialPlot:
         self.groups = groups
         self.raw = raw
         self.layer = layer
+        self.fig = fig
+        self.ax = ax
         self.max_cols = max_cols
         self.xlim = xlim
         self.ylim = ylim
@@ -404,7 +408,12 @@ class MultiSpatialPlot:
         self.check_arguments()
         
         # plotting
-        self.setup_subplots()
+        if self.ax is None:
+            self.setup_subplots()
+        else:
+            assert self.fig is not None, "If axis for plotting is given, also a figure object needs to be provided via `fig`"
+            assert len(self.keys) == 1, "If single axis is given not more than one key is allowed."
+            
         self.plot_to_subplots()
                 
         save_and_show_figure(
@@ -548,15 +557,18 @@ class MultiSpatialPlot:
                     crange_ = self.crange
                     
                 # get axis to plot
-                if len(self.axs.shape) == 2:
-                    ax = self.axs[row, col]
-                elif len(self.axs.shape) == 1:
-                    if self.multikeys:
-                        ax = self.axs[col]
+                if self.ax is None:
+                    if len(self.axs.shape) == 2:
+                        ax = self.axs[row, col]
+                    elif len(self.axs.shape) == 1:
+                        if self.multikeys:
+                            ax = self.axs[col]
+                        else:
+                            ax = self.axs[i]
                     else:
-                        ax = self.axs[i]
+                        raise ValueError("`len(self.axs.shape)` has wrong shape {}. Requires 1 or 2.".format(len(self.axs.shape)))
                 else:
-                    raise ValueError("`len(self.axs.shape)` has wrong shape {}. Requires 1 or 2.".format(len(self.axs.shape)))
+                    ax = self.ax
                 
                 # counter for axis
                 i+=1

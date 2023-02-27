@@ -599,7 +599,7 @@ class CountsToAnndata():
                 db.pl.spatial(ad, keys=gene, groupby='id', groups=idx, image_key=reg_channel_label, 
                             lowres=False,
                             xlim=(1800,2000), ylim=(1800,2000), alpha=0.5, 
-                            axis=axs[r+c], fig=fig)
+                            ax=axs[r+c], fig=fig)
                 if r == 0:
                     axs[r+c].set_title(c_names[c] + "\n" + gene, fontsize=12, fontweight='bold')
                     
