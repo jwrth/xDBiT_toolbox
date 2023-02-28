@@ -144,7 +144,9 @@ def convert_to_8bit(img, save_mem=True):
     Convert numpy array image to 8bit.
     '''
     if save_mem:
-        img = np.float16(img)
+        # for a 16-bit image at least int32 is necessary for signed integers because the value range is [-65535,...,0,...,65535]
+        # or uint16 can be used as unsigned integer with only positive values
+        img = np.uint16(img)
     img = (img / img.max()) * 255
     img = np.uint8(img)
     return img
