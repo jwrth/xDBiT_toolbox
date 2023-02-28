@@ -357,6 +357,7 @@ class MultiSpatialPlot:
                  savepath: Optional[str] = None,
                  save_only: bool = False,
                  dpi_save: int = 300,
+                 show: bool = True,
                  
                  # less important
                  prefix_groups: str = '',
@@ -394,6 +395,7 @@ class MultiSpatialPlot:
         self.savepath = savepath
         self.save_only = save_only
         self.dpi_save = dpi_save
+        self.show = show
         
         # image stuff
         self.image_key = image_key
@@ -420,6 +422,7 @@ class MultiSpatialPlot:
             savepath=self.savepath,
             fig=self.fig,
             save_only=self.save_only,
+            show=self.show,
             dpi_save=self.dpi_save
             )
 
