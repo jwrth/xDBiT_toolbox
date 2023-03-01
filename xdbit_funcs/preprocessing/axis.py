@@ -1,22 +1,14 @@
-from scipy.interpolate import splprep, splev, UnivariateSpline
+from scipy.interpolate import UnivariateSpline
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import minmax_scale
 from anndata import AnnData
 import matplotlib.pyplot as plt
-from ..tools import get_nrows_maxcols, standard_preprocessing, extract_groups
+from ..preprocessing import standard_preprocessing
 from ..readwrite import save_and_show_figure
 import gc
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
-
-gene_to_sort = "Cyp2e1"
-groupby = 'id'
-umap_key = 'X_umap'
-max_cols = 6
-k_spline = 3
-s = 5000
-#s = None
 
 def generate_axis(
     adata: AnnData,
@@ -32,6 +24,7 @@ def generate_axis(
     save_only: bool = False,
     **kwargs
 ):
+    from ..tools import get_nrows_maxcols, extract_groups
     
     groups = adata.obs[groupby].unique()
     # check whether to calculate the UMAP per group or use existing UMAP calculation saved in adata.obsm[umap_key]
@@ -150,3 +143,5 @@ def generate_axis(
 
     # add data to obs
     adata.obs[obs_key] = x_new
+    
+    

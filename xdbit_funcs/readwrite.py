@@ -1,4 +1,3 @@
-from numpy.lib.arraysetops import unique
 import scanpy as sc
 import numpy as np
 import matplotlib.pyplot as plt
