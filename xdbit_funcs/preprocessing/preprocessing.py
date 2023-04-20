@@ -66,6 +66,7 @@ def standard_preprocessing(adata_in,
     dim_reduction=True, umap=True, tsne=True,
     batch_correction_key=None,  batch_correction_method="scanorama", verbose=True,
     tsne_lr=1000, tsne_jobs=8,
+    random_state=0,
     **kwargs):
     '''
     Function to perform standard preprocessing on ST data. Adapted from Squidpy Napari Tutorial.
@@ -138,9 +139,9 @@ def standard_preprocessing(adata_in,
             sc.pp.pca(adata)
             if umap:
                 sc.pp.neighbors(adata)
-                sc.tl.umap(adata)
+                sc.tl.umap(adata, random_state=random_state)
             if tsne:
-                sc.tl.tsne(adata, n_jobs=tsne_jobs, learning_rate=tsne_lr)
+                sc.tl.tsne(adata, n_jobs=tsne_jobs, learning_rate=tsne_lr, random_state=random_state)
 
         else:
             # PCA
@@ -162,8 +163,8 @@ def standard_preprocessing(adata_in,
 
                 # dim reduction with corrected data
                 print("Dimensionality reduction with batch corrected data...") if verbose else None
-                sc.tl.umap(adata)
-                sc.tl.tsne(adata)
+                sc.tl.umap(adata, random_state=random_state)
+                sc.tl.tsne(adata, random_state=random_state)
             elif batch_correction_method == "scanorama":
                 print("Batch correction using {} for {}...".format(batch_correction_method, batch_correction_key)) if verbose else None
                 hvgs = list(adata.var_names[adata.var['highly_variable']])
@@ -171,13 +172,13 @@ def standard_preprocessing(adata_in,
 
                 # find neighbors
                 sc.pp.neighbors(adata, use_rep="X_scanorama")
-                sc.tl.umap(adata)
-                sc.tl.tsne(adata, use_rep="X_scanorama")
+                sc.tl.umap(adata, random_state=random_state)
+                sc.tl.tsne(adata, use_rep="X_scanorama", random_state=random_state)
 
         # clustering
         print("Leiden clustering...") if verbose else None
         sc.tl.leiden(adata)
-
+        
     # if not in_place:
     #     return adata
     return adata

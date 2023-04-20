@@ -6,28 +6,9 @@ from ..readwrite import save_and_show_figure
 import seaborn as sns
 import networkx as nx
 from ..readwrite import save_and_show_figure
+from ..utils import rename_net, check_if_adjustText
 import textwrap
 from scipy.stats import pearsonr
-
-
-
-# https://stackoverflow.com/questions/50569419/where-to-put-the-doc-string-for-a-decorator
-# from functools import wraps
-# def dec(func):
-#     @wraps(func)
-#     def wrap(*args, **kwargs):
-#         return func(*args, **kwargs)
-#     return wrap
-
-# @dec
-# def func():
-#     """Docstring here"""
-
-# def testfunc(volcano_plot):
-#     @wraps(volcano_plot)
-#     def wrap(*args, **kwargs):
-#         return volcano_plot(*args, **kwargs)
-#     return wrap
 
 # @testfunc
 def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', pvals_label='pvals_adj', gene_names='names', 
@@ -510,3 +491,271 @@ def pearson_facet_plot(adata, groupby,
                 
     save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
     
+    
+def barplot_custom(data, x, y, 
+                   hue=None, 
+                   order=["Periportal", "Midzone", "Pericentral"], 
+                   hue_order=["young", "old"],
+                   palette=["white", "grey"],
+                   max_cols=4,
+                   figsize=(6,4),
+                   stat_annot=True,
+                   test='t-test_welch',
+                   comparisons_correction=None,
+                   verbose=1,
+                   savepath=None, fig=None, save_only=False, show=True, dpi_save=300
+                   ):
+    
+    y = [y] if isinstance(y, str) else list(y)
+    n_plots, n_rows, max_cols = get_nrows_maxcols(keys=y, max_cols=max_cols)
+    
+    fig, axs = plt.subplots(n_rows, max_cols, figsize=(figsize[0]*max_cols, figsize[1]*n_rows))
+    
+    if n_plots > 1:
+        axs = axs.ravel()
+    else:
+        axs = [axs]
+            
+    for i, yy in enumerate(y):
+        sns.barplot(data=data, x=x, y=yy, 
+                    hue=hue, 
+                    order=order,
+                    hue_order=hue_order,
+                    dodge=True,
+                    linewidth=1, 
+                    edgecolor='k',
+                    palette=palette,
+                    errorbar="sd", errcolor='k', errwidth=1.5, capsize=0.2,
+                    ax=axs[i]
+                )
+
+        sns.stripplot(data=data, x=x, y=yy, 
+                      hue=hue,
+                    order=order,
+                    hue_order=hue_order,
+                    color="k",
+                    dodge=True, 
+                    legend=False,
+                    ax=axs[i]
+                )
+        
+        axs[i].set_title(yy)
+        axs[i].set_ylabel("Expression")
+        
+        if stat_annot:
+            #from statannot import add_stat_annotation
+            from statannotations.Annotator import Annotator
+            # add statistical asterisks
+            box_pairs=[
+            (("Pericentral", "old"), ("Pericentral", "young")),
+            (("Midzone", "old"), ("Midzone", "young")),
+            (("Periportal", "old"), ("Periportal", "young"))
+            ]
+            
+            annot = Annotator(axs[i], pairs=box_pairs, data=data, 
+                              x=x, y=yy, 
+                              order=order,
+                              hue=hue, hue_order=hue_order
+                              )
+            annot.configure(test=test, comparisons_correction=comparisons_correction, verbose=verbose)
+            annot.apply_test()
+            annot.annotate()
+            
+            # add_stat_annotation(axs[i], data=data, x=x, y=yy, 
+            #                     order=order,
+            #                     hue=hue, hue_order=hue_order,
+            #                     box_pairs=box_pairs,
+            #                     test='t-test_ind', comparisons_correction=None,
+            #                     loc='inside', verbose=verbose)
+            
+    save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, show=show, dpi_save=dpi_save)
+    plt.show()
+    
+
+def filter_limits(df, sign_limit=None, lFCs_limit=None):
+
+    # Define limits if not defined
+    if sign_limit is None:
+        sign_limit = np.inf
+    if lFCs_limit is None:
+        lFCs_limit = np.inf
+
+    # Filter by absolute value limits
+    msk_sign = df['pvals'] < np.abs(sign_limit)
+    msk_lFCs = np.abs(df['logFCs']) < np.abs(lFCs_limit)
+    df = df.loc[msk_sign & msk_lFCs]
+
+    return df
+    
+def plot_volcano(logFCs, pvals, contrast, 
+                 size=None, 
+                 name=None, net=None, top=5, source='source', target='target',
+                 weight='weight',
+                 size_scale_factor=10,
+                 sign_thr=0.05, lFCs_thr=0.5, 
+                 sign_limit=None, lFCs_limit=None, 
+                 return_data=False,
+                 figsize=(7, 5),
+                 dpi=100, ax=None, return_fig=False, 
+                 save=None, save_only=False, show=True, dpi_save=300
+                 ):
+    """
+    Function adapted from https://github.com/saezlab/decoupler-py/blob/main/decoupler/plotting.py
+    
+    Plot logFC and p-values. If name and net are provided, it does the same for the targets of a selected source.
+    Parameters
+    ----------
+    logFCs : DataFrame
+        Data-frame of logFCs (contrasts x features).
+    pvals : DataFrame
+        Data-frame of p-values (contrasts x features).
+    contrast : str
+        Name of the contrast (row) to plot.
+    name : str, None
+        Name of the source to plot. If None, plot classic volcano (without subsetting targets).
+    net : DataFrame, None
+        Network dataframe. If None, plot classic volcano (without subsetting targets).
+    top : int
+        Number of top differentially expressed features.
+    source : str
+        Column name in net with source nodes.
+    target : str
+        Column name in net with target nodes.
+    weight : str, None
+        Column name in net with weights. If none, set to None.
+    sign_thr : float
+        Significance threshold for p-values.
+    lFCs_thr : float
+        Significance threshold for logFCs.
+    sign_limit : float
+        Limit of p-values to plot in -log10.
+    lFCs_limit : float
+        Limit of logFCs to plot in absolute value.
+    figsize : tuple
+        Figure size.
+    dpi : int
+        DPI resolution of figure.
+    ax : Axes, None
+        A matplotlib axes object. If None returns new figure.
+    return_fig : bool
+        Whether to return a Figure object or not.
+    save : str, None
+        Path to where to save the plot. Infer the filetype if ending on {`.pdf`, `.png`, `.svg`}.
+    Returns
+    -------
+    fig : Figure, None
+        If return_fig, returns Figure object.
+    df  : DataFrame, None
+        If return_data, returns DataFrame object.
+    """
+    
+    # Load plotting packages
+    at = check_if_adjustText()
+
+    # Match dfs
+    index = logFCs.index.intersection(pvals.index)
+    columns = logFCs.columns.intersection(pvals.columns)
+    logFCs = logFCs.loc[index, columns]
+    pvals = pvals.loc[index, columns]
+
+    # Transform sign_thr
+    logsign_thr = -np.log10(sign_thr)
+
+    # Plot
+    fig = None
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figsize, dpi=dpi)
+
+    # Check for net
+    if net is not None:
+        # Rename nets
+        net = rename_net(net, source=source, target=target, weight=weight)
+
+        # Get max and if + and -
+        max_n = np.std(np.abs(net['weight']), ddof=1)*2
+        has_neg = np.any(net['weight'] < 0)
+
+        # Filter by shared targets
+        if name is None:
+            raise ValueError('If net is given, name cannot be None.')
+        df = net[net['source'] == name].set_index('target')
+        df['logFCs'] = logFCs.loc[[contrast]].T
+        df['pvals'] = -np.log10(pvals.loc[[contrast]].T)
+        df = df[~np.any(pd.isnull(df), axis=1)]
+        df = filter_limits(df, sign_limit=sign_limit, lFCs_limit=lFCs_limit)
+
+        if has_neg:
+            vmin = -max_n
+        else:
+            vmin = 0
+        df.plot.scatter(x='logFCs', y='pvals', c='weight', cmap='coolwarm',
+                        vmin=vmin, vmax=max_n, sharex=False, ax=ax)
+        ax.set_title('{0} | {1}'.format(contrast, name))
+    else:
+        df = logFCs.loc[[contrast]].T.rename({contrast: 'logFCs'}, axis=1)
+        df['pvals'] = pvals.loc[[contrast]].T
+        df['logpvals'] = -np.log10(pvals.loc[[contrast]].T)
+        
+        if size is not None:
+            df['means'] = size.loc[[contrast]].T
+            df['means_scaled'] = df['means'] * size_scale_factor
+            
+        df = df[~np.any(pd.isnull(df), axis=1)]
+        df = filter_limits(df, sign_limit=sign_limit, lFCs_limit=lFCs_limit)
+        df['weight'] = 'gray'
+        df.loc[(df['logFCs'] >= lFCs_thr) & (df['logpvals'] >= logsign_thr), 'weight'] = '#D62728'
+        df.loc[(df['logFCs'] <= -lFCs_thr) & (df['logpvals'] >= logsign_thr), 'weight'] = '#1F77B4'
+        
+        if size is None:
+            df.plot.scatter(x='logFCs', y='logpvals', c='weight', sharex=False, ax=ax)
+        else:
+            df.plot.scatter(x='logFCs', y='logpvals', c='weight', s='means_scaled', 
+                            edgecolor='k',
+                            linewidth=0.5,
+                            sharex=False, ax=ax)
+        
+        ax.set_title('{0}'.format(contrast))
+
+    # Draw sign lines
+    ax.axhline(y=logsign_thr, linestyle='--', color="black")
+    ax.axvline(x=lFCs_thr, linestyle='--', color="black")
+    ax.axvline(x=-lFCs_thr, linestyle='--', color="black")
+
+    # Plot top sign features
+    signs = df[(np.abs(df['logFCs']) >= lFCs_thr) & (df['logpvals'] >= logsign_thr)].sort_values('logpvals', ascending=False)
+    signs = signs.iloc[:top]
+    
+    # Add labels
+    ax.set_ylabel('-log10(pvals)')
+    texts = []
+    for x, y, s in zip(signs['logFCs'], signs['logpvals'], signs.index):
+        texts.append(ax.text(x, y, s))
+    if len(texts) > 0:
+        at.adjust_text(texts, arrowprops=dict(arrowstyle='-', color='black'), ax=ax)
+                    
+    if size is not None:
+        # produce a legend with a cross-section of sizes from the scatter
+        pc = ax.collections[0] # get PathCollections
+        handles, labels = pc.legend_elements(prop="sizes",
+                                            alpha=1,
+                                            func=lambda x: x / size_scale_factor,
+                                            markerfacecolor='gray',
+                                            markeredgecolor='k'
+                                            )
+        legend = ax.legend(handles, labels, 
+                            #loc="upper right", 
+                            title="Mean expression"
+                            )
+    
+    if save is not None:
+        if ax is None:
+            save_and_show_figure(savepath=save, fig=fig, save_only=save_only, show=show, dpi_save=dpi_save)
+        else:
+            raise ValueError("ax is not None, cannot save figure.")
+
+    if return_fig:
+        if ax is None:
+            return fig
+    elif return_data:
+        return df
+

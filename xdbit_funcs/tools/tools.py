@@ -266,5 +266,6 @@ def save_metadata(metadata, outfile):
 def standard_preprocessing(*args, **kwargs):
     warn('This function is deprecated. Use instead `db.pp.standard_preprocessing()`', DeprecationWarning, stacklevel=2)
     from ..preprocessing import standard_preprocessing as sp
-    sp(*args, **kwargs)
+    adata = sp(*args, **kwargs)
+    return adata
     

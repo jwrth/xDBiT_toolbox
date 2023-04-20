@@ -16,7 +16,7 @@ def generate_axis(
     groupby: str,
     umap_key: str = 'X_umap',
     obs_key: str = 'umap_spline',
-    max_cols: int = 6,
+    max_cols: int = 5,
     k_spline: int = 3,
     s: int = 5000,
     plot: bool = True,
