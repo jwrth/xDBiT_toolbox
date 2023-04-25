@@ -525,7 +525,7 @@ def barplot_custom(data, x, y,
                     linewidth=1, 
                     edgecolor='k',
                     palette=palette,
-                    errorbar="sd", errcolor='k', errwidth=1.5, capsize=0.2,
+                    ci="sd", errcolor='k', errwidth=1.5, capsize=0.2,
                     ax=axs[i]
                 )
 
@@ -535,9 +535,18 @@ def barplot_custom(data, x, y,
                     hue_order=hue_order,
                     color="k",
                     dodge=True, 
-                    legend=False,
+                    #legend=False,
                     ax=axs[i]
                 )
+        
+        # plot only the barplot legends
+        handles, labels = axs[i].get_legend_handles_labels()
+        l = axs[i].legend(handles[2:4], 
+                          labels[2:4], 
+                          #bbox_to_anchor=(1.05, 1), 
+                          #loc=2, 
+                          #borderaxespad=0.
+                          )
         
         axs[i].set_title(yy)
         axs[i].set_ylabel("Expression")
@@ -759,3 +768,77 @@ def plot_volcano(logFCs, pvals, contrast,
     elif return_data:
         return df
 
+from matplotlib import ticker, colors
+
+def custom_dotplot(lfcs, pvals, genes,
+                   size_scale_factor = 100,
+                   order = None,
+                   figsize=(8, 6),
+                   xmargin=0.1, ymargin=0.2,
+                   savepath=None,
+                   save_only=False,
+                   show=True, 
+                   dpi_save=300,
+                   **kwargs
+                  ):
+    
+    # reshape data
+    lfcmelt = lfcs.melt(var_name="gene", value_name="lfc", ignore_index=False)
+    lfcmelt = lfcmelt.reset_index(names="zone")
+    lfcmelt = lfcmelt.set_index(["zone", "gene"])
+
+    pvalmelt = pvals.melt(var_name="gene", value_name="pval", ignore_index=False)
+    pvalmelt = pvalmelt.reset_index(names="zone")
+    pvalmelt = pvalmelt.set_index(["zone", "gene"])
+    
+    # combine pval and lfc data
+    lfcmelt["pval"] = pvalmelt
+    lfcmelt = lfcmelt.reset_index()
+    
+    # order zones
+    if order is not None:
+        lfcmelt = lfcmelt.set_index("zone").loc[order].reset_index()
+    
+    # select genes
+    subset = lfcmelt.loc[lfcmelt.gene.isin(genes), :].copy()
+    
+    # calculate significance score
+    subset["-log10(pval)"] = -np.log10(subset["pval"])*size_scale_factor
+    
+    # plotting
+    fig, ax = plt.subplots(1,1, figsize=figsize)
+    subset.plot.scatter(x="gene", y="zone", c="lfc", s="-log10(pval)", ax=ax, 
+                        norm=colors.CenteredNorm(), 
+                        **kwargs)
+    
+    nonsig = subset.copy()
+    nonsig.loc[nonsig["pval"] > 0.05, "-log10(pval)"] = np.nan
+    nonsig.plot.scatter(x="gene", y="zone", c="None", s="-log10(pval)", 
+                        alpha=1, edgecolor='k', linewidth=1,
+                        ax=ax
+                        )
+    
+    # produce a legend with a cross-section of sizes from the scatter
+    pc = ax.collections[0] # get PathCollections    
+    handles, labels = pc.legend_elements(prop="sizes", 
+                                         num=ticker.FixedLocator([-np.log10(0.1),
+                                                                  -np.log10(0.05), 
+                                                                  -np.log10(0.01)]),
+                                         alpha=1,
+                                         func=lambda x: x / size_scale_factor,
+                                         markerfacecolor='gray',
+                                         markeredgecolor='k'
+                                        )
+    legend = ax.legend(handles, labels, 
+                       bbox_to_anchor=(1.3, 1),
+                        loc="upper left", 
+                        title="-log10(pval)"
+                        )
+    plt.xticks(rotation=45)
+    plt.margins(x=xmargin, y=ymargin)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    
+    plt.savefig(savepath, bbox_inches='tight')
