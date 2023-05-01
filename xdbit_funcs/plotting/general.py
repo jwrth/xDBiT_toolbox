@@ -9,6 +9,7 @@ from ..readwrite import save_and_show_figure
 from ..utils import rename_net, check_if_adjustText
 import textwrap
 from scipy.stats import pearsonr
+from matplotlib import ticker, colors
 
 # @testfunc
 def volcano_plot(adata, keys, groups=None, foldchanges_label='logfoldchanges', pvals_label='pvals_adj', gene_names='names', 
@@ -768,13 +769,14 @@ def plot_volcano(logFCs, pvals, contrast,
     elif return_data:
         return df
 
-from matplotlib import ticker, colors
-
-def custom_dotplot(lfcs, pvals, genes,
+def custom_dotplot(c, s, genes,
                    size_scale_factor = 100,
+                   size_thresh = -np.log(0.05),
+                   size_legend_title = "-log10(pval)",
                    order = None,
                    figsize=(8, 6),
                    xmargin=0.1, ymargin=0.2,
+                   xticks_rotation=90,
                    savepath=None,
                    save_only=False,
                    show=True, 
@@ -783,16 +785,16 @@ def custom_dotplot(lfcs, pvals, genes,
                   ):
     
     # reshape data
-    lfcmelt = lfcs.melt(var_name="gene", value_name="lfc", ignore_index=False)
+    lfcmelt = c.melt(var_name="gene", value_name="color", ignore_index=False)
     lfcmelt = lfcmelt.reset_index(names="zone")
     lfcmelt = lfcmelt.set_index(["zone", "gene"])
 
-    pvalmelt = pvals.melt(var_name="gene", value_name="pval", ignore_index=False)
+    pvalmelt = s.melt(var_name="gene", value_name="size", ignore_index=False)
     pvalmelt = pvalmelt.reset_index(names="zone")
     pvalmelt = pvalmelt.set_index(["zone", "gene"])
     
     # combine pval and lfc data
-    lfcmelt["pval"] = pvalmelt
+    lfcmelt["size"] = pvalmelt
     lfcmelt = lfcmelt.reset_index()
     
     # order zones
@@ -802,18 +804,21 @@ def custom_dotplot(lfcs, pvals, genes,
     # select genes
     subset = lfcmelt.loc[lfcmelt.gene.isin(genes), :].copy()
     
+    subset["size_scaled"]= subset["size"] * size_scale_factor
+    
     # calculate significance score
-    subset["-log10(pval)"] = -np.log10(subset["pval"])*size_scale_factor
+    #subset["-log10(pval)"] = -np.log10(subset["pval"])*size_scale_factor
     
     # plotting
     fig, ax = plt.subplots(1,1, figsize=figsize)
-    subset.plot.scatter(x="gene", y="zone", c="lfc", s="-log10(pval)", ax=ax, 
+    subset.plot.scatter(x="gene", y="zone", c="color", s="size_scaled", ax=ax, 
                         norm=colors.CenteredNorm(), 
                         **kwargs)
     
-    nonsig = subset.copy()
-    nonsig.loc[nonsig["pval"] > 0.05, "-log10(pval)"] = np.nan
-    nonsig.plot.scatter(x="gene", y="zone", c="None", s="-log10(pval)", 
+    # identify significant measurements and draw circle around them
+    sig = subset.copy()
+    sig.loc[sig["size"] < size_thresh, "size_scaled"] = np.nan
+    sig.plot.scatter(x="gene", y="zone", c="None", s="size_scaled", 
                         alpha=1, edgecolor='k', linewidth=1,
                         ax=ax
                         )
@@ -832,13 +837,15 @@ def custom_dotplot(lfcs, pvals, genes,
     legend = ax.legend(handles, labels, 
                        bbox_to_anchor=(1.3, 1),
                         loc="upper left", 
-                        title="-log10(pval)"
+                        title=size_legend_title
                         )
-    plt.xticks(rotation=45)
+    
+    plt.xticks(rotation=xticks_rotation)
     plt.margins(x=xmargin, y=ymargin)
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['bottom'].set_visible(False)
     ax.spines['left'].set_visible(False)
     
-    plt.savefig(savepath, bbox_inches='tight')
+    if savepath is not None:
+        plt.savefig(savepath, bbox_inches='tight')
