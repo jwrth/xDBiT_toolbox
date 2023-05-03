@@ -190,6 +190,7 @@ def expr_along_obs_val(adata: AnnData,
                        legend_fontsize=24, 
                        plot_legend=True,
                        xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
+                       figsize=(8,6),
                        savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
                        dpi_save=300,
                        smooth=True, 
@@ -234,7 +235,7 @@ def expr_along_obs_val(adata: AnnData,
         # prepare plotting
         if axis is None:
             n_plots, n_rows, max_cols = get_nrows_maxcols(keys, max_cols)
-            fig, axs = plt.subplots(n_rows,max_cols, figsize=(8*max_cols, 6*n_rows))
+            fig, axs = plt.subplots(n_rows,max_cols, figsize=(figsize[0]*max_cols, figsize[1]*n_rows))
 
         else:            
             axs = axis
