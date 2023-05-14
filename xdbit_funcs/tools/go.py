@@ -507,6 +507,8 @@ def cluster_goterms_by_genes(enrichment, cmap, gene_cat="intersections", dist_th
     else:
         enrichment["clustercolor"] = 'k'
         enrichment["cluster_id"] = 1
+        Z = None
+        dist_thresh = None
         
     return enrichment, Z, dist_thresh
 
