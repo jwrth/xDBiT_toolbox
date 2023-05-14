@@ -348,3 +348,9 @@ def cohens_d(a, b, paired=False, correct_small_sample_size=True):
         d = np.mean(diff) / np.std(diff)
         
     return d
+
+def jaccard_dist(a, b):
+    intersect = set(a) & set(b)
+    union = set(a) | set(b)
+    j = 1 - (len(intersect) / len(union))
+    return j

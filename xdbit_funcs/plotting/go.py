@@ -22,6 +22,7 @@ def go_plot(enrichment,
     value_to_plot='Enrichment score', 
     colorcol=None,
     sortby=None, sort=True, additional_sortby=None,
+    x_margin=None, y_margin=None,
     name_key='name', libraries=None, ascending=False,
     savepath=None, save_only=False, show=True, dpi_save=300
     ):
@@ -141,10 +142,10 @@ def go_plot(enrichment,
                     ys_pos,
                     width=df[value_to_plot], 
                     height=0.8,
-                    color='k', 
-                #cmap=cmap, 
-                #s=markersize, 
-                #edgecolors='k'
+                    color='k',
+                    #cmap=cmap, 
+                    #s=markersize,
+                    #edgecolors='k'
                 )
                 axs[i].set_yticks(ys_pos, labels=ys)
             else:
@@ -159,6 +160,7 @@ def go_plot(enrichment,
             axs[i].set_xlabel(value_to_plot, fontsize=ax_label_size)
             axs[i].tick_params(axis='x', which='major', labelsize=xtick_label_size)
             axs[i].tick_params(axis='y', which='major', labelsize=ytick_label_size)
+            axs[i].margins(x=x_margin, y=y_margin)
             
             if style == "dot":
                 axs[i].grid(axis='y')
@@ -181,7 +183,7 @@ def go_plot(enrichment,
             if style in ["dot", "dot_fixed"]:
                 if color_key is not None:
                     if clb_pos is None:
-                        clb = fig.colorbar(s, ax=axs[i])
+                        clb = fig.colorbar(s, ax=axs[i], fraction=0.2, aspect=40, pad=0.15)
                         clb.set_label(color_key, loc='center', fontsize=clb_label_size)
                         clb.ax.tick_params(labelsize=clb_tick_label_size)
                         if clb_norm:
@@ -349,17 +351,8 @@ def go_dotplot(enrichment, color_key=None, size_key=None, groups=None,
             s = axs[i].scatter(df[value_to_plot], df[name_key], 
                 c=color, cmap=cmap, 
                 s=markersize, 
-                edgecolors='k')
+                edgecolors='k')        
             
-            # s = axs[i].bar(df[value_to_plot], df[name_key], 
-            #     color=color, 
-            #     #cmap=cmap, 
-            #     #s=markersize, 
-            #     #edgecolors='k'
-            #     )
-            
-            
-
             if custom_headers is None:
                 axs[i].set_title("{}\n{}".format(group, libraries), fontsize=title_size)
             else:
@@ -661,3 +654,4 @@ savepath=None, save_only=False, dpi_save=300):
     #plt.tight_layout()
 
     save_and_show_figure(savepath=savepath, save_only=save_only, dpi_save=dpi_save)
+    
