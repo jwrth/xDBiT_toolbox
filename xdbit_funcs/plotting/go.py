@@ -70,7 +70,7 @@ def go_plot(enrichment,
         enrichment = enrichment.groupby(level=0).head(max_to_plot)
         
     if additional_sortby is not None:
-        enrichment.sort_values(additional_sortby, inplace=True)
+        enrichment.sort_values([additional_sortby, sortby], ascending=[True, False], inplace=True)
         #enrichment[name_key] = ["{} ({})".format(a,b) for a,b in zip(enrichment[name_key], enrichment[additional_sortby])]
 
     # Prepare names for plotting

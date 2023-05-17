@@ -784,6 +784,9 @@ def custom_dotplot(c, s, genes,
                    **kwargs
                   ):
     
+    # select genes
+    c = c.loc[:, genes]
+    
     # reshape data
     lfcmelt = c.melt(var_name="gene", value_name="color", ignore_index=False)
     lfcmelt = lfcmelt.reset_index(names="zone")
@@ -802,21 +805,21 @@ def custom_dotplot(c, s, genes,
         lfcmelt = lfcmelt.set_index("zone").loc[order].reset_index()
     
     # select genes
-    subset = lfcmelt.loc[lfcmelt.gene.isin(genes), :].copy()
+    #subset = lfcmelt.loc[lfcmelt.gene.isin(genes), :].copy()
     
-    subset["size_scaled"]= subset["size"] * size_scale_factor
+    lfcmelt["size_scaled"]= lfcmelt["size"] * size_scale_factor
     
     # calculate significance score
     #subset["-log10(pval)"] = -np.log10(subset["pval"])*size_scale_factor
-    
+        
     # plotting
     fig, ax = plt.subplots(1,1, figsize=figsize)
-    subset.plot.scatter(x="gene", y="zone", c="color", s="size_scaled", ax=ax, 
+    lfcmelt.plot.scatter(x="gene", y="zone", c="color", s="size_scaled", ax=ax, 
                         norm=colors.CenteredNorm(), 
                         **kwargs)
     
     # identify significant measurements and draw circle around them
-    sig = subset.copy()
+    sig = lfcmelt.copy()
     sig.loc[sig["size"] < size_thresh, "size_scaled"] = np.nan
     sig.plot.scatter(x="gene", y="zone", c="None", s="size_scaled", 
                         alpha=1, edgecolor='k', linewidth=1,
