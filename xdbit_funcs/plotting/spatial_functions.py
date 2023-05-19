@@ -19,6 +19,7 @@ from warnings import warn
 from scipy.stats import zscore
 from typing import Literal
 from anndata import AnnData
+import matplotlib.ticker as ticker
 
 # ignore future warnings (suppresses annoying pandas warning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -177,6 +178,7 @@ def expr_along_obs_val(adata: AnnData,
                        range_min=None, 
                        range_max=None, 
                        cmap="tab10",
+                       linewidth=8,
                        extra_cats=None,
                        normalize=False,
                        nsteps=100,
@@ -184,7 +186,7 @@ def expr_along_obs_val(adata: AnnData,
                        use_raw=False,
                        max_cols=4,
                        xlabel=None,ylabel=None,
-                       vline=None, hline=None,
+                       vline=None, hline=None, vlinewidth=4,
                        #values_into_title=None, title_suffix='', 
                        custom_titles=None,
                        legend_fontsize=24, 
@@ -380,7 +382,7 @@ def expr_along_obs_val(adata: AnnData,
                     df['y_pred'], 
                     label=label, 
                     color=color,
-                    linewidth=8)
+                    linewidth=linewidth)
 
                 if hue is not None and _hue not in added_to_legend:
                     added_to_legend.append(_hue)
@@ -395,7 +397,7 @@ def expr_along_obs_val(adata: AnnData,
                 linecolors = ['k'] * len(vline)
             
             for c, v in zip(linecolors, vline):
-                axs[i].axvline(x=v, ymin=0, ymax=1, c=c, linewidth=4, linestyle='dashed')
+                axs[i].axvline(x=v, ymin=0, ymax=1, c=c, linewidth=vlinewidth, linestyle='dashed')
 
         if hline is not None:
             if isinstance(hline, dict):
@@ -417,6 +419,8 @@ def expr_along_obs_val(adata: AnnData,
             axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
             axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
             axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+            axs[i].set_xlim(0, 1)
+            #axs[i].xaxis.set_major_locator(ticker.FixedLocator([0.1, 0.9]))
 
             if custom_titles is None:
                 axs[i].set_title(key, fontsize=title_fontsize)
@@ -463,8 +467,8 @@ def expr_along_obs_val(adata: AnnData,
                 # remove empty plots
                 axs[i].set_axis_off()
         if show:
-            fig.tight_layout()
-            save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
+            #fig.tight_layout()
+            save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save, tight=True)
         else:
             return fig, axs
 

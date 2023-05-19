@@ -466,6 +466,10 @@ def violinplot(data, x, y, ax, hue=None,
         return plt.show()
 
 def pearson_facet_plot(adata, groupby, 
+                       figsize=(8,6),
+                       fontsize=20, labelsize=20, ticklabelsize=20,
+                       markersize=2, markercolor='k',
+                       coef_in_title = True,
                        savepath=None, save_only=False, dpi_save=300):
     
     df = adata.to_df()
@@ -475,20 +479,34 @@ def pearson_facet_plot(adata, groupby,
     indices = long_df[groupby].unique()
     n = len(indices)
 
-    fig, axs = plt.subplots(n, n, figsize=(8*n, 6*n))
-
+    fig, axs = plt.subplots(n, n, figsize=(figsize[0]*n, figsize[1]*n))
+    
     for r, rid in enumerate(indices):
         for c, cid in enumerate(indices):
             x = long_df.query('{} == "{}"'.format(groupby, cid))['value'].values
             y = long_df.query('{} == "{}"'.format(groupby, rid))['value'].values
 
-            axs[r, c].scatter(x, y)
-            axs[r, c].set_title("r = {}".format(round(pearsonr(x, y)[0], 2)), fontsize=20)
+            axs[r, c].scatter(x, y, s=markersize, c=markercolor)
+            
+            if coef_in_title:
+                axs[r, c].set_title("r = {}".format(round(pearsonr(x, y)[0], 2)), fontsize=fontsize)
+            else:
+                axs[r, c].annotate("r = {}".format(round(pearsonr(x, y)[0], 2)), 
+                                   xy=(0.15, 0.75), xycoords='axes fraction', 
+                                   fontsize=fontsize)
+                
             if r == n-1:
-                axs[r, c].set_xlabel(cid, fontsize=20)
+                axs[r, c].set_xlabel(cid, fontsize=labelsize)
+            else:
+                axs[r, c].set_xticklabels([]) # remove xtick labels in the center subplots
 
             if c == 0:
-                axs[r, c].set_ylabel(rid, fontsize=20)
+                axs[r, c].set_ylabel(rid, fontsize=labelsize)
+            else:
+                axs[r, c].set_yticklabels([]) # remove xtick labels in the center subplots
+                
+            axs[r, c].tick_params(axis='both', labelsize=ticklabelsize)
+            
                 
     save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
     
