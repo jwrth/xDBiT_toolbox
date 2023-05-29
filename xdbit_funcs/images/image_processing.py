@@ -6,9 +6,14 @@ from ..calculations import dist_points, rotation_angle
 from sklearn.preprocessing import minmax_scale
 import numpy as np
 from scipy import ndimage
-from typing import Optional, Tuple, Union, List, Dict, Any, Literal
+from typing import Optional, Tuple, Union, List, Dict, Any, Literal, Callable
 from PIL import Image
 from skimage.color import rgb2hed, hed2rgb
+from ..datasets import ImageData
+from anndata import AnnData
+from pathlib import Path
+import pandas as pd
+import warnings
 
 def rotateImage(img, angle, pivot, imagetype="grayscale", PIL=True, order=3):
     """
@@ -247,7 +252,7 @@ def recalculate_scale(adata, groupby, group, ppm_given=None, spatial_key='spatia
 
 def calc_image_param_per_spot(adata, groupby='id', channel_pattern='dapi',
                               fun=np.mean, fun_descriptor='mean', lowres=False,
-                              normalize=True
+                              normalize=True, 
                               ):
     '''
     Function to apply a function spotwise to an image in a ST dataset. 
@@ -285,15 +290,15 @@ def calc_image_param_per_spot(adata, groupby='id', channel_pattern='dapi',
             if len(img_key) == 1:
                 if lowres:
                     scalef = adata.uns['spatial'][img_key[0]
-                                                  ]['scalefactors']['tissue_lowres_scalef']
+                                                ]['scalefactors']['tissue_lowres_scalef']
                 else:
                     scalef = adata.uns['spatial'][img_key[0]
-                                                  ]['scalefactors']['tissue_hires_scalef']
+                                                ]['scalefactors']['tissue_hires_scalef']
 
                 img = adata.uns['spatial'][img_key[0]
-                                           ]['images'][resolution_key]
+                                        ]['images'][resolution_key]
                 px_dia = adata.uns['spatial'][img_key[0]
-                                              ]['scalefactors']['spot_diameter_real'] * scalef
+                                            ]['scalefactors']['spot_diameter_real'] * scalef
 
             else:
                 print("No or no unique image key found for spot {}: {}".format(
@@ -363,3 +368,124 @@ def deconvolve_he(
 
         return ihc_h, ihc_e, ihc_d
     
+def calc_image_param_per_spot_zarr(
+    adata: AnnData,
+    groupby: str = "id",
+    channel_pattern: str = "nephrin",
+    lowres: bool = True,
+    lowres_sf: float = 0.1,
+    zarr_key: str = "zarr_directories",
+    fun: Callable = np.mean, # function. If None the region image will be extracted.
+    fun_descriptor: str = "mean",
+    normalize: bool = True,
+    overwrite: bool = False,
+):
+    '''
+    Function to apply a function spotwise to an image in a ST dataset. 
+    The dataset is expected to be in anndata format.
+
+    The image is expected to be stored as zarr in adata.uns['zarr_directories'].
+
+    Spot coordinates are expected to be stored in adata.obsm['spatial'] and should match the order of `adata.obs`.
+
+    The function to be applied can be specified with `fun`. Default is `np.mean`.
+
+    Changes to anndata object are made in-place.
+    '''
+
+    groups = adata.obs[groupby].unique()
+
+    results = []
+    indices = []
+    for group in groups:
+        # get mask of group
+        mask = adata.obs[groupby] == group
+        
+        # select obs and coordinates
+        obs = adata.obs[mask]
+        coords = adata.obsm['spatial'][mask]
+        
+        # check if channel pattern is in current data of current group
+        zarr_dir = Path(adata.uns[zarr_key][group][0])
+        
+        # get directory for given channel pattern
+        img_dir = [elem for elem in zarr_dir.glob("*") if elem.is_dir() and channel_pattern in elem.stem] 
+        
+        # check if there was a unique channel pattern found
+        if len(img_dir) == 1:
+            img_dir = img_dir[0]
+        elif len(img_dir) == 0:
+            img_dir = None
+        else:
+            raise ValueError("More than one possible channel found for given channel pattern {}: {}".format(channel_pattern, img_dir))
+        
+        if img_dir is not None:
+            # load image data
+            ImgD = ImageData(adata=adata, image_key=channel_pattern, group=group, 
+                                lowres=lowres, lowres_sf=lowres_sf, zarr_key=zarr_key
+                                )
+            img = ImgD.image
+            scalef = ImgD.scale_factor
+            px_dia = ImgD.image_metadata['spot_diameter_real'] * scalef
+            
+            # iterate through observations and do calculations per spot
+            results_list = []
+            indices_list = []
+            for i, (index, row) in enumerate(obs.iterrows()):
+                # extract spot
+                spot = coords[i] * scalef
+                # determine region of spot
+                region = img[int((spot[1] - px_dia / 2)): int((spot[1] + px_dia / 2)),
+                            int((spot[0] - px_dia / 2)): int((spot[0] + px_dia / 2))]
+                
+                # apply function to region and record result
+                if fun is None:
+                    results_list.append(region) # collect region image
+                else:
+                    results_list.append(fun(region)) # collect result of calculation
+                    
+                # collect index
+                indices_list.append(index)
+            
+            # collect results and indices
+            results = results + results_list
+            indices = indices + indices_list
+
+        else:
+            # add NANs as results
+            ImgD = None
+            results = results + [np.nan] * len(obs)
+            indices = indices + list(obs.index)
+
+    # create name to be added to column
+    obshead = "{}_{}".format(channel_pattern, fun_descriptor)
+
+    # create series of results
+    res = pd.Series(results, index=indices,
+                    name=obshead
+                )
+
+    if obshead in adata.obs.columns:
+        if overwrite:
+            # drop column if it exists already
+            adata.obs = adata.obs.drop(obshead, axis=1)
+        else:
+            raise AssertionError("Column {} exists already in `adata.obs`. If you still want to do the calculations use `overwrite=True`".format(obshead))
+
+    # add results to adata.obs considering the indices
+    adata.obs = pd.merge(left = adata.obs, right=res, left_index=True, right_index=True)
+
+    if normalize:
+        norm_obshead = obshead + "_norm"
+        if norm_obshead in adata.obs.columns:
+            if overwrite:
+                # drop column if it exists already
+                adata.obs = adata.obs.drop(norm_obshead, axis=1)
+            else:
+                raise AssertionError("Column {} exists already in `adata.obs`. If you still want to do the calculations use `overwrite=True`".format(norm_obshead))
+
+        # due to the insertion of NaNs per group one group have only NaNs. Warnings are ignored.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message="All-NaN slice encountered")
+            adata.obs[norm_obshead] = adata.obs[[groupby, obshead]].groupby(groupby).transform(minmax_scale)
+        
