@@ -489,10 +489,10 @@ def pearson_facet_plot(adata, groupby,
             axs[r, c].scatter(x, y, s=markersize, c=markercolor)
             
             if coef_in_title:
-                axs[r, c].set_title("r = {}".format(round(pearsonr(x, y)[0], 2)), fontsize=fontsize)
+                axs[r, c].set_title("r={}".format(round(pearsonr(x, y)[0], 2)), fontsize=fontsize)
             else:
-                axs[r, c].annotate("r = {}".format(round(pearsonr(x, y)[0], 2)), 
-                                   xy=(0.15, 0.75), xycoords='axes fraction', 
+                axs[r, c].annotate("r={}".format(round(pearsonr(x, y)[0], 2)), 
+                                   xy=(0.05, 0.75), xycoords='axes fraction', 
                                    fontsize=fontsize)
                 
             if r == n-1:
