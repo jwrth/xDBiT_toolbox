@@ -5,7 +5,11 @@ def interactive(adata, images, genes,
                 channel_names=None, 
                 scalebar=True, 
                 spatial_key='spatial', 
-                return_meta=False
+                return_meta=False,
+                in_obs=False,
+                symbol='s',
+                cmap='viridis',
+                rgb=False
                 ):
     '''
     Interactive viewer for xDbit data using napari.
@@ -33,7 +37,7 @@ def interactive(adata, images, genes,
         channel_axis=channel_axis,
         name=channel_names,
         colormap=["gray", "blue", "green"], 
-        rgb=False,
+        rgb=rgb,
         scale=img_scale
     )
 
@@ -53,7 +57,10 @@ def interactive(adata, images, genes,
         for i, gene in enumerate(genes):
             # get expression values
             geneid = adata.var_names.get_loc(gene)
-            expr = adata.X[:, geneid]
+            if not in_obs:
+                expr = adata.X[:, geneid]
+            else:
+                expr = adata.obs[geneid].values
 
             point_properties = {
                 #'good_point': np.array([True]*len(expr)),
@@ -66,10 +73,11 @@ def interactive(adata, images, genes,
 
             points_layer[gene] = viewer.add_points(points, name=gene,
                                                    properties=point_properties,
-                                                   symbol='s',
-                                                   size=res,
+                                                   symbol=symbol,
+                                                   size=2,
+                                                   #size=res,
                                                    face_color='confidence',
-                                                   face_colormap='viridis',
+                                                   face_colormap=cmap,
                                                    opacity=0.7,
                                                    visible=visible, 
                                                    edge_width=0
