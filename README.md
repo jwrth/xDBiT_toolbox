@@ -105,12 +105,16 @@ if module_path not in sys.path:
 
 import xdbit_funcs as db
 ```
-# Preprint
+# Publication
 
 ## Spatial Transcriptomics Using Multiplexed Deterministic Barcoding in Tissue
 
-Preprint available on [BioRxiv](https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1).
+The study was published in [Nature Communications](https://www.nature.com/articles/s41467-023-37111-w).
 
 ## Abstract
 
-In this study, we present a multiplexed version of deterministic barcoding in tissue (xDbit) to acquire spatially resolved transcriptomes of nine tissue sections in parallel. New microfluidic chips were developed to spatially encode mRNAs over a total tissue area of 1.17 cm2 with spots of 50 µm×50 µm. Optimization of the biochemical protocol increased read and gene counts per spot by one order of magnitude compared with previous reports. Furthermore, the introduction of alignment markers allows seamless registration of images and spatial transcriptomic spot coordinates. Together with technological advances, we provide an open-source computational pipeline to transform raw sequencing data from xDbit experiments into the AnnData format. The functionality of xDbit was demonstrated by the acquisition of 18 spatially resolved transcriptomic datasets from five different murine organs, including cerebellum, liver, kidney, spleen, and heart. Factor analysis and deconvolution of xDbit spatial transcriptomes allowed for in-depth characterization of the murine kidney.
+Spatially resolved transcriptomics of tissue sections enables advances in fundamental and applied biomedical research. Here, we present Multiplexed Deterministic Barcoding in Tissue (xDBiT) to acquire spatially resolved transcriptomes of nine tissue sections in parallel. New microfluidic chips were developed to spatially encode mRNAs over a total tissue area of 1.17 cm2 with a 50 µm resolution. Optimization of the biochemical protocol increased read and gene counts per spot by one order of magnitude compared to previous reports. Furthermore, the introduction of alignment markers allowed seamless registration of images and spatial transcriptomic spots. Together with technological advances, we provide an open-source computational pipeline to prepare raw sequencing data for downstream analysis. The functionality of xDBiT was demonstrated by acquiring 16 spatially resolved transcriptomic datasets from five different murine organs, including the cerebellum, liver, kidney, spleen, and heart. Factor analysis and deconvolution of spatial transcriptomes allowed for in-depth characterization of the murine kidney.
+
+## How to Cite
+
+Wirth, J., Huber, N., Yin, K. et al. Spatial transcriptomics using multiplexed deterministic barcoding in tissue. Nat Commun 14, 1523 (2023). https://doi.org/10.1038/s41467-023-37111-w
