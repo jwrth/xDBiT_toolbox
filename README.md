@@ -2,7 +2,7 @@
 
 # xDBiT_toolbox
 
-This repository contains all code that is necessary to reproduce results shown in the preprint https://www.biorxiv.org/content/10.1101/2022.08.30.505834v1.
+This repository contains all code that is necessary to reproduce results shown in [Wirth et al., 2023](https://www.nature.com/articles/s41467-023-37111-w).
 
 Further, it includes an analysis pipeline to compute the digital gene expression matrix from Dbit-seq or xDbit experiments.
 This part is partially based on the Split-seq toolbox: https://github.com/RebekkaWegmann/splitseq_toolbox.
