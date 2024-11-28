@@ -9,6 +9,10 @@ from gprofiler import GProfiler
 from pathlib import Path
 from .adata import collect_deg_data, create_deg_df
 from ..utils import SpeciesToID, find_between
+from ..calculations import jaccard_dist
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster, set_link_color_palette
+from scipy.spatial.distance import squareform
+from matplotlib import colormaps
 
 class GOEnrichment():
     def __init__(self):
@@ -463,4 +467,48 @@ class StringDB:
 
             sdb = StringDB(return_results=False)
             sdb.call_stringdb_network(genes=target_genes, species=organism, prefix=prefix, output_format=output_format, save=True, **kwargs)
+
+def cluster_goterms_by_genes(enrichment, cmap, gene_cat="intersections", dist_thresh=None):
+    '''
+    Cluster GO terms by genes that belong to the respective terms.
+    
+    Currently only works with a list of hexadecimal colors as `cmap`!
+    
+    Returns: enrichment, Z, dist_thresh
+    '''
+    if len(enrichment) > 1:
+        # get gene lists
+        gene_inters = enrichment[gene_cat].tolist()
+
+        # calculate distance matrix using Jaccard distance
+        dm = np.array([[jaccard_dist(a, b) for a in gene_inters] for b in gene_inters])
+        dm = pd.DataFrame(dm, columns=enrichment.native, index=enrichment.native)
+
+        # calculate linkages of clustering tree
+        Z = linkage(squareform(dm))
+
+        # create dendrogram
+        set_link_color_palette(cmap)
+
+        # get clusters
+        if dist_thresh is None:
+            dist_thresh = 0.7*np.max(Z[:,2]) # calculate distance threshold used by dendrogram function
+            
+        clusters = pd.Series(fcluster(Z, t=dist_thresh, criterion='distance'), index=dm.columns, name="cluster")
+
+        # map colors to clusters
+        lut = dict(zip(sorted(clusters.unique()), cmap))
+        clustercolors = clusters.map(lut)
+
+        # add information to dataframe
+        enrichment["clustercolor"] = clustercolors.values
+        enrichment["cluster_id"] = clusters.values
+        
+    else:
+        enrichment["clustercolor"] = 'k'
+        enrichment["cluster_id"] = 1
+        Z = None
+        dist_thresh = None
+        
+    return enrichment, Z, dist_thresh
 

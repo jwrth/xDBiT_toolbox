@@ -5,6 +5,7 @@ from typing import Optional, Tuple, Union, List, Dict, Any
 import json
 import pickle
 from pathlib import Path
+from warnings import warn
 
 
 def decode_list(l):
@@ -261,3 +262,10 @@ def save_metadata(metadata, outfile):
             
     else:
         raise ValueError('Unknown file ending. Must be ".json", ".pkl" or ".pickle"')
+    
+def standard_preprocessing(*args, **kwargs):
+    warn('This function is deprecated. Use instead `db.pp.standard_preprocessing()`', DeprecationWarning, stacklevel=2)
+    from ..preprocessing import standard_preprocessing as sp
+    adata = sp(*args, **kwargs)
+    return adata
+    

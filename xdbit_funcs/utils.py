@@ -103,3 +103,55 @@ def find_between(s, first, last ):
     except ValueError:
         return ""
         
+def rename_net(net, source='source', target='target', weight='weight'):
+    """
+    Renames input network to match decoupler's format (source, target, weight).
+
+    Parameters
+    ----------
+    net : DataFrame
+        Network in long format.
+    source : str
+        Column name where to extract source features.
+    target : str
+        Column name where to extract target features.
+    weight : str, None
+        Column name where to extract features' weights. If no weights are available, set to None.
+
+    Returns
+    -------
+    net : DataFrame
+        Renamed network.
+    """
+
+    # Check if names are in columns
+    msg = 'Column name "{0}" not found in net. Please specify a valid column.'
+    assert source in net.columns, msg.format(source)
+    assert target in net.columns, msg.format(target)
+    if weight is not None:
+        assert weight in net.columns, msg.format(weight) + """Alternatively, set to None if no weights are available."""
+    else:
+        net = net.copy()
+        net['weight'] = 1.0
+        weight = 'weight'
+
+    # Rename
+    net = net.rename(columns={source: 'source', target: 'target', weight: 'weight'})
+
+    # Sort
+    net = net.reindex(columns=['source', 'target', 'weight'])
+
+    # Check if duplicated
+    is_d = net.duplicated(['source', 'target']).sum()
+    if is_d > 0:
+        raise ValueError('net contains repeated edges, please remove them.')
+
+    return net
+
+def check_if_adjustText():
+    try:
+        import adjustText as at
+    except Exception:
+        raise ImportError('adjustText is not installed. Please install it with: pip install adjustText')
+    return at
+

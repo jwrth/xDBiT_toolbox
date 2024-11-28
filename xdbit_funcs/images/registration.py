@@ -34,17 +34,21 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
     # dim = (4000,4000)
     if maxpx is not None:
         if np.max(image.shape) > maxpx:
-            dim_image = tuple([int(elem / np.max(image.shape) * maxpx) for elem in image.shape])
+            shape_image = tuple([int(elem / np.max(image.shape) * maxpx) for elem in image.shape])
         else:
-            dim_image = image.shape
+            shape_image = image.shape
         
         if np.max(template.shape) > maxpx:        
-            dim_template = tuple([int(elem / np.max(template.shape) * maxpx) for elem in template.shape])
+            shape_template = tuple([int(elem / np.max(template.shape) * maxpx) for elem in template.shape])
         else:
-            dim_template = template.shape
+            shape_template = template.shape
             
-        print("Rescale image to following dimensions: {}".format(dim_image))
-        print("Rescale template to following dimensions: {}".format(dim_template))
+        # reverse order of shape to match opencv requirements
+        dim_image = (shape_image[1], shape_image[0])
+        dim_template = (shape_template[1], shape_template[0])
+            
+        print("Rescale image to following dimensions: {}".format(shape_image))
+        print("Rescale template to following dimensions: {}".format(shape_template))
         image_scaled = resize_image(img=image, dim=dim_image)
         template_scaled = resize_image(img=template, dim=dim_template)
         print("Dim of image: {}".format(image_scaled.shape))
@@ -136,10 +140,10 @@ def register_image(image, template, maxFeatures=500, keepFraction=0.2, maxpx=Non
         ptsB[i] = kpsB[m.trainIdx].pt
 
     # calculate scale factors for x and y dimension for image and template
-    x_sf_image = dim_image[0] / image.shape[0]
-    y_sf_image = dim_image[1] / image.shape[1]
-    x_sf_template = dim_template[0] / template.shape[0]
-    y_sf_template = dim_template[1] / template.shape[1]
+    x_sf_image = shape_image[0] / image.shape[0]
+    y_sf_image = shape_image[1] / image.shape[1]
+    x_sf_template = shape_template[0] / template.shape[0]
+    y_sf_template = shape_template[1] / template.shape[1]
 
     # apply scale factors to points - separately for each dimension
     ptsA[:, 0] = ptsA[:, 0] / x_sf_image

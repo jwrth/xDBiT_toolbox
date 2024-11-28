@@ -1,24 +1,27 @@
-from lib2to3.pytree import convert
-from matplotlib import pyplot as plt
-from matplotlib import patches, colors
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import math
+import warnings
+from lib2to3.pytree import convert
+from typing import Literal
+from warnings import warn
+
+import matplotlib.ticker as ticker
+import numpy as np
 import pandas as pd
 import seaborn as sns
-import numpy as np
-import warnings
-from ..calculations._calc import dist_points, minDistance
-from sklearn.preprocessing import MinMaxScaler
-from ..tools import extract_groups, check_raw, create_color_dict, get_nrows_maxcols, get_crange
-from ..calculations import smooth_fit
-from ..readwrite import save_and_show_figure
-from ..images import set_histogram
-from tqdm import tqdm
-import warnings
-from warnings import warn
-from scipy.stats import zscore
-from typing import Literal
 from anndata import AnnData
+from matplotlib import colors, patches
+from matplotlib import pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from scipy.stats import zscore
+from sklearn.preprocessing import MinMaxScaler
+from tqdm import tqdm
+
+from ..calculations import smooth_fit
+from ..calculations._calc import dist_points, minDistance
+from ..images import set_histogram
+from ..readwrite import save_and_show_figure
+from ..tools import (check_raw, create_color_dict, extract_groups, get_crange,
+                     get_nrows_maxcols)
 
 # ignore future warnings (suppresses annoying pandas warning)
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -53,7 +56,7 @@ def radial_expression(adata, coordinates, radius, min_dist=50, keys=None, mode='
             [x.um_col, x.um_row], [coordinates[0], coordinates[1]]), axis=1)
 
     elif coordinate_len > 1:
-        dists = adata.obs.apply(lambda x: np.min([minDistance(coordinates[i], coordinates[i + 1], 
+        dists = adata.obs.apply(lambda x: np.min([minDistance(coordinates[i], coordinates[i + 1],
             [x.um_col, x.um_row]) for i in range(len(coordinates) - 1)]), axis=1)
 
     else:
@@ -161,22 +164,23 @@ def spatial_clusters(adata, save=False, savepath="figures/clusters.png", cluster
         return plt.show()
     else:
         return ax
-    
+
 def expression_along_observation_value(*args, **kwargs):
     warn('This function is deprecated. Use instead `db.pl.expr_along_obs_val()`', DeprecationWarning, stacklevel=2)
     expr_along_obs_val(*args, **kwargs)
 
-def expr_along_obs_val(adata: AnnData, 
-                       keys: str, 
-                       x_category: str, 
-                       groupby: str, 
-                       splitby: str = None, 
-                       hue: str = None, 
+def expr_along_obs_val(adata: AnnData,
+                       keys: str,
+                       x_category: str,
+                       groupby: str,
+                       splitby: str = None,
+                       hue: str = None,
                        method: Literal["lowess", "loess"] = 'loess',
-                       stderr: bool = False, 
-                       range_min=None, 
-                       range_max=None, 
+                       stderr: bool = False,
+                       range_min=None,
+                       range_max=None,
                        cmap="tab10",
+                       linewidth=8,
                        extra_cats=None,
                        normalize=False,
                        nsteps=100,
@@ -184,25 +188,26 @@ def expr_along_obs_val(adata: AnnData,
                        use_raw=False,
                        max_cols=4,
                        xlabel=None,ylabel=None,
-                       vline=None, hline=None,
-                       #values_into_title=None, title_suffix='', 
+                       vline=None, hline=None, vlinewidth=4,
+                       #values_into_title=None, title_suffix='',
                        custom_titles=None,
-                       legend_fontsize=24, 
+                       legend_fontsize=24,
                        plot_legend=True,
                        xlabel_fontsize=28, ylabel_fontsize=28, title_fontsize=20, tick_fontsize=24,
+                       figsize=(8,6),
                        savepath=None, save_only=False, show=True, axis=None, return_data=False, fig=None,
                        dpi_save=300,
-                       smooth=True, 
+                       smooth=True,
                        **kwargs
                        ):
 
     '''
-    Plot the expression of a gene as a function of an observation value (e.g. the automatic expression histology value 
+    Plot the expression of a gene as a function of an observation value (e.g. the automatic expression histology value
     given by SpatialDE).
     Grouping by one other observation is possible.
 
     Future ideas:
-        -   Include the possibility of plotting categorical values like leiden plot (stacked line plot as done with 
+        -   Include the possibility of plotting categorical values like leiden plot (stacked line plot as done with
             the radial expression and different cell types)
 
     '''
@@ -216,7 +221,7 @@ def expr_along_obs_val(adata: AnnData,
 
     # make inputs to lists
     keys = [keys] if isinstance(keys, str) else list(keys)
-    
+
     if hue is not None:
         hue_cats = list(adata.obs[hue].unique())
         cmap_colors = plt.get_cmap(cmap)
@@ -227,21 +232,21 @@ def expr_along_obs_val(adata: AnnData,
         else:
             extra_cats.append(hue)
 
-        
+
 
     #if show:
     if not return_data:
         # prepare plotting
         if axis is None:
             n_plots, n_rows, max_cols = get_nrows_maxcols(keys, max_cols)
-            fig, axs = plt.subplots(n_rows,max_cols, figsize=(8*max_cols, 6*n_rows))
+            fig, axs = plt.subplots(n_rows,max_cols, figsize=(figsize[0]*max_cols, figsize[1]*n_rows))
 
-        else:            
+        else:
             axs = axis
             #fig = None
             n_plots = 1
             show = False # otherwise plotting into given axes wouldn't work
-            
+
         if n_plots > 1:
             axs = axs.ravel()
         else:
@@ -257,7 +262,7 @@ def expr_along_obs_val(adata: AnnData,
 
         # check if plotting raw data
         X, var, var_names = check_raw(adata, use_raw=use_raw)
-        
+
         group_collection = {}
         for group in groups:
             #partial = extract_groups(adata, groupby=groupby, groups=group)
@@ -288,7 +293,7 @@ def expr_along_obs_val(adata: AnnData,
                     dd = dd.reset_index().melt(id_vars="index") # reshape to get long list of x values
                     x = dd["index"].values
                     y = dd["value"].values
-                
+
                 elif key in var_names:
                     # extract expression values as y
                     idx = var.index.get_loc(key)
@@ -301,11 +306,11 @@ def expr_along_obs_val(adata: AnnData,
                 elif key in group_obs.columns:
                     y = group_obs.loc[:, key].values.copy()
                 else:
-                    print("Key '{}' not found.".format(key))                    
+                    print("Key '{}' not found.".format(key))
 
                 if smooth:
                     # do smooth fitting
-                    df = smooth_fit(x, y, 
+                    df = smooth_fit(x, y,
                                 min=range_min, max=range_max,
                                 nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                 else:
@@ -324,7 +329,7 @@ def expr_along_obs_val(adata: AnnData,
                 range_min = x.min()
                 range_max = x.max()
                 for split in splits:
-                    # extract x values                                            
+                    # extract x values
                     split_mask = group_obs[splitby] == split
                     x = group_obs.loc[split_mask, x_category].values
 
@@ -334,7 +339,7 @@ def expr_along_obs_val(adata: AnnData,
 
                     # do smooth fitting
                     if smooth:
-                        df_split = smooth_fit(x, y, 
+                        df_split = smooth_fit(x, y,
                                 min=range_min, max=range_max,
                                 nsteps=nsteps, method=method, stderr=stderr, **kwargs)
                     else:
@@ -343,9 +348,9 @@ def expr_along_obs_val(adata: AnnData,
 
                     # collect data
                     df_collection[split] = df_split
-                
+
                 df_collection = pd.concat(df_collection)
-                
+
                 # calculate mean and std
                 df = df_collection[['x', 'y_pred']].groupby('x').mean()
                 df['std'] = df_collection[['x', 'y_pred']].groupby('x').std()
@@ -361,7 +366,7 @@ def expr_along_obs_val(adata: AnnData,
                 # plotting
                 cols = df.columns
                 if 'conf_lower' in cols and 'conf_upper' in cols:
-                    axs[i].fill_between(df['x'], 
+                    axs[i].fill_between(df['x'],
                                     df['conf_lower'],
                                     df['conf_upper'],
                                     alpha = 0.2,
@@ -374,12 +379,12 @@ def expr_along_obs_val(adata: AnnData,
                 else:
                     label = group
                     color = None
-                
-                axs[i].plot(df['x'], 
-                    df['y_pred'], 
-                    label=label, 
+
+                axs[i].plot(df['x'],
+                    df['y_pred'],
+                    label=label,
                     color=color,
-                    linewidth=8)
+                    linewidth=linewidth)
 
                 if hue is not None and _hue not in added_to_legend:
                     added_to_legend.append(_hue)
@@ -392,9 +397,9 @@ def expr_along_obs_val(adata: AnnData,
             else:
                 vline = [vline] if isinstance(vline, int) or isinstance(vline, float) else list(vline)
                 linecolors = ['k'] * len(vline)
-            
+
             for c, v in zip(linecolors, vline):
-                axs[i].axvline(x=v, ymin=0, ymax=1, c=c, linewidth=4, linestyle='dashed')
+                axs[i].axvline(x=v, ymin=0, ymax=1, c=c, linewidth=vlinewidth, linestyle='dashed')
 
         if hline is not None:
             if isinstance(hline, dict):
@@ -403,7 +408,7 @@ def expr_along_obs_val(adata: AnnData,
             else:
                 hline = [hline] if isinstance(hline, int) or isinstance(hline, float) else list(hline)
                 linecolors = ['k'] * len(hline)
-            
+
             for c, h in zip(linecolors, hline):
                 axs[i].axhline(y=h, xmin=0, xmax=1, c=c, linewidth=4, linestyle='dashed')
 
@@ -416,6 +421,8 @@ def expr_along_obs_val(adata: AnnData,
             axs[i].set_xlabel(xlabel, fontsize=xlabel_fontsize)
             axs[i].set_ylabel(ylabel, fontsize=ylabel_fontsize)
             axs[i].tick_params(axis='both', which='major', labelsize=tick_fontsize)
+            axs[i].set_xlim(0, 1)
+            #axs[i].xaxis.set_major_locator(ticker.FixedLocator([0.1, 0.9]))
 
             if custom_titles is None:
                 axs[i].set_title(key, fontsize=title_fontsize)
@@ -424,8 +431,8 @@ def expr_along_obs_val(adata: AnnData,
                 axs[i].set_title(str(custom_titles[i]), fontsize=title_fontsize)
 
             if plot_legend:
-                axs[i].legend(fontsize=legend_fontsize, 
-                #bbox_to_anchor=(legend_x, 1), 
+                axs[i].legend(fontsize=legend_fontsize,
+                #bbox_to_anchor=(legend_x, 1),
                 loc='best'
                 )
             else:
@@ -443,7 +450,7 @@ def expr_along_obs_val(adata: AnnData,
             data_collection[key] = group_collection
 
 
-    
+
     if return_data:
         # close plot
         plt.close()
@@ -453,7 +460,7 @@ def expr_along_obs_val(adata: AnnData,
         data_collection.index.names = ['key', groupby, None]
         return data_collection
 
-    else: 
+    else:
         if n_plots > 1:
 
             # check if there are empty plots remaining
@@ -462,17 +469,17 @@ def expr_along_obs_val(adata: AnnData,
                 # remove empty plots
                 axs[i].set_axis_off()
         if show:
-            fig.tight_layout()
-            save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save)
+            #fig.tight_layout()
+            save_and_show_figure(savepath=savepath, fig=fig, save_only=save_only, dpi_save=dpi_save, tight=True)
         else:
             return fig, axs
 
 
 def linear_expression_grouped(adata, splitby=None, keys=None, x_category=None, groupby=None, max_cols=4, n_bins=20, use_raw=False,
 x_limit_labels=None, savepath=None, save_only=False, show=True, dpi_save=300, **kwargs):
-    
+
     n_plots, n_rows, max_cols = get_nrows_maxcols(keys, max_cols)
-    
+
     fig, axs = plt.subplots(n_rows,max_cols, figsize=(8*max_cols, 6*n_rows))
 
     if n_plots > 1:
