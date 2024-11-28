@@ -1,69 +1,71 @@
+from math import sqrt
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from warnings import warn
+
 import numpy as np
 import pandas as pd
-from math import sqrt
 from scipy.spatial import distance as dist
+
 #from sympy import lowergamma
-from ..exceptions import ModuleNotFoundOnWindows, ImportErrorLoess
-from typing import Optional, Tuple, Union, List, Dict, Any, Literal
+from ..exceptions import ImportErrorLoess, ModuleNotFoundOnWindows
 from .lowess import lowess
-from warnings import warn
 
 
 def minDistance(A, B, E) :
-	# Python3 implementation of the approach from https://www.geeksforgeeks.org/minimum-distance-from-a-point-to-the-line-segment-using-vectors/   
-	# Function to return the minimum distance  
-	# between a line segment AB and a point E 
+	# Python3 implementation of the approach from https://www.geeksforgeeks.org/minimum-distance-from-a-point-to-the-line-segment-using-vectors/
+	# Function to return the minimum distance
+	# between a line segment AB and a point E
 
-    # vector AB  
-    AB = [None, None];  
-    AB[0] = B[0] - A[0];  
-    AB[1] = B[1] - A[1];  
-  
-    # vector BP  
-    BE = [None, None]; 
-    BE[0] = E[0] - B[0];  
-    BE[1] = E[1] - B[1];  
-  
-    # vector AP  
-    AE = [None, None]; 
-    AE[0] = E[0] - A[0]; 
-    AE[1] = E[1] - A[1];  
-  
-    # Variables to store dot product  
-  
-    # Calculating the dot product  
-    AB_BE = AB[0] * BE[0] + AB[1] * BE[1];  
-    AB_AE = AB[0] * AE[0] + AB[1] * AE[1];  
-  
-    # Minimum distance from  
-    # point E to the line segment  
-    reqAns = 0;  
-  
-    # Case 1  
-    if (AB_BE > 0) : 
-  
-        # Finding the magnitude  
-        y = E[1] - B[1];  
-        x = E[0] - B[0];  
-        reqAns = sqrt(x * x + y * y);  
-  
-    # Case 2  
-    elif (AB_AE < 0) : 
-        y = E[1] - A[1];  
-        x = E[0] - A[0];  
-        reqAns = sqrt(x * x + y * y);  
-  
-    # Case 3  
-    else: 
-  
-        # Finding the perpendicular distance  
-        x1 = AB[0];  
-        y1 = AB[1];  
-        x2 = AE[0];  
-        y2 = AE[1];  
-        mod = sqrt(x1 * x1 + y1 * y1);  
-        reqAns = abs(x1 * y2 - y1 * x2) / mod;  
-      
+    # vector AB
+    AB = [None, None];
+    AB[0] = B[0] - A[0];
+    AB[1] = B[1] - A[1];
+
+    # vector BP
+    BE = [None, None];
+    BE[0] = E[0] - B[0];
+    BE[1] = E[1] - B[1];
+
+    # vector AP
+    AE = [None, None];
+    AE[0] = E[0] - A[0];
+    AE[1] = E[1] - A[1];
+
+    # Variables to store dot product
+
+    # Calculating the dot product
+    AB_BE = AB[0] * BE[0] + AB[1] * BE[1];
+    AB_AE = AB[0] * AE[0] + AB[1] * AE[1];
+
+    # Minimum distance from
+    # point E to the line segment
+    reqAns = 0;
+
+    # Case 1
+    if (AB_BE > 0) :
+
+        # Finding the magnitude
+        y = E[1] - B[1];
+        x = E[0] - B[0];
+        reqAns = sqrt(x * x + y * y);
+
+    # Case 2
+    elif (AB_AE < 0) :
+        y = E[1] - A[1];
+        x = E[0] - A[0];
+        reqAns = sqrt(x * x + y * y);
+
+    # Case 3
+    else:
+
+        # Finding the perpendicular distance
+        x1 = AB[0];
+        y1 = AB[1];
+        x2 = AE[0];
+        y2 = AE[1];
+        mod = sqrt(x1 * x1 + y1 * y1);
+        reqAns = abs(x1 * y2 - y1 * x2) / mod;
+
     return reqAns;
 
 def rotation_angle(upper, lower):
@@ -77,7 +79,7 @@ def rotation_angle(upper, lower):
         |µ \
         |__/\
         |    x lower
-    
+
     '''
 
     dx = lower[0] - upper[0]
@@ -160,10 +162,10 @@ def order_points_clockwise(pts, mode='yx'):
     return np.array([tl, tr, br, bl], dtype="float32")
 
 
-def smooth_fit(xs: np.ndarray, ys: np.ndarray, 
+def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     #x_to_fit_on: Optional[List] = None,
-    #dist_thrs: Optional[float] = None, 
-    min: Optional[float] = None, 
+    #dist_thrs: Optional[float] = None,
+    min: Optional[float] = None,
     max: Optional[float] = None,
     #stepsize: Optional[float] = None,
     nsteps: Optional[float] = None,
@@ -198,7 +200,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
         "lowess" Bootstrapping is used to estimate a confidence interval.
     K: int
         Only needed for `method="lowess"`. Determines number of bootstrapping cycles.
-    
+
     Returns:
     -------
     A tuple with included x and y-values (xs',ys'), as well
@@ -208,7 +210,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
 
     From: https://github.com/almaan/ST-mLiver
     """
-    
+
     # check method
     if method == "loess":
         loess = True
@@ -220,7 +222,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     if loess:
         try:
             from skmisc.loess import loess
-            
+
         except ModuleNotFoundError as e:
             raise ModuleNotFoundOnWindows(e)
 
@@ -233,11 +235,11 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     xs = xs[srt]
     ys = ys[srt]
 
-    # determine min and max x values and select x inside this range    
+    # determine min and max x values and select x inside this range
     if min is None:
         min = xs.min()
     if max is None:
-        max = xs.max()    
+        max = xs.max()
 
     keep = (xs >= min) & (xs <= max)
     xs = xs[keep]
@@ -247,7 +249,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     if loess:
         ls = loess(xs, ys)
     else:
-        ls = lowess(xs, ys)      
+        ls = lowess(xs, ys)
 
     # fit loess class to data
     ls.fit()
@@ -265,10 +267,10 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
         pred =  ls.predict(xs_pred, stderror=stderr)
     else:
         pred =  ls.predict(xs_pred, stderror=stderr, K=K)
-        
+
     # get predicted values
     ys_hat = pred.values
-    
+
     if stderr:
         # get standard error
         stderr = pred.stderr
@@ -278,7 +280,7 @@ def smooth_fit(xs: np.ndarray, ys: np.ndarray,
     else:
         lower = np.nan
         upper = np.nan
-        
+
     df = pd.DataFrame({
         'x': xs_pred,
         #'y': ys,
@@ -346,7 +348,7 @@ def cohens_d(a, b, paired=False, correct_small_sample_size=True):
         assert len(a) == len(b), "For paired testing the size of both samples needs to be equal."
         diff = np.array(a) - np.array(b)
         d = np.mean(diff) / np.std(diff)
-        
+
     return d
 
 def jaccard_dist(a, b):
