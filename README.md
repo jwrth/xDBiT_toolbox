@@ -21,6 +21,8 @@ If you have questions or suggestions, please feel free to open an issue or conta
     - Version for reproducing results of final publication. Includes all changes and new notebooks that have been added during the review process.
     - ReadsToCounts:
         - Optional analysis of interaction reads added (this feature has barely been tested).
+- `2.2`:
+    - Fixed circular import error and other bugs.
 
 The `main` branch corresponds to the latest version (currently `v2.1`).
         
